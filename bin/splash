@@ -23,18 +23,19 @@ module CLISplash
       @config_file = "./splash.yml"
     end
 
-    option :config, :type => :text
+    option :config
     desc "analyse", "analyze logs in config"
     def analyse
-      self.config_file
+      @config_file = options[:config] if options[:config]
       result = LogScanner::new(@config_file)
       result.analyse
       p result.output
     end
 
-    option :config, :type => :text
+    option :config
     desc "monitor", "monitor logs in config"
     def monitor
+      @config_file = options[:config] if options[:config]
       result = LogScanner::new(@config_file)
       result.analyse
       result.notify

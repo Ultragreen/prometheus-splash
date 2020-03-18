@@ -1,0 +1,5 @@
+:logs:
+  - :log: /tmp/test
+    :pattern: ERROR
+  - :log: /var/log/message
+    :pattern: error

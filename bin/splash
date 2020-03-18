@@ -18,7 +18,7 @@ module CLISplash
   end
   class Logs < Thor
     attr_accessor :config_file
-    def initialize
+    def initialize(*args)
       super
       @config_file = "./splash.yml"
     end

@@ -5,8 +5,14 @@ require 'prometheus/client/push'
 require 'thor'
 require 'yaml'
 
+require 'splash/command'
+require 'splash/logs'
+
 module CLISplash
+
+
   class Commands < Thor
+    
     option :ack, :type => :boolean
     desc "wrap NAME", "wrapping for command or ack result"
     def wrap(name)
@@ -14,10 +20,12 @@ module CLISplash
       command.ack if options[:ack]
       command.call_and_notify
     end
-
   end
+
   class Logs < Thor
+
     attr_accessor :config_file
+
     def initialize(*args)
       super
       @config_file = "./splash.yml"
@@ -55,71 +63,8 @@ end
 
 
 
-class LogScanner
-
-  def readconf(file = './splasj.yml')
-    @logs_target = YAML.load_file(file)[:logs]
-  end
-
-  def initialize(config_file)
-    readconf(config_file)
-  end
-
-  def analyse
-    @logs_target.each do |record|
-      record[:count]=0 if record[:count].nil?
-      record[:status] = :clean if record[:status].nil?
-      if File.exist?(record[:log]) then
-        record[:count] = File.readlines(record[:log]).grep(/#{record[:pattern]}/).size
-        record[:status] = :matched if record[:count] > 0
-      else
-        record[:status] = :mssing
-      end
-    end
-  end
-
-  def output
-    return @logs_target
-  end
-
-  def notify
-    registry = Prometheus::Client.registry
-    metric = Prometheus::Client::Gauge.new(:logerror, docstring: 'SPLASH metric log error', labels: [:log ])
-    registry.register(metric)
-    @logs_target.each do |item|
-      metric.set(item[:count], labels: { log: item[:log] })
-    end
-    Prometheus::Client::Push.new('Splash').add(registry)
-  end
-
-end
-
-class CommandWrapper
-  def initialize(name)
-    @name = name
-  end
-
-  def ack
-    puts "Sending ack for command : '#{@name}'"
-    notify(@name,0)
-    exit 0
-  end
-
-  def notify(value)
-    registry = Prometheus::Client.registry
-    metric = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
-    registry.register(metric)
-    metric.set(value)
-    Prometheus::Client::Push.new(@name).add(registry)
-  end
 
 
-  def call_and_notify
-    puts "Executing command : '#{@name}' and notify Prometheus PushGateway"
-    system("#{@name} > /dev/null")
-    exit_code = $?.exitstatus
-    notify(exit_code)
-  end
-end
+
 
 Splash.start(ARGV)

@@ -1,0 +1,20 @@
+[Unit]
+Description=Splash Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+
+User=splash
+Group=splash
+UMask=007
+
+ExecStart=/splash daemon start
+
+Restart=on-failure
+
+# Configures the time to wait before service is stopped forcefully.
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target

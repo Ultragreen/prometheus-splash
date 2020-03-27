@@ -43,7 +43,7 @@ module Splash
     #      end
     #     end
     # @return [Fixnum] pid the pid of the forked processus
-    def daemonize(_options)
+    def daemonize(options)
       return yield if options[:debug]
       trap("SIGINT"){ exit! 0 }
       trap("SIGTERM"){ exit! 0 }

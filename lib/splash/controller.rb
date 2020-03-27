@@ -1,18 +1,30 @@
-def start(options = {})
-      runner = options[:runner]
-      unless File::exist? "/tmp/#{runner}.pid" then
-        return daemonize :description => "LightESB : #{runner} Runner", :pid_file => "/tmp/#{runner}.pid" do
-          runner = "LightESB::Runners::#{runner}".constantize.new
-          runner.launch
+
+module Splash
+  module LogsMonitor
+    module DaemonController
+      include Splash::Helpers
+
+      def start(options = {})
+        unless File::exist? "/tmp/splash.pid" then
+          return daemonize :description => "Splash : daemon", :pid_file => "/tmp/splash.pid" do
+            while true
+              sleep 5
+              @config_file = "./splash.yml"
+              result = LogScanner::new(@config_file)
+              result.analyse
+              result.notify
+            end
+          end
+        end
+      end
+
+      def stop(options = {})
+        if File::exist? "/tmp/splash.pid" then
+          Process.kill("TERM", `cat /tmp/splash.pid`.to_i)
+          FileUtils::rm "/tmp/splash.pid"
+          return true
         end
       end
     end
-
-    def stop(options = {})
-      runner = options[:runner]
-      if File::exist? "/tmp/#{runner}.pid" then
-        Process.kill("TERM", `cat /tmp/#{runner}.pid`.to_i)
-        FileUtils::rm "/tmp/#{runner}.pid"
-        return true
-      end
-    end
+  end
+end

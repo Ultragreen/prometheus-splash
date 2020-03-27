@@ -5,20 +5,34 @@ require 'prometheus/client/push'
 require 'thor'
 require 'yaml'
 
+require 'splash/helpers'
 require 'splash/command'
 require 'splash/logs'
+require 'splash/controller'
 
 module CLISplash
 
 
   class Commands < Thor
-    
+
     option :ack, :type => :boolean
     desc "wrap NAME", "wrapping for command or ack result"
     def wrap(name)
       command =  CommandWrapper::new(name)
       command.ack if options[:ack]
       command.call_and_notify
+    end
+  end
+
+
+  class DaemonController < Thor
+
+    option :foreground, :type => :boolean
+    desc "start", "Starting Logs Monitor Daemon"
+    def start
+      p Splash::LogsMonitor::DaemonController
+      p Splash::LogsMonitor::DaemonController.methods
+        Splash::LogsMonitor::DaemonController::start
     end
   end
 
@@ -52,12 +66,14 @@ module CLISplash
   end
 end
 
-class Splash < Thor
+class CLI < Thor
   include CLISplash
   desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision"
   subcommand "commands", Commands
   desc "logs SUBCOMMAND ...ARGS", "Managing Files/Logs supervision"
   subcommand "logs", Logs
+  desc "daemon SUBCOMMAND ...ARGS", "Logs monitor daemon contoller"
+  subcommand "daemon", DaemonController
 end
 
 
@@ -67,4 +83,4 @@ end
 
 
 
-Splash.start(ARGV)
+CLI.start(ARGV)

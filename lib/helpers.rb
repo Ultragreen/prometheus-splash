@@ -3,7 +3,6 @@ require 'fileutils'
 # coding: utf-8
 module Splash
   module Helpers
-    module Application
 
       # method for daemonize blocks
       # @param [Hash] _options the list of options, keys are symbols
@@ -44,7 +43,7 @@ module Splash
       #      end
       #     end
       # @return [Fixnum] pid the pid of the forked processus
-      def daemonize(_options)
+      def daemonize(options)
         return yield if options[:debug]
         trap("SIGINT"){ exit! 0 }
         trap("SIGTERM"){ exit! 0 }
@@ -143,4 +142,4 @@ module Splash
 
     end
   end
-end
+  

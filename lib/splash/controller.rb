@@ -1,7 +1,7 @@
 
 module Splash
   module LogsMonitor
-    module DaemonController
+    module Controller
       include Splash::Helpers
 
       def start(options = {})
@@ -25,6 +25,12 @@ module Splash
           return true
         end
       end
+
     end
   end
 end
+
+include Splash::LogsMonitor::Controller
+
+
+Splash::LogsMonitor::Controller.start

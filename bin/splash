@@ -26,14 +26,14 @@ module CLISplash
 
 
   class DaemonController < Thor
-
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      include Splash::LogsMonitor::Controller
-      Splash::LogsMonitor::Controller::start
+      Splash::LogsMonitor::DaemonController.startdaemon
     end
   end
+
+
 
   class Logs < Thor
 

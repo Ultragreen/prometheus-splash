@@ -4,7 +4,7 @@ module Splash
     module Controller
       include Splash::Helpers
 
-      def start(options = {})
+      def startdaemon(options = {})
         unless File::exist? "/tmp/splash.pid" then
           return daemonize :description => "Splash : daemon", :pid_file => "/tmp/splash.pid" do
             while true
@@ -18,7 +18,7 @@ module Splash
         end
       end
 
-      def stop(options = {})
+      def stopdaemon(options = {})
         if File::exist? "/tmp/splash.pid" then
           Process.kill("TERM", `cat /tmp/splash.pid`.to_i)
           FileUtils::rm "/tmp/splash.pid"

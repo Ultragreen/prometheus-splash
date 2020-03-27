@@ -30,6 +30,7 @@ module CLISplash
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
+      include Splash::LogsMonitor::Controller
       Splash::LogsMonitor::Controller::start
     end
   end

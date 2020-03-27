@@ -1,7 +1,7 @@
 
 module Splash
   module LogsMonitor
-    module Controller
+    module DaemonController
       include Splash::Helpers
 
       def startdaemon(options = {})

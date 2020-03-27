@@ -11,6 +11,7 @@ require 'splash/logs'
 require 'splash/controller'
 
 module CLISplash
+  include Splash::LogsMonitor::DaemonController
 
 
   class Commands < Thor
@@ -25,11 +26,11 @@ module CLISplash
   end
 
 
-  class DaemonController < Thor
+  class CLIController < Thor
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      Splash::LogsMonitor::DaemonController.startdaemon
+      Splash::LogsMonitor::DaemonController::startdaemon
     end
   end
 
@@ -72,7 +73,7 @@ class CLI < Thor
   desc "logs SUBCOMMAND ...ARGS", "Managing Files/Logs supervision"
   subcommand "logs", Logs
   desc "daemon SUBCOMMAND ...ARGS", "Logs monitor daemon contoller"
-  subcommand "daemon", DaemonController
+  subcommand "daemon", CLIController
 end
 
 

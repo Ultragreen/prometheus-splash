@@ -29,8 +29,3 @@ module Splash
     end
   end
 end
-
-include Splash::LogsMonitor::Controller
-
-
-Splash::LogsMonitor::Controller.start

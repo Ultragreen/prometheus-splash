@@ -9,7 +9,7 @@ module Splash
           return daemonize :description => "Splash : daemon", :pid_file => "/tmp/splash.pid" do
             while true
               sleep 5
-              @config_file = "./splash.yml"
+              @config_file = "config/splash.yml"
               result = LogScanner::new(@config_file)
               result.analyse
               result.notify

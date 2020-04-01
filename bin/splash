@@ -9,9 +9,11 @@ require 'splash/helpers'
 require 'splash/command'
 require 'splash/logs'
 require 'splash/controller'
+require 'splash/config'
+
 
 module CLISplash
-  include Splash::LogsMonitor::DaemonController
+
 
 
   class Commands < Thor
@@ -27,13 +29,28 @@ module CLISplash
 
 
   class CLIController < Thor
+    include Splash::LogsMonitor::DaemonController
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      Splash::LogsMonitor::DaemonController::startdaemon
+      startdaemon
     end
   end
 
+  class Config < Thor
+    include Splash::Config
+    desc "setup", "Setup installation fo Splash"
+    def setup
+
+    end
+
+    desc "sanitycheck", "Verify installation fo Splash"
+    def sanitycheck
+      checkconfig
+    end
+
+
+  end
 
 
   class Logs < Thor
@@ -74,6 +91,8 @@ class CLI < Thor
   subcommand "logs", Logs
   desc "daemon SUBCOMMAND ...ARGS", "Logs monitor daemon contoller"
   subcommand "daemon", CLIController
+  desc "config SUBCOMMAND ...ARGS", "config tools for Splash"
+  subcommand "config", Config
 end
 
 

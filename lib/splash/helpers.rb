@@ -1,5 +1,7 @@
 # coding: utf-8
 require 'fileutils'
+require 'etc'
+
 # coding: utf-8
 module Splash
   module Helpers
@@ -113,7 +115,20 @@ module Splash
     # @param [Hash] options
     # @option options [String] :name path du fichier
     def verify_file(options ={})
-      return File.file?(options[:name])
+      res = Array::new
+      return  [:inexistant] unless File.file?(options[:name])
+      stat = File.stat(options[:name])
+      if options[:mode] then
+        mode = "%o" % stat.mode
+        res << :mode if mode[-3..-1] != options[:mode]
+      end
+      if options[:owner] then
+        res << :owner if Etc.getpwuid(stat.uid).name != options[:owner]
+      end
+      if options[:group] then
+        res << :group if Etc.getgrgid(stat.gid).name != options[:group]
+      end
+      return res
     end
 
     # verifier de l'ecoute d'un service sur un host et port donné en TCP

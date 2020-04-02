@@ -1,5 +1,6 @@
 module Splash
   module Config
+    include Splash::Helpers
     CONFIG_FILE = "/etc/splash.yml"
     def setupsplash
       conf_in_path = search_file_in_gem "splash", "config/splash.yml"

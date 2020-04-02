@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway}
   spec.summary       = %q{Supervision with Prometheus of Logs and Asynchronous tasks for Services or Hosts }
   spec.homepage      = "http://www.ultragreen.net"
-  spec.license       = "BSD"
+  spec.license       = "BSD-2-Clause"
   spec.require_paths << 'bin'
   spec.bindir = 'bin'
   spec.executables = Dir["bin/*"].map!{|item| item.gsub("bin/","")}
@@ -19,15 +19,15 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
-  spec.add_runtime_dependency 'thor'
-  spec.add_runtime_dependency 'prometheus-client'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'yard'
-  spec.add_development_dependency 'rdoc'
-  spec.add_development_dependency 'roodi'
-  spec.add_development_dependency 'code_statistics'
-  spec.add_development_dependency 'yard-rspec'
+  spec.add_runtime_dependency 'thor','~> 1.0.1'
+  spec.add_runtime_dependency 'prometheus-client','~> 2.0.0'
+  spec.add_development_dependency 'rake', '~> 13.0.1'
+  spec.add_development_dependency 'rspec', '~> 3.9.0'
+  spec.add_development_dependency 'yard', '~> 0.9.24'
+  spec.add_development_dependency 'rdoc', '~> 6.2.1'
+  spec.add_development_dependency 'roodi', '~> 5.0.0'
+  spec.add_development_dependency 'code_statistics', '~> 0.2.13'
+  spec.add_development_dependency 'yard-rspec', '~> 0.1'
 
 
 end

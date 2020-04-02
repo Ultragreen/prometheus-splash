@@ -5,6 +5,7 @@ require 'prometheus/client/push'
 require 'thor'
 require 'yaml'
 
+require 'splash/constants'
 require 'splash/helpers'
 require 'splash/command'
 require 'splash/logs'
@@ -57,10 +58,11 @@ module CLISplash
   class Logs < Thor
 
     attr_accessor :config_file
+    include Splash::Constants
 
     def initialize(*args)
       super
-      @config_file = "./splash.yml"
+      @config_file = CONFIG_FILE
     end
 
     option :config

@@ -2,7 +2,7 @@
 module Splash
   module LogsMonitor
     module DaemonController
-      CONFIG_FILE= "/etc/splash.yml"
+      include Splash::Constants
       include Splash::Helpers
 
       def startdaemon(options = {})

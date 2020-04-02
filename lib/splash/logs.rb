@@ -1,5 +1,6 @@
 class LogScanner
-  CONFIG_FILE = '/etc/splash.yml'
+  include Splash::Constants
+
   def readconf(file = CONFIG_FILE)
     @logs_target = YAML.load_file(file)[:logs]
   end

@@ -5,8 +5,6 @@ module Splash
 
     def setupsplash
       conf_in_path = search_file_in_gem "splash", "config/splash.yml"
-      p Splash::Helpers.methods
-      p Splash::Config.methods  
       install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: "root", group: "wheel"
     end
 

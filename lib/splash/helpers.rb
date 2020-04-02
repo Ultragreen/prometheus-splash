@@ -66,12 +66,14 @@ module Splash
 
     # @!group facilités sur le système de fichier
 
-    # facilité de copy de fichier
+    # facilité d'installation de fichier
     # @param [Hash] options
     # @option options [String] :source le chemin source du fichier
     # @option options [String] :target le chemin cible du fichier
-    def copy_file(options = {})
+    def install_file(options = {})
       FileUtils::copy options[:source], options[:target] unless File::exist? options[:target]
+      FileUtils.chmod options[:mode].to_i(8), options[:target] if options[:mode]
+      FileUtils.chown options[:user], options[:group], options[:target] if options[:owner] and options[:group]
     end
 
     # facilité de création de répertoire

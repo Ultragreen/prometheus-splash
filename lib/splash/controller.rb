@@ -2,6 +2,7 @@
 module Splash
   module LogsMonitor
     module DaemonController
+      CONFIG_FILE= "/etc/splash.yml"
       include Splash::Helpers
 
       def startdaemon(options = {})
@@ -9,7 +10,7 @@ module Splash
           return daemonize :description => "Splash : daemon", :pid_file => "/tmp/splash.pid" do
             while true
               sleep 5
-              @config_file = "config/splash.yml"
+              @config_file = CONFIG_FILE
               result = LogScanner::new(@config_file)
               result.analyse
               result.notify

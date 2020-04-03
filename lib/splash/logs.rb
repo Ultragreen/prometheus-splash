@@ -1,13 +1,11 @@
 module Splash
   class LogScanner
     include Splash::Constants
+    include Splash::Config
 
-    def readconf(file = CONFIG_FILE)
-      @logs_target = YAML.load_file(file)[:logs]
-    end
+    def initialize
+      @logs_target = get_config.logs
 
-    def initialize(config_file)
-      readconf(config_file)
       @registry = Prometheus::Client.registry
       @metric = Prometheus::Client::Gauge.new(:logerror, docstring: 'SPLASH metric log error', labels: [:log ])
       @registry.register(@metric)

@@ -6,17 +6,23 @@ module Splash
 
 
     class Configuration < Hash
-      def initilize(config_file=CONFIG_FILE)
+      include Splash::Constants
+      def initialize(config_file=CONFIG_FILE)
         config_from_file = readconf config_file
         self[:version] = VERSION
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_user] = (config_from_file[:daemon][:user])? config_from_file[:daemon][:user] : DAEMON_USER
         self[:daemon_group] = (config_from_file[:daemon][:group])? config_from_file[:daemon][:group] : DAEMON_GROUP
-        self[:pid_path] = (config_from_file[:daemon][:path][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
-        self[:trace_path] = (config_from_file[:daemon][:path][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
+        self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
+        self[:trace_path] = (config_from_file[:daemon][:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
         self[:pid_file] = (config_from_file[:daemon][:files][:pid_file])? config_from_file[:daemon][:files][:pid_file] : PID_FILE
         self[:stdout_trace] = (config_from_file[:daemon][:files][:stdout_trace])? config_from_file[:daemon][:files][:stdout_trace] : STDOUT_TRACE
-        self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] :  : STDERR_TRACE
+        self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] : STDERR_TRACE
+        self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
+      end
+
+      def logs
+        return self[:logs]
       end
 
       def version
@@ -47,11 +53,16 @@ module Splash
         return "#{self[:trace_path]}/#{self[:stderr_trace]}"
       end
 
+      private
+      def readconf(file = CONFIG_FILE)
+        return YAML.load_file(file)[:splash]
+      end
+
 
     end
 
 
-    def get_config(config_file)
+    def get_config(config_file=CONFIG_FILE)
       return Configuration::new config_file
     end
 
@@ -59,7 +70,7 @@ module Splash
     def setupsplash
       conf_in_path = search_file_in_gem "splash", "config/splash.yml"
 
-      print "* Configuration file : #{CONFIG_FILE} : "
+      print "* Installing Configuration file : #{CONFIG_FILE} : "
       if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: "root", group: "wheel" then
         puts "[OK]"
       else
@@ -67,15 +78,15 @@ module Splash
       end
       config = get_config
 
-      print "* Checking pid file path : #{config.full_pid_path}"
-      if make_folder path: config.full_pid_path, mode: "644", owner: "root", group: "wheel" then
+      print "* Checking pid file path : #{config[:pid_path]}"
+      if make_folder path: config[:pid_path], mode: "644", owner: "root", group: "wheel" then
         puts "[OK]"
       else
         puts "[KO]"
       end
 
       print "* Checking trace file path : #{config[:trace_path]}"
-      if make_folder path: config[:trace_path], mode: "644", owner: config.daemon_user, group: config.daemon_group then
+      if make_folder path: config[:trace_path], mode: "777", owner: config.daemon_user, group: config.daemon_group then
         puts "[OK]"
       else
         puts "[KO]"
@@ -100,9 +111,6 @@ module Splash
     end
 
     private
-    def readconf(file = CONFIG_FILE)
-      return YAML.load_file(file)[:logs]
-    end
 
     def search_file_in_gem(_gem,_file)
       if Gem::Specification.respond_to?(:find_by_name)

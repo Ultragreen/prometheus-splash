@@ -8,11 +8,13 @@ require 'yaml'
 
 require 'splash/constants'
 require 'splash/helpers'
+require 'splash/config'
+
 require 'splash/command'
 require 'splash/logs'
 require 'splash/controller'
-require 'splash/config'
 
+#inhibit warning : due to prometheus-client call to URI.encode warning
 $-w = nil
 
 include Splash::Helpers
@@ -35,11 +37,19 @@ module CLISplash
 
   class CLIController < Thor
     include Splash::LogsMonitor::DaemonController
+
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
       startdaemon
     end
+
+    desc "stop", "Stopping Logs Monitor Daemon"
+    def stop
+      stopdaemon
+    end
+
+
   end
 
   class Config < Thor
@@ -54,37 +64,32 @@ module CLISplash
       checkconfig
     end
 
+    desc "version", "display current Splash version"
+    def version
+        config = get_config
+        puts "Splash version : #{config.version}, Author : #{config.author}"
+    end
+
 
   end
 
 
   class Logs < Thor
 
-    attr_accessor :config_file
-    include Splash::Constants
-
-    def initialize(*args)
-      super
-      @config_file = CONFIG_FILE
-    end
-
-    option :config
     desc "analyse", "analyze logs in config"
     def analyse
-      @config_file = options[:config] if options[:config]
-      result = Splash::LogScanner::new(@config_file)
+      result = Splash::LogScanner::new
       result.analyse
       p result.output
     end
 
-    option :config
     desc "monitor", "monitor logs in config"
     def monitor
-      @config_file = options[:config] if options[:config]
-      result = Splash::LogScanner::new(@config_file)
+      result = Splash::LogScanner::new
       result.analyse
       result.notify
     end
+
 
   end
 end

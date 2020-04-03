@@ -46,18 +46,23 @@ module Splash
     #     end
     # @return [Fixnum] pid the pid of the forked processus
     def daemonize(options)
+      #Process.euid = 0
+      #Process.egid = 0
       return yield if options[:debug]
       trap("SIGINT"){ exit! 0 }
       trap("SIGTERM"){ exit! 0 }
       trap("SIGHUP"){ exit! 0 }
 
       fork do
-        Process.daemon
-        Process.setpuid(Etc.getpwnam(options[:daemon_user]))
-        Process.setpgid(Etc.getgrnam(options[:daemon_group]))
+        #Process.daemon
+        File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]
+        uid = Etc.getpwnam(options[:daemon_user]).uid
+        gid = Etc.getgrnam(options[:daemon_group]).gid
+        Process::UID.change_privilege(uid)
+      #  Process::GID.change_privilege(gid)
         $stdout.reopen(options[:stdout_trace], "w")
         $stderr.reopen(options[:stderr_trace], "w")
-        File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]
+
         #$0 = options[:description]
         Process.setproctitle options[:description]
 
@@ -74,14 +79,14 @@ module Splash
     # @option options [String] :source le chemin source du fichier
     # @option options [String] :target le chemin cible du fichier
     def install_file(options = {})
-      begin
-        FileUtils::copy options[:source], options[:target] unless File::exist? options[:target]
+      #begin
+        FileUtils::copy options[:source], options[:target] #unless File::exist? options[:target]
         FileUtils.chmod options[:mode].to_i(8), options[:target] if options[:mode]
-        FileUtils.chown options[:user], options[:group], options[:target] if options[:owner] and options[:group]
+        FileUtils.chown options[:owner], options[:group], options[:target] if options[:owner] and options[:group]
         return true
-      rescue StandardError
-         return false
-      end
+      #rescue StandardError
+        # return false
+      #end
     end
 
     # facilité de création de répertoire
@@ -90,6 +95,8 @@ module Splash
     def make_folder(options = {})
       begin
         FileUtils::mkdir_p options[:path] unless File::exist? options[:path]
+        FileUtils.chmod options[:mode].to_i(8), options[:path] if options[:mode]
+        FileUtils.chown options[:owner], options[:group], options[:path] if options[:owner] and options[:group]
         return true
       rescue StandardError
         return false

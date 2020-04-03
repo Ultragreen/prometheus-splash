@@ -5,7 +5,7 @@ module Splash
     DAEMON_USER = "root"
     DAEMON_GROUP = "wheel"
     PID_PATH="/var/run"
-    TRACE_PATH-"/var/run/splash"
+    TRACE_PATH="/var/run/splash"
     PID_FILE="splash.pid"
     STDOUT_TRACE="stdout.txt"
     STDERR_TRACE="stderr.txt"

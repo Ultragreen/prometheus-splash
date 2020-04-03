@@ -1,17 +1,17 @@
-:logs:
-  - :log: /tmp/test
-    :pattern: ERROR
-  - :log: /var/log/message
-    :pattern: error
-
-:daemon:
-  :user: root
-  :group: wheel
-  :process_name: "Splash : Prometheus logs monitoring."
-  :paths:
-    :pid_path: /tmp
-    :trace_path: /tmp/splash
-  :files:
-    :stdout_trace: stdout.txt
-    :stderr_trace: stderr.txt
-    :pid_file: splash.pid
+:splash:
+  :logs:
+    - :log: /tmp/test
+      :pattern: ERROR
+    - :log: /var/log/message
+      :pattern: error
+  :daemon:
+    :user: daemon
+    :group: daemon
+    :process_name: "Splash : Prometheus logs monitoring."
+    :paths:
+      :pid_path: /tmp
+      :trace_path: /tmp/splash
+    :files:
+      :stdout_trace: stdout.txt
+      :stderr_trace: stderr.txt
+      :pid_file: splash.pid

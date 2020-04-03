@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'splash/version'
+require 'splash/constants'
 
 Gem::Specification.new do |spec|
   spec.name          = "splash"
-  spec.version       = Splash::VERSION
+  spec.version       = Splash::Constants::VERSION
   spec.authors       = ["Romain GEORGES"]
   spec.email         = ["romain@ultragreen.net"]
   spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway}

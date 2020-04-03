@@ -1,7 +1,8 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -W:no-deprecated
 
 require 'prometheus/client'
 require 'prometheus/client/push'
+
 require 'thor'
 require 'yaml'
 
@@ -11,6 +12,8 @@ require 'splash/command'
 require 'splash/logs'
 require 'splash/controller'
 require 'splash/config'
+
+$-w = nil
 
 include Splash::Helpers
 
@@ -23,7 +26,7 @@ module CLISplash
     option :ack, :type => :boolean
     desc "wrap NAME", "wrapping for command or ack result"
     def wrap(name)
-      command =  CommandWrapper::new(name)
+      command =  Splash::CommandWrapper::new(name)
       command.ack if options[:ack]
       command.call_and_notify
     end
@@ -69,7 +72,7 @@ module CLISplash
     desc "analyse", "analyze logs in config"
     def analyse
       @config_file = options[:config] if options[:config]
-      result = LogScanner::new(@config_file)
+      result = Splash::LogScanner::new(@config_file)
       result.analyse
       p result.output
     end
@@ -78,7 +81,7 @@ module CLISplash
     desc "monitor", "monitor logs in config"
     def monitor
       @config_file = options[:config] if options[:config]
-      result = LogScanner::new(@config_file)
+      result = Splash::LogScanner::new(@config_file)
       result.analyse
       result.notify
     end

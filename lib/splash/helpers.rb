@@ -53,10 +53,13 @@ module Splash
 
       fork do
         Process.daemon
-        $stdout.reopen("/tmp/out.txt", "w")
-        $stderr.reopen("/tmp/err.txt", "w")
+        Process.setpuid(Etc.getpwnam(options[:daemon_user]))
+        Process.setpgid(Etc.getgrnam(options[:daemon_group]))
+        $stdout.reopen(options[:stdout_trace], "w")
+        $stderr.reopen(options[:stderr_trace], "w")
         File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]
-        $0 = options[:description]
+        #$0 = options[:description]
+        Process.setproctitle options[:description]
 
         yield
 
@@ -71,16 +74,26 @@ module Splash
     # @option options [String] :source le chemin source du fichier
     # @option options [String] :target le chemin cible du fichier
     def install_file(options = {})
-      FileUtils::copy options[:source], options[:target] unless File::exist? options[:target]
-      FileUtils.chmod options[:mode].to_i(8), options[:target] if options[:mode]
-      FileUtils.chown options[:user], options[:group], options[:target] if options[:owner] and options[:group]
+      begin
+        FileUtils::copy options[:source], options[:target] unless File::exist? options[:target]
+        FileUtils.chmod options[:mode].to_i(8), options[:target] if options[:mode]
+        FileUtils.chown options[:user], options[:group], options[:target] if options[:owner] and options[:group]
+        return true
+      rescue StandardError
+         return false
+      end
     end
 
     # facilité de création de répertoire
     # @param [Hash] options
     # @option options [String] :path le répertoire à créer (relatif ou absolut)
     def make_folder(options = {})
-      FileUtils::mkdir_p options[:path] unless File::exist? options[:path]
+      begin
+        FileUtils::mkdir_p options[:path] unless File::exist? options[:path]
+        return true
+      rescue StandardError
+        return false
+      end
     end
 
     # facilité de liaison symbolique  de fichier
@@ -88,8 +101,13 @@ module Splash
     # @option options [String] :source le chemin source du fichier
     # @option options [String] :link le chemin du lien symbolique
     def make_link(options = {})
-      FileUtils::rm options[:link] if (File::symlink? options[:link] and not File::exist? options[:link])
-      FileUtils::ln_s options[:source], options[:link] unless File::exist? options[:link]
+      begin
+        FileUtils::rm options[:link] if (File::symlink? options[:link] and not File::exist? options[:link])
+        FileUtils::ln_s options[:source], options[:link] unless File::exist? options[:link]
+        return true
+      rescue StandardError
+        return false
+      end
     end
     # @!endgroup
 

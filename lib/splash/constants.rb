@@ -1,5 +1,14 @@
 module Splash
-  module constants
+  module Constants
     VERSION = "0.0.1"
     CONFIG_FILE = "/etc/splash.yml"
-  
+    DAEMON_USER = "root"
+    DAEMON_GROUP = "wheel"
+    PID_PATH="/var/run"
+    TRACE_PATH-"/var/run/splash"
+    PID_FILE="splash.pid"
+    STDOUT_TRACE="stdout.txt"
+    STDERR_TRACE="stderr.txt"
+    DAEMON_PROCESS_NAME="Splash : Prometheus logs monitoring."
+  end
+end

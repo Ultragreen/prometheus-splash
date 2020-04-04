@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'splash/constants'
 
 Gem::Specification.new do |spec|
-  spec.name          = "splash"
+  spec.name          = "prometheus-splash"
   spec.version       = Splash::Constants::VERSION
   spec.authors       = [Splash::Constants::AUTHOR]
   spec.email         = [Splash::Constants::EMAIL]

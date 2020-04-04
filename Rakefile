@@ -24,7 +24,7 @@ CLEAN.include('*.tmp','*.old')
 CLOBBER.include('*.tmp', 'build/*','#*#')
 
 
-content = File::readlines(File.join(File.dirname(__FILE__), 'splash.gemspec')).join
+content = File::readlines(File.join(File.dirname(__FILE__), 'prometheus-splash.gemspec')).join
 spec = eval(content)
 
 RSpec::Core::RakeTask.new('spec')

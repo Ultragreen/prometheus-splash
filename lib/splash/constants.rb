@@ -10,5 +10,9 @@ module Splash
     STDOUT_TRACE="stdout.txt"
     STDERR_TRACE="stderr.txt"
     DAEMON_PROCESS_NAME="Splash : Prometheus logs monitoring."
+    AUTHOR="Romain GEORGES"
+    EMAIL = "romain@ultragreen.net"
+    COPYRIGHT="Ultragreen (c) 2020"
+    LICENSE="BSD-2-Clause"
   end
 end

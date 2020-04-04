@@ -34,7 +34,7 @@ module Splash
               pid = `cat #{config.full_pid_path}`.to_i
               Process.kill("TERM", pid)
             rescue Errno::ESRCH
-              puts "Process of PID : #{pid} not found"
+              $stderr.puts "Process of PID : #{pid} not found"
             end
               FileUtils::rm config.full_pid_path if File::exist? config.full_pid_path
             return true

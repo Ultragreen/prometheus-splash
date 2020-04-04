@@ -10,6 +10,8 @@ module Splash
       def initialize(config_file=CONFIG_FILE)
         config_from_file = readconf config_file
         self[:version] = VERSION
+        self[:author] = "#{AUTHOR} <#{EMAIL}>"
+        self[:copyright] = "#{COPYRIGHT} #{LICENSE}"
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_user] = (config_from_file[:daemon][:user])? config_from_file[:daemon][:user] : DAEMON_USER
         self[:daemon_group] = (config_from_file[:daemon][:group])? config_from_file[:daemon][:group] : DAEMON_GROUP
@@ -23,6 +25,14 @@ module Splash
 
       def logs
         return self[:logs]
+      end
+
+      def author
+        return self[:author]
+      end
+
+      def copyright
+        return self[:copyright]
       end
 
       def version

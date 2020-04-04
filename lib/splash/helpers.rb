@@ -6,6 +6,25 @@ require 'etc'
 module Splash
   module Helpers
 
+    def is_root?
+      case (Process.uid)
+      when 0
+        return true
+      else
+        return false
+      end
+    end
+
+    def run_as_root(method)
+      unless is_root?
+        $stderr.puts "You need to be root to execute this subcommands : #{method.to_s}"
+        $stderr.puts "Please execute with sudo, or rvmsudo."
+        exit 10
+      else
+        self.send method
+      end
+    end
+
     # method for daemonize blocks
     # @param [Hash] _options the list of options, keys are symbols
     # @option  _options [String] :description the description of the process, use for $0

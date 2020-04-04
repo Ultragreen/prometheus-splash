@@ -3,7 +3,14 @@
 require 'prometheus/client'
 require 'prometheus/client/push'
 
-require 'thor'
+begin
+  require 'thor'
+rescue Gem::GemNotFoundException
+  $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
+  $stderr.puts "If you run on RVM, please run with rvmsudo and not with sudo."
+  $stderr.puts "If problem is percistant, please, proceed to new install and Setup."
+end
+
 require 'yaml'
 
 require 'splash/constants'
@@ -20,7 +27,6 @@ $-w = nil
 include Splash::Helpers
 
 module CLISplash
-
 
 
   class Commands < Thor
@@ -41,12 +47,12 @@ module CLISplash
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      startdaemon
+      run_as_root :startdaemon
     end
 
     desc "stop", "Stopping Logs Monitor Daemon"
     def stop
-      stopdaemon
+      run_as_root :stopdaemon
     end
 
 
@@ -54,20 +60,24 @@ module CLISplash
 
   class Config < Thor
     include Splash::Config
+    include Splash::Helpers
+
     desc "setup", "Setup installation fo Splash"
     def setup
-        setupsplash
+      run_as_root :setupsplash
+
     end
 
     desc "sanitycheck", "Verify installation fo Splash"
     def sanitycheck
-      checkconfig
+      run_as_root :checkconfig
     end
 
     desc "version", "display current Splash version"
     def version
         config = get_config
         puts "Splash version : #{config.version}, Author : #{config.author}"
+        puts config.copyright
     end
 
 
@@ -95,6 +105,10 @@ module CLISplash
 end
 
 class CLI < Thor
+    def self.exit_on_failure?
+      true
+    end
+
   include CLISplash
   desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision"
   subcommand "commands", Commands
@@ -105,8 +119,6 @@ class CLI < Thor
   desc "config SUBCOMMAND ...ARGS", "config tools for Splash"
   subcommand "config", Config
 end
-
-
 
 
 

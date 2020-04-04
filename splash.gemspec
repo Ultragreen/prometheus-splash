@@ -6,12 +6,12 @@ require 'splash/constants'
 Gem::Specification.new do |spec|
   spec.name          = "splash"
   spec.version       = Splash::Constants::VERSION
-  spec.authors       = ["Romain GEORGES"]
-  spec.email         = ["romain@ultragreen.net"]
+  spec.authors       = [Splash::Constants::AUTHOR]
+  spec.email         = [Splash::Constants::EMAIL]
   spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway}
   spec.summary       = %q{Supervision with Prometheus of Logs and Asynchronous tasks for Services or Hosts }
   spec.homepage      = "http://www.ultragreen.net"
-  spec.license       = "BSD-2-Clause"
+  spec.license       = Splash::Constants::LICENSE
   spec.require_paths << 'bin'
   spec.bindir = 'bin'
   spec.executables = Dir["bin/*"].map!{|item| item.gsub("bin/","")}

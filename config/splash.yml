@@ -1,9 +1,19 @@
 :splash:
+  :templates:
+    :execution: /etc/splash_execution_report.tpl
   :logs:
     - :log: /tmp/test
       :pattern: ERROR
     - :log: /var/log/message
       :pattern: error
+  :prometheus:
+    :pushgateway:
+      :host: "localhost"
+      :port: 9091
+  :commands:
+    :false_test:
+      :desc: test command
+      :command: false
   :daemon:
     :user: daemon
     :group: daemon

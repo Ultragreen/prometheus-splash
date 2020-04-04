@@ -21,7 +21,7 @@ module Splash
         $stderr.puts "Please execute with sudo, or rvmsudo."
         exit 10
       else
-        self.send method
+        return self.send method
       end
     end
 
@@ -141,11 +141,27 @@ module Splash
     #@!group  Vérifiers de l'application
 
     # verifier d'existence d'un repertoire
-    # @return [Bool] vrai ou faux
+    # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :path le répertoire à créer (relatif ou absolut)
+    # @option options [String] :path le répertoire (relatif ou absolut) obligatoire
+    # @option options [String] :mode droit du  répertoire optionnel
+    # @option options [String] :owner owner du répertoire optionnel
+    # @option options [String] :group groupe du répertoire optionnel
     def verify_folder(options ={})
-      return File.directory?(options[:path])
+      res = Array::new
+      return  [:inexistant] unless File.directory?(options[:name])
+      stat = File.stat(options[:name])
+      if options[:mode] then
+        mode = "%o" % stat.mode
+        res << :mode if mode[-3..-1] != options[:mode]
+      end
+      if options[:owner] then
+        res << :owner if Etc.getpwuid(stat.uid).name != options[:owner]
+      end
+      if options[:group] then
+        res << :group if Etc.getgrgid(stat.gid).name != options[:group]
+      end
+      return res
     end
 
     # verifier d'existence d'un lien
@@ -157,9 +173,12 @@ module Splash
     end
 
     # verifier d'existence d'un fichier
-    # @return [Bool] vrai ou faux
+    # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :name path du fichier
+    # @option options [String] :name path du fichier obligatoire
+    # @option options [String] :mode droit du fichier optionnel
+    # @option options [String] :owner owner du fichier optionnel
+    # @option options [String] :group groupe du fichier optionnel
     def verify_file(options ={})
       res = Array::new
       return  [:inexistant] unless File.file?(options[:name])

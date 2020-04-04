@@ -1,6 +1,6 @@
 module Splash
   module Constants
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
     CONFIG_FILE = "/etc/splash.yml"
     DAEMON_USER = "root"
     DAEMON_GROUP = "wheel"
@@ -14,5 +14,7 @@ module Splash
     EMAIL = "gems@ultragreen.net"
     COPYRIGHT="Ultragreen (c) 2020"
     LICENSE="BSD-2-Clause"
+    PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
+    PROMETHEUS_PUSHGATEWAY_PORT = "9091"
   end
 end

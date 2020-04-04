@@ -8,6 +8,12 @@ module Splash
 
       def startdaemon(options = {})
         config = get_config
+        unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
+          $stderr.puts "Prometheus PushGateway Service is not running,"
+          $stderr.puts " please start before running Splash daemon."
+          exit 11
+        end
+
         unless File::exist? config.full_pid_path then
           return daemonize :description => config.daemon_process_name,
                            :pid_file => config.full_pid_path,
@@ -28,6 +34,7 @@ module Splash
 
       def stopdaemon(options = {})
           config = get_config
+          errorcode = 0
           if File.exist?(config.full_pid_path) then
 
             begin
@@ -35,12 +42,14 @@ module Splash
               Process.kill("TERM", pid)
             rescue Errno::ESRCH
               $stderr.puts "Process of PID : #{pid} not found"
+              errorcode = 12
             end
-              FileUtils::rm config.full_pid_path if File::exist? config.full_pid_path
-            return true
+            FileUtils::rm config.full_pid_path if File::exist? config.full_pid_path
           else
-            return false
+            $stderr.puts "Splash is not running"
+            errorcode = 13
           end
+          return errorcode
       end
 
     end

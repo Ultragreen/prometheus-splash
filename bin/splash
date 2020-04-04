@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby -W:no-deprecated
 
-require 'prometheus/client'
-require 'prometheus/client/push'
 
 begin
+  require 'prometheus/client'
+  require 'prometheus/client/push'
   require 'thor'
 rescue Gem::GemNotFoundException
   $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
@@ -16,8 +16,9 @@ require 'yaml'
 require 'splash/constants'
 require 'splash/helpers'
 require 'splash/config'
+require 'splash/templates'
 
-require 'splash/command'
+require 'splash/commands'
 require 'splash/logs'
 require 'splash/controller'
 
@@ -31,12 +32,18 @@ module CLISplash
 
   class Commands < Thor
 
-    option :ack, :type => :boolean
-    desc "wrap NAME", "wrapping for command or ack result"
+  desc "wrap NAME", "wrapping for command or ack result"
+    long_desc <<-LONGDESC
+    wrapping for command or ack result
+    with --no-trace prevent storing execution trace in TRACE_PATH (see config file)
+    with --ack, notify errorcode=0 to Prometheus PushGateway
+    LONGDESC
+    option :trace, :type => :boolean, :default => true
+    option :ack, :type => :boolean, negate: false
     def wrap(name)
       command =  Splash::CommandWrapper::new(name)
       command.ack if options[:ack]
-      command.call_and_notify
+      command.call_and_notify trace: options[:trace]
     end
   end
 
@@ -47,12 +54,14 @@ module CLISplash
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      run_as_root :startdaemon
+      errorcode = run_as_root :startdaemon
+      exit errorcode
     end
 
     desc "stop", "Stopping Logs Monitor Daemon"
     def stop
-      run_as_root :stopdaemon
+      errorcode = run_as_root :stopdaemon
+      exit errorcode
     end
 
 
@@ -64,13 +73,14 @@ module CLISplash
 
     desc "setup", "Setup installation fo Splash"
     def setup
-      run_as_root :setupsplash
-
+      errorcode = run_as_root :setupsplash
+      exit errorcode
     end
 
     desc "sanitycheck", "Verify installation fo Splash"
     def sanitycheck
-      run_as_root :checkconfig
+      errorcode = run_as_root :checkconfig
+      exit errorcode
     end
 
     desc "version", "display current Splash version"

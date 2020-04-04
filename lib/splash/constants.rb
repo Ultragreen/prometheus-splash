@@ -16,5 +16,7 @@ module Splash
     LICENSE="BSD-2-Clause"
     PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
     PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+    EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
+    TOKENS_LIST = [:date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status]
   end
 end

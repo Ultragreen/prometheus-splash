@@ -5,8 +5,9 @@ require 'date'
 module Splash
   class CommandWrapper
     include Splash::Templates
-
     include Splash::Config
+    include Splash::Helpers
+
     def initialize(name)
       @config  = get_config
       @name = name
@@ -42,27 +43,35 @@ module Splash
       puts "Executing command : '#{@name}' "
       unless options[:trace] then
         puts "Traceless execution"
-        system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+        if @config.commands[@name.to_sym][:user] then
+          system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+        else
+          system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+        end
         exit_code = $?.exitstatus
       else
         puts "Tracefull execution"
-        stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
-        data = Hash::new
-        data['date'] = DateTime.now.to_s
-        data['cmd_name'] = @name
-        data['cmd_line'] = @config.commands[@name.to_sym][:command]
-        data['desc'] = @config.commands[@name.to_sym][:desc]
-        data['error_code'] = status
-        data['stdout'] = stdout
-        data['stderr'] = stderr
+        if @config.commands[@name.to_sym][:user] then
+          stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
+        else
+          stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
+        end
         tp = Template::new(
-            list_token: ["DATE","CMD_NAME","CMD_LINE","STDOUT","STDERR","DESC","DATE","ERROR_CODE"],
-            template_file: @config.execution_template)
-        tp.map data
-        puts tp.output
+            list_token: @config.execution_template_tokens,
+            template_file: @config.execution_template_path)
+
+        tp.date = DateTime.now.to_s
+        tp.cmd_name = @name
+        tp.cmd_line = @config.commands[@name.to_sym][:command]
+        tp.desc = @config.commands[@name.to_sym][:desc]
+        tp.status = status.to_s
+        tp.stdout = stdout
+        tp.stderr = stderr
+        filename = "#{@config[:trace_path]}/#{@name}_trace.last"
+        File.open(filename, 'w') { |file| file.write(tp.output) }
+        exit_code = status.exitstatus
       end
 
-      exit_code = $?.exitstatus
       notify(exit_code)
       exit exit_code
     end

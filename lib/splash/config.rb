@@ -16,7 +16,8 @@ module Splash
         self[:prometheus_pushgateway_port] = (config_from_file[:prometheus][:pushgateway][:port])? config_from_file[:prometheus][:pushgateway][:port] : PROMETHEUS_PUSHGATEWAY_PORT
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_user] = (config_from_file[:daemon][:user])? config_from_file[:daemon][:user] : DAEMON_USER
-        self[:execution_template] = (config_from_file[:templates][:execution])? config_from_file[:template][:execution] : EXECUTION_TEMPLATE
+        self[:execution_template_tokens] = (config_from_file[:templates][:execution][:tokens])? config_from_file[:templates][:execution][:tokens] : TOKENS_LIST
+        self[:execution_template_path] = (config_from_file[:templates][:execution][:path])? config_from_file[:templates][:execution][:path] : EXECUTION_TEMPLATE
         self[:daemon_group] = (config_from_file[:daemon][:group])? config_from_file[:daemon][:group] : DAEMON_GROUP
         self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
         self[:trace_path] = (config_from_file[:daemon][:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
@@ -28,10 +29,13 @@ module Splash
 
       end
 
-      def execution_template
-        return self[:execution_template]
+      def execution_template_path
+        return self[:execution_template_path]
       end
 
+      def execution_template_tokens
+        return self[:execution_template_tokens]
+      end
       def logs
         return self[:logs]
       end
@@ -110,8 +114,8 @@ module Splash
       end
       config = get_config
       report_in_path = search_file_in_gem "prometheus-splash", "templates/report.txt"
-      print "* Installing template file : #{config.execution_template} : "
-      if install_file source: report_in_path, target: config.execution_template, mode: "644", owner: "root", group: "wheel" then
+      print "* Installing template file : #{config.execution_template_path} : "
+      if install_file source: report_in_path, target: config.execution_template_path, mode: "644", owner: "root", group: "wheel" then
         puts "[OK]"
       else
         full_res =+ 1

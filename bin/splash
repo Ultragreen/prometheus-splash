@@ -31,8 +31,9 @@ module CLISplash
 
 
   class Commands < Thor
+    include Splash::Config
 
-  desc "wrap NAME", "wrapping for command or ack result"
+    desc "wrap NAME", "wrapping for command or ack result"
     long_desc <<-LONGDESC
     wrapping for command or ack result
     with --no-trace prevent storing execution trace in TRACE_PATH (see config file)
@@ -41,10 +42,68 @@ module CLISplash
     option :trace, :type => :boolean, :default => true
     option :ack, :type => :boolean, negate: false
     def wrap(name)
-      command =  Splash::CommandWrapper::new(name)
-      command.ack if options[:ack]
-      command.call_and_notify trace: options[:trace]
+      if is_root? then
+        command =  Splash::CommandWrapper::new(name)
+        command.ack if options[:ack]
+        command.call_and_notify trace: options[:trace]
+      else
+        $stderr.puts "Command wrapping need to be run as root"
+        exit 60
+      end
     end
+
+
+    desc "list", "Show configured commands"
+    long_desc <<-LONGDESC
+    Show configured commands
+    with --detail, show command details
+    LONGDESC
+    option :detail, :type => :boolean
+    def list
+      puts "Splash configured commands :"
+      list = get_config.commands
+      puts 'No configured commands found' if list.keys.empty?
+      listc.keys.each do |command|
+        puts " * #{command.to_s}"
+        if options[:detail] then
+          puts "   - command line : '#{list[command][:command]}'"
+          puts "   - command description : '#{list[command][:desc]}'"
+        end
+      end
+    end
+
+
+    desc "show COMMAND", "Show specific configured command COMMAND"
+    def show(command)
+      list = get_config.commands
+      if list.keys.include? command.to_sym then
+        puts "Splash command : #{command}"
+        puts "   - command line : '#{list[command.to_sym][:command]}'"
+        puts "   - command description : '#{list[command.to_sym][:desc]}'"
+      else
+        $stderr.puts "Command not configured"
+        exit 50
+      end
+    end
+
+
+    desc "lastrun COMMAND", "Show last running result for specific configured command COMMAND"
+    def lastrun(command)
+      list = get_config.commands
+      if list.keys.include? command.to_sym then
+        print "Splash command #{command} previous execution report:\n\n"
+        filename = "#{get_config[:trace_path]}/#{command}_trace.last"
+        if File::exist? filename then
+          system("cat #{filename}")
+        else
+          puts "Command not already runned."
+        end
+      else
+        $stderr.puts "Command not configured"
+        exit 50
+      end
+    end
+
   end
 
 
@@ -64,8 +123,17 @@ module CLISplash
       exit errorcode
     end
 
+    desc "status", "Logs Monitor Daemon status"
+    def status
+      errorcode = run_as_root :statusdaemon
+      exit errorcode
+    end
+
 
   end
+
+
+
 
   class Config < Thor
     include Splash::Config
@@ -85,9 +153,9 @@ module CLISplash
 
     desc "version", "display current Splash version"
     def version
-        config = get_config
-        puts "Splash version : #{config.version}, Author : #{config.author}"
-        puts config.copyright
+      config = get_config
+      puts "Splash version : #{config.version}, Author : #{config.author}"
+      puts config.copyright
     end
 
 
@@ -115,9 +183,9 @@ module CLISplash
 end
 
 class CLI < Thor
-    def self.exit_on_failure?
-      true
-    end
+  def self.exit_on_failure?
+    true
+  end
 
   include CLISplash
   desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision"

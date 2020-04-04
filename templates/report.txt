@@ -5,7 +5,7 @@ Date : %%DATE%%
 Command : %%CMD_NAME%%
 full command line : %%CMD_LINE%%
 Description : %%DESC%%
-errorcode : %%ERROR_CODE%%
+errorcode : %%STATUS%%
 
 STDOUT:
 -------

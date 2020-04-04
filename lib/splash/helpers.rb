@@ -6,6 +6,19 @@ require 'etc'
 module Splash
   module Helpers
 
+
+
+    def get_process(options = {})
+      pattern = options[:pattern]
+      res = `ps aux|grep '#{pattern}'|grep -v grep`.to_s
+      unless res.empty? then
+        return res.split(/\s+/)[1]
+      else
+        return ''
+      end
+    end
+
+
     def is_root?
       case (Process.uid)
       when 0
@@ -88,7 +101,7 @@ module Splash
         yield
 
       end
-      return true
+      return 0
     end
 
     # @!group facilités sur le système de fichier

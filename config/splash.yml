@@ -1,6 +1,15 @@
 :splash:
   :templates:
-    :execution: /etc/splash_execution_report.tpl
+    :execution:
+      :path: /etc/splash_execution_report.tpl
+      :tokens:
+        - :date
+        - :cmd_name
+        - :cmd_line
+        - :stdout
+        - :stderr
+        - :desc
+        - :status
   :logs:
     - :log: /tmp/test
       :pattern: ERROR
@@ -12,8 +21,12 @@
       :port: 9091
   :commands:
     :false_test:
-      :desc: test command
-      :command: false
+      :desc: "test command"
+      :command: "false"
+    :ls_slash_tmp:
+      :desc: list file in /tmp
+      :command: ls -al /tmp
+      :user: daemon
   :daemon:
     :user: daemon
     :group: daemon

@@ -1,3 +1,4 @@
+require 'etc'
 module Splash
   module Config
     include Splash::Helpers
@@ -16,15 +17,14 @@ module Splash
         self[:prometheus_pushgateway_host] = (config_from_file[:prometheus][:pushgateway][:host])? config_from_file[:prometheus][:pushgateway][:host] : PROMETHEUS_PUSHGATEWAY_HOST
         self[:prometheus_pushgateway_port] = (config_from_file[:prometheus][:pushgateway][:port])? config_from_file[:prometheus][:pushgateway][:port] : PROMETHEUS_PUSHGATEWAY_PORT
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
-        self[:daemon_user] = (config_from_file[:daemon][:user])? config_from_file[:daemon][:user] : DAEMON_USER
-        self[:execution_template_tokens] = (config_from_file[:templates][:execution][:tokens])? config_from_file[:templates][:execution][:tokens] : TOKENS_LIST
+        self[:daemon_logmon_scheduling] = (config_from_file[:daemon][:logmon_scheduling])? config_from_file[:daemon][:logmon_scheduling] : DAEMON_LOGMON_SCHEDULING
+        self[:execution_template_tokens] = (config_from_file[:templates][:execution][:tokens])? config_from_file[:templates][:execution][:tokens] : EXECUTION_TEMPLATE_TOKENS_LIST
         self[:execution_template_path] = (config_from_file[:templates][:execution][:path])? config_from_file[:templates][:execution][:path] : EXECUTION_TEMPLATE
-        self[:daemon_group] = (config_from_file[:daemon][:group])? config_from_file[:daemon][:group] : DAEMON_GROUP
-        self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
+        self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : DAEMON_PID_PATH
         self[:trace_path] = (config_from_file[:daemon][:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
-        self[:pid_file] = (config_from_file[:daemon][:files][:pid_file])? config_from_file[:daemon][:files][:pid_file] : PID_FILE
-        self[:stdout_trace] = (config_from_file[:daemon][:files][:stdout_trace])? config_from_file[:daemon][:files][:stdout_trace] : STDOUT_TRACE
-        self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] : STDERR_TRACE
+        self[:pid_file] = (config_from_file[:daemon][:files][:pid_file])? config_from_file[:daemon][:files][:pid_file] : DAEMON_PID_FILE
+        self[:stdout_trace] = (config_from_file[:daemon][:files][:stdout_trace])? config_from_file[:daemon][:files][:stdout_trace] : DAEMON_STDOUT_TRACE
+        self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] : DAEMON_STDERR_TRACE
 
         self[:transports] = {} ; self[:transports].merge! TRANSPORTS_STRUCT ; self[:transports].merge! config_from_file[:transports] if config_from_file[:transports]
         self[:backends] = {} ; self[:backends].merge! BACKENDS_STRUCT ; self[:backends].merge! config_from_file[:backends] if config_from_file[:backends]
@@ -36,6 +36,23 @@ module Splash
 
       # @!group accessors on configurations Items
 
+      def Configuration.user_root
+        return Etc.getpwuid(0).name
+      end
+
+      def Configuration.group_root
+        return Etc.getgrgid(0).name
+      end
+
+      def user_root
+        return Configuration.user_root
+      end
+
+      def group_root
+        return Configuration.group_root
+      end
+
+
       def backends
         return self[:backends]
       end
@@ -44,6 +61,13 @@ module Splash
         return self[:transport]
       end
 
+      def daemon_logmon_scheduling
+        return self[:daemon_logmon_scheduling]
+      end
+
+      def execution_template_path
+        return self[:execution_template_path]
+      end
       def execution_template_tokens
         return self[:execution_template_tokens]
       end
@@ -76,14 +100,6 @@ module Splash
       end
       def prometheus_pushgateway_port
         return self[:prometheus_pushgateway_port]
-      end
-
-      def daemon_user
-        return self[:daemon_user]
-      end
-
-      def daemon_group
-        return self[:daemon_group]
       end
 
       def full_pid_path
@@ -122,7 +138,7 @@ module Splash
       full_res = 0
       puts "Splash -> setup : "
       print "* Installing Configuration file : #{CONFIG_FILE} : "
-      if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: "root", group: "wheel" then
+      if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: Configuration.user_root, group: Configuration.group_root then
         puts "[OK]"
       else
         full_res =+ 1
@@ -131,7 +147,7 @@ module Splash
       config = get_config
       report_in_path = search_file_in_gem "prometheus-splash", "templates/report.txt"
       print "* Installing template file : #{config.execution_template_path} : "
-      if install_file source: report_in_path, target: config.execution_template_path, mode: "644", owner: "root", group: "wheel" then
+      if install_file source: report_in_path, target: config.execution_template_path, mode: "644", owner: config.user_root, group: config.group_root then
         puts "[OK]"
       else
         full_res =+ 1
@@ -139,7 +155,7 @@ module Splash
       end
 
       print "* Creating/Checking pid file path : #{config[:pid_path]} : "
-      if make_folder path: config[:pid_path], mode: "644", owner: "root", group: "wheel" then
+      if make_folder path: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root then
         puts "[OK]"
       else
         full_res =+ 1
@@ -147,7 +163,7 @@ module Splash
       end
 
       print "* Creating/Checking trace file path : #{config[:trace_path]} : "
-      if make_folder path: config[:trace_path], mode: "777", owner: config.daemon_user, group: config.daemon_group then
+      if make_folder path: config[:trace_path], mode: "644", owner: config.user_root, group: config.group_root then
         puts "[OK]"
       else
         full_res =+ 1
@@ -171,7 +187,7 @@ module Splash
       config = get_config
       full_res = 0
       print "* Config file : #{CONFIG_FILE} : "
-      res = verify_file(name: CONFIG_FILE, mode: "644", owner: "root", group: "wheel")
+      res = verify_file(name: CONFIG_FILE, mode: "644", owner: config.user_root, group: config.group_root)
       if res.empty? then
         print "[OK]\n"
       else
@@ -181,7 +197,7 @@ module Splash
       end
 
       print "* PID Path : #{config[:pid_path]} : "
-      res = verify_folder(name: config[:pid_path], mode: "644", owner: "root", group: "wheel")
+      res = verify_folder(name: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root)
       if res.empty? then
         print "[OK]\n"
       else
@@ -192,7 +208,7 @@ module Splash
       end
 
       print "* trace Path : #{config[:trace_path]} : "
-      res = verify_folder(name: config[:trace_path], mode: "777", owner: config.daemon_user, group: config.daemon_group)
+      res = verify_folder(name: config[:trace_path], mode: "777", owner: config.user_root, group: config.group_root)
       if res.empty? then
         print "[OK]\n"
       else

@@ -5,6 +5,8 @@ begin
   require 'prometheus/client'
   require 'prometheus/client/push'
   require 'thor'
+  require 'rufus-scheduler'
+
 rescue Gem::GemNotFoundException
   $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
   $stderr.puts "If you run on RVM, please run with rvmsudo and not with sudo."
@@ -17,9 +19,11 @@ require 'splash/constants'
 require 'splash/helpers'
 require 'splash/config'
 require 'splash/templates'
+require 'splash/backends'
 
 require 'splash/commands'
 require 'splash/logs'
+require 'splash/orchestrator'
 require 'splash/controller'
 
 #inhibit warning : due to prometheus-client call to URI.encode warning
@@ -34,24 +38,51 @@ module CLISplash
     include Splash::Config
     include Splash::Backends
 
-    desc "wrap NAME", "wrapping for command or ack result"
+    desc "run NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
-    wrapping for command or ack result
+    Running  command or sequence or ack result
     with --no-trace prevent storing execution trace in TRACE_PATH (see config file)
     with --ack, notify errorcode=0 to Prometheus PushGateway
+    with --no-notify, bypass Prometheus notification
     LONGDESC
     option :trace, :type => :boolean, :default => true
     option :ack, :type => :boolean, negate: false
+    option :notify, :type => :boolean, :default => true
     def wrap(name)
       if is_root? then
         command =  Splash::CommandWrapper::new(name)
         command.ack if options[:ack]
-        command.call_and_notify trace: options[:trace]
+        command.call_and_notify trace: options[:trace], notify: options[:notify]
       else
         $stderr.puts "Command wrapping need to be run as root"
         exit 60
       end
     end
+
+
+
+    desc "treeview", "Show commands sequence tree"
+    def treeview(command, depht = 0)
+      puts "Command : #{command.to_s}" if depht == 0
+      cmd  = get_config.commands[command.to_sym]
+      if cmd[:on_failure] then
+        print " " * depht + " "
+        puts "* on failure => #{cmd[:on_failure]}"
+        treeview(cmd[:on_failure], depht+2)
+      end
+      if cmd[:on_success] then
+        print " " * depht + " "
+        puts "* on success => #{cmd[:on_success]}"
+        treeview(cmd[:on_success],depht+2)
+      end
+    end
+
+
+
+
+
+
+
 
 
     desc "list", "Show configured commands"
@@ -69,6 +100,8 @@ module CLISplash
         if options[:detail] then
           puts "   - command line : '#{list[command][:command]}'"
           puts "   - command description : '#{list[command][:desc]}'"
+          puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
+          puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
         end
       end
     end
@@ -81,6 +114,8 @@ module CLISplash
         puts "Splash command : #{command}"
         puts "   - command line : '#{list[command.to_sym][:command]}'"
         puts "   - command description : '#{list[command.to_sym][:desc]}'"
+        puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
+        puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
       else
         $stderr.puts "Command not configured"
         exit 50
@@ -93,10 +128,10 @@ module CLISplash
       list = get_config.commands
       if list.keys.include? command.to_sym then
         print "Splash command #{command} previous execution report:\n\n"
-        backend = get_default_backend
+        backend = get_backend :execution_trace
         key = "#{command}_trace.last"
         if backend.exist? key: key then
-          backend.get key: key
+          print backend.get key: key
         else
           puts "Command not already runned."
         end

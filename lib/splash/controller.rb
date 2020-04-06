@@ -5,6 +5,7 @@ module Splash
       include Splash::Constants
       include Splash::Helpers
       include Splash::Config
+      include Splash::Orchestrator
 
       def startdaemon(options = {})
         config = get_config
@@ -17,21 +18,9 @@ module Splash
         unless File::exist? config.full_pid_path then
           res = daemonize :description => config.daemon_process_name,
               :pid_file => config.full_pid_path,
-              :daemon_user => config.daemon_user,
-              :daemon_group => config.daemon_group,
               :stdout_trace => config.full_stdout_trace_path,
               :stderr_trace => config.full_stderr_trace_path do
-            result = LogScanner::new
-            while true
-              begin
-                sleep 5
-                puts "Notify"
-                result.analyse
-                result.notify
-              rescue Errno::ECONNREFUSED
-                $stderr.puts "PushGateway seems to be done, please start it."
-              end
-            end
+              Scheduler::new
           end
           if res == 0 then
             pid = `cat #{config.full_pid_path}`.to_i

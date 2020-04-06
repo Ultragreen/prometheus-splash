@@ -6,6 +6,7 @@ Command : %%CMD_NAME%%
 full command line : %%CMD_LINE%%
 Description : %%DESC%%
 errorcode : %%STATUS%%
+Execution time (sec) : %%EXEC_TIME%%
 
 STDOUT:
 -------

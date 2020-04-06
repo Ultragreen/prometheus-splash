@@ -13,26 +13,29 @@
         - :stderr
         - :desc
         - :status
+        - :exec_time
   :backends:
     :list:
       - :file
       - :redis
-    :active: :file
-    :file:
-      :path: /tmp/splash/
-    :redis:
-      :base: 1
-      :host: localhost
-      :port: 6379
-      #:auth: "mykey"
+    :stores:
+      :execution_trace:
+          :type: :file
+          :path: /tmp/splash
+#      :execution_trace:
+#        :type: :redis
+#        :host: localhost
+#        :port: 6379
+#        #:auth: "mykey"
+#        :base: 1
   :transports:
     :active: :rabbitmq
     :rabbitmq:
       :url: amqp://127.0.0.1
   :daemon:
-    :user: daemon
-    :group: daemon
-    :process_name: "Splash : Prometheus logs monitoring."
+    :logmon_scheduling:
+      :every: 20s
+    :process_name: "Splash : daemon."
     :paths:
       :pid_path: /tmp
       :trace_path: /tmp/splash
@@ -53,25 +56,39 @@
       :command: id root
     :true_test:
       :desc: "test command returning true : 0"
-      :command: "false"
+      :command: "true"
       :schedule:
         :every: "1h"
-        :on_failure: :ls_slash_tmp
-        :on_success: :pwd
+      :on_failure: :ls_slash_tmp
+      :on_success: :pwd
     :false_test:
       :desc: "test command returning false > 0"
       :command: "false"
       :schedule:
         :every: "1h"
-        :on_failure: :ls_slash_tmp
-        :on_success: :pwd
+      :on_failure: :ls_slash_tmp
+      :on_success: :pwd
     :ls_slash_tmp:
       :desc: list file in /tmp
       :command: ls -al /tmp
       :user: daemon
+      :on_success: :echo1
     :pwd:
       :desc: run pwd
       :command: pwd
+      :on_success: :echo1
+      :on_failure: :echo2
+    :echo1:
+      :desc: echo 'foo'
+      :command: echo foo
+      :on_failure: :echo3
+    :echo2:
+      :desc: echo 'bar'
+      :command: echo bar
+    :echo3:
+      :desc: echo 'been'
+      :command: echo been
+
 
 ### configuration of monitored logs
   :logs:

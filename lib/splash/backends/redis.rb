@@ -4,9 +4,9 @@ module Splash
   module Backends
     class Redis
       include Splash::Config
-      def initialize
-        @config = get_config[:backends][:redis]
-        @store = Redis.new(:host => @config[:host], :port => @config[:port], :db => @config[:db].to_i)
+      def initialize(store)
+        @config = get_config[:backends][:stores][store]
+        @store = ::Redis.new :host => @config[:host], :port => @config[:port], :db => @config[:base].to_i
         @redis_cli_cmd = `which redis-cli`
         @store.auth(@config[:auth]) if @config[:auth]
       end

@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'thor','~> 1.0.1'
   spec.add_runtime_dependency 'prometheus-client','~> 2.0.0'
   spec.add_runtime_dependency 'rufus-scheduler','~> 3.6.0'
+  spec.add_runtime_dependency 'redis','~> 4.1.3'  
   spec.add_development_dependency 'rake', '~> 13.0.1'
   spec.add_development_dependency 'rspec', '~> 3.9.0'
   spec.add_development_dependency 'yard', '~> 0.9.24'

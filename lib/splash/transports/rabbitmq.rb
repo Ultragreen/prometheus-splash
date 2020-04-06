@@ -3,7 +3,7 @@ module Splash
   module Transports
     module RabbitMQ
 
-      class Manager
+      class Subscriber
         def initialize
 
         end
@@ -19,7 +19,6 @@ module Splash
 
 
         def publish(options ={})
-          p 'titi'
           return @channel.default_exchange.publish(options[:message], :routing_key => options[:queue])
         end
 

@@ -2,8 +2,8 @@ module Splash
   module Backends
     class File
       include Splash::Config
-      def initialize
-        @config = get_config[:backends][:redis]
+      def initialize(store)
+        @config = get_config[:backends][:stores][store]
         @path = @config[:path]
       end
 
@@ -12,21 +12,21 @@ module Splash
       end
 
       def get(options)
-        return File.readlines("#{@path}/#{options[:key]}")
+        return ::File.readlines("#{@path}/#{options[:key]}").join
       end
 
       def put(options)
-        File.open("#{@path}/#{options[:key]}", 'w') { |file|
+        ::File.open("#{@path}/#{options[:key]}", 'w') { |file|
           file.write options[:value]
         }
       end
 
       def del(options)
-        File.unlink("#{@path}/#{options[:key]}") if File.exist?("#{@path}/#{options[:key]}")
+        ::File.unlink("#{@path}/#{options[:key]}") if File.exist?("#{@path}/#{options[:key]}")
       end
 
       def exist?(options)
-        return File.exist?("#{@path}/#{options[:key]}")
+        return ::File.exist?("#{@path}/#{options[:key]}")
       end
 
     end

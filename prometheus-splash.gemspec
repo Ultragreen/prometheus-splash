@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Splash::Constants::VERSION
   spec.authors       = [Splash::Constants::AUTHOR]
   spec.email         = [Splash::Constants::EMAIL]
-  spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway}
-  spec.summary       = %q{Supervision with Prometheus of Logs and Asynchronous tasks for Services or Hosts }
+  spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway and commands orchestration}
+  spec.summary       = %q{Supervision with Prometheus of Logs and Asynchronous tasks orchestration for Services or Hosts }
   spec.homepage      = "http://www.ultragreen.net"
   spec.license       = Splash::Constants::LICENSE
   spec.require_paths << 'bin'
@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.add_runtime_dependency 'thor','~> 1.0.1'
   spec.add_runtime_dependency 'prometheus-client','~> 2.0.0'
+  spec.add_runtime_dependency 'rufus-scheduler','~> 3.6.0'
   spec.add_development_dependency 'rake', '~> 13.0.1'
   spec.add_development_dependency 'rspec', '~> 3.9.0'
   spec.add_development_dependency 'yard', '~> 0.9.24'

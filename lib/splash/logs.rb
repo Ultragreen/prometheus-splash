@@ -1,3 +1,5 @@
+require 'socket'
+
 module Splash
   class LogScanner
     include Splash::Constants
@@ -5,10 +7,14 @@ module Splash
 
     def initialize
       @logs_target = get_config.logs
-
+      @config = get_config
       @registry = Prometheus::Client.registry
-      @metric = Prometheus::Client::Gauge.new(:logerror, docstring: 'SPLASH metric log error', labels: [:log ])
-      @registry.register(@metric)
+      @metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])
+      @metric_missing = Prometheus::Client::Gauge.new(:logmissing, docstring: 'SPLASH metric log missing', labels: [:log ])
+      @metric_lines = Prometheus::Client::Gauge.new(:loglines, docstring: 'SPLASH metric log lines numbers', labels: [:log ])
+      @registry.register(@metric_count)
+      @registry.register(@metric_missing)
+      @registry.register(@metric_lines)
     end
 
     def analyse
@@ -18,8 +24,9 @@ module Splash
         if File.exist?(record[:log]) then
           record[:count] = File.readlines(record[:log]).grep(/#{record[:pattern]}/).size
           record[:status] = :matched if record[:count] > 0
+          record[:lines] = `wc -l "#{record[:log]}"`.strip.split(/\s+/)[0].to_i unless record[:status] == :missing
         else
-          record[:status] = :mssing
+          record[:status] = :missing
         end
       end
     end
@@ -29,10 +36,24 @@ module Splash
     end
 
     def notify
-      @logs_target.each do |item|
-        @metric.set(item[:count], labels: { log: item[:log] })
+      unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
+        $stderr.puts "Prometheus PushGateway Service IS NOT running"
+        $stderr.puts "Exit without notification."
+        exit 30
       end
-      Prometheus::Client::Push.new('Splash').add(@registry)
+      puts "Sending metrics to Prometheus Pushgateway"
+      @logs_target.each do |item|
+        missing = (item[:status] == :missing)? 1 : 0
+        puts " * Sending metrics for #{item[:log]}"
+        @metric_count.set(item[:count], labels: { log: item[:log] })
+        @metric_missing.set(missing, labels: { log: item[:log] })
+        lines = (item[:lines])? item[:lines] : 0
+        @metric_lines.set(lines, labels: { log: item[:log] })
+      end
+      hostname = Socket.gethostname
+      url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
+      Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
+      puts "Sending done."
     end
 
   end

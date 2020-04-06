@@ -1,12 +1,13 @@
 require 'open3'
 require 'date'
-
+require 'socket'
 
 module Splash
   class CommandWrapper
     include Splash::Templates
     include Splash::Config
     include Splash::Helpers
+    include Splash::Backends
 
     def initialize(name)
       @config  = get_config
@@ -34,7 +35,8 @@ module Splash
       metric = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
       registry.register(metric)
       metric.set(value)
-      Prometheus::Client::Push.new(@name, nil, url).add(registry)
+      hostname = Socket.gethostname
+      Prometheus::Client::Push.new(@name, hostname, url).add(registry)
       puts "Prometheus Gateway notified."
     end
 
@@ -44,6 +46,7 @@ module Splash
       unless options[:trace] then
         puts "Traceless execution"
         if @config.commands[@name.to_sym][:user] then
+          puts "Execute with user : #{@config.commands[@name.to_sym][:user]}."
           system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
         else
           system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
@@ -52,6 +55,7 @@ module Splash
       else
         puts "Tracefull execution"
         if @config.commands[@name.to_sym][:user] then
+          puts "Execute with user : #{@config.commands[@name.to_sym][:user]}."
           stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
         else
           stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
@@ -67,8 +71,9 @@ module Splash
         tp.status = status.to_s
         tp.stdout = stdout
         tp.stderr = stderr
-        filename = "#{@config[:trace_path]}/#{@name}_trace.last"
-        File.open(filename, 'w') { |file| file.write(tp.output) }
+        backend = get_default_backend
+        key = "#{@name}_trace.last"
+        backend.put key: key, value: tp.output
         exit_code = status.exitstatus
       end
 

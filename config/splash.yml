@@ -1,4 +1,7 @@
+# Splash Configuration
 :splash:
+
+### Main Configuration
   :templates:
     :execution:
       :path: /etc/splash_execution_report.tpl
@@ -10,23 +13,22 @@
         - :stderr
         - :desc
         - :status
-  :logs:
-    - :log: /tmp/test
-      :pattern: ERROR
-    - :log: /var/log/message
-      :pattern: error
-  :prometheus:
-    :pushgateway:
-      :host: "localhost"
-      :port: 9091
-  :commands:
-    :false_test:
-      :desc: "test command"
-      :command: "false"
-    :ls_slash_tmp:
-      :desc: list file in /tmp
-      :command: ls -al /tmp
-      :user: daemon
+  :backends:
+    :list:
+      - :file
+      - :redis
+    :active: :file
+    :file:
+      :path: /tmp/splash/
+    :redis:
+      :base: 1
+      :host: localhost
+      :port: 6379
+      #:auth: "mykey"
+  :transports:
+    :active: :rabbitmq
+    :rabbitmq:
+      :url: amqp://127.0.0.1
   :daemon:
     :user: daemon
     :group: daemon
@@ -38,3 +40,42 @@
       :stdout_trace: stdout.txt
       :stderr_trace: stderr.txt
       :pid_file: splash.pid
+  :prometheus:
+    :pushgateway:
+      :host: "localhost"
+      :port: 9091
+
+
+### configuration of commands and scheduling
+  :commands:
+    :id_root:
+      :desc: run id command on root
+      :command: id root
+    :true_test:
+      :desc: "test command returning true : 0"
+      :command: "false"
+      :schedule:
+        :every: "1h"
+        :on_failure: :ls_slash_tmp
+        :on_success: :pwd
+    :false_test:
+      :desc: "test command returning false > 0"
+      :command: "false"
+      :schedule:
+        :every: "1h"
+        :on_failure: :ls_slash_tmp
+        :on_success: :pwd
+    :ls_slash_tmp:
+      :desc: list file in /tmp
+      :command: ls -al /tmp
+      :user: daemon
+    :pwd:
+      :desc: run pwd
+      :command: pwd
+
+### configuration of monitored logs
+  :logs:
+    - :log: /tmp/test
+      :pattern: ERROR
+    - :log: /var/log/message
+      :pattern: error

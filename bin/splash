@@ -32,6 +32,7 @@ module CLISplash
 
   class Commands < Thor
     include Splash::Config
+    include Splash::Backends
 
     desc "wrap NAME", "wrapping for command or ack result"
     long_desc <<-LONGDESC
@@ -63,7 +64,7 @@ module CLISplash
       puts "Splash configured commands :"
       list = get_config.commands
       puts 'No configured commands found' if list.keys.empty?
-      listc.keys.each do |command|
+      list.keys.each do |command|
         puts " * #{command.to_s}"
         if options[:detail] then
           puts "   - command line : '#{list[command][:command]}'"
@@ -92,9 +93,10 @@ module CLISplash
       list = get_config.commands
       if list.keys.include? command.to_sym then
         print "Splash command #{command} previous execution report:\n\n"
-        filename = "#{get_config[:trace_path]}/#{command}_trace.last"
-        if File::exist? filename then
-          system("cat #{filename}")
+        backend = get_default_backend
+        key = "#{command}_trace.last"
+        if backend.exist? key: key then
+          backend.get key: key
         else
           puts "Command not already runned."
         end
@@ -163,12 +165,25 @@ module CLISplash
 
 
   class Logs < Thor
+    include Splash::Config
 
     desc "analyse", "analyze logs in config"
     def analyse
-      result = Splash::LogScanner::new
-      result.analyse
-      p result.output
+      results = Splash::LogScanner::new
+      results.analyse
+      puts "SPlash Configured logs status :"
+      full_status = true
+      results.output.each do |result|
+        status = (result[:status] == :clean)? "OK": "KO"
+        puts " * Log : #{result[:log]} : [#{status}]"
+        puts "   - Detected pattern : #{result[:pattern]}"
+        puts "   - detailled Status : #{result[:status].to_s}"
+        puts "     count = #{result[:count]}" if result[:status] == :matched
+        puts "     nb lines = #{result[:lines]}" if result[:status] != :missing
+        full_status = false unless result[:status] == :clean
+      end
+      display_status = (full_status)? "OK": "KO"
+      puts "Global Status : [#{display_status}]"
     end
 
     desc "monitor", "monitor logs in config"
@@ -178,6 +193,36 @@ module CLISplash
       result.notify
     end
 
+    desc "show LOG", "show configured log monitoring for LOG"
+    def show(log)
+      log_record_set = get_config.logs.select{|item| item[:log] == log }
+      unless log_record_set.empty? then
+        record = log_record_set.first
+        puts "Splash log monitor : #{record[:log]}"
+        puts "  ->   pattern : /#{record[:pattern]}/"
+    else
+        $stderr.puts "log not configured"
+        exit 50
+      end
+    end
+
+    desc "list", "Show configured logs monitoring"
+    long_desc <<-LONGDESC
+    Show configured logs monitoring
+    with --detail, show logs monitor details
+    LONGDESC
+    option :detail, :type => :boolean
+    def list
+      puts "Splash configured log monitoring :"
+      log_record_set = get_config.logs
+      puts 'No configured commands found' if log_record_set.empty?
+      log_record_set.each do |record|
+        puts " *  log monitor : #{record[:log]}"
+        if options[:detail] then
+          puts "  ->   pattern : /#{record[:pattern]}/"
+        end
+      end
+    end
 
   end
 end

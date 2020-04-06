@@ -7,7 +7,10 @@ module Splash
   module Helpers
 
 
-
+    # facilité pour récupérer un PID depuis une regexp
+    # @param [Hash] options
+    # @option options [String] :pattern une regexp
+    # @return [String] le PID
     def get_process(options = {})
       pattern = options[:pattern]
       res = `ps aux|grep '#{pattern}'|grep -v grep`.to_s
@@ -18,7 +21,8 @@ module Splash
       end
     end
 
-
+    # facilité pour vérifier si le process actif est root
+    # @return [Bool] vrai ou faux
     def is_root?
       case (Process.uid)
       when 0
@@ -28,6 +32,9 @@ module Splash
       end
     end
 
+    # facilité pour s'assurer qu'on execute une méthode avec les droits root
+    # @param [Symbol] method a method name th wrap
+    # @return [void] le retour de la méthode wrappée
     def run_as_root(method)
       unless is_root?
         $stderr.puts "You need to be root to execute this subcommands : #{method.to_s}"
@@ -39,13 +46,18 @@ module Splash
     end
 
     # method for daemonize blocks
-    # @param [Hash] _options the list of options, keys are symbols
-    # @option  _options [String] :description the description of the process, use for $0
-    # @option  _options [String] :pid_file the pid filenam
+    # @param [Hash] options the list of options, keys are symbols
+    # @option  options [String] :description the description of the process, use for $0
+    # @option  options [String] :pid_file the pid filename
+    # @option  options [String] :daemon_user the user to change privileges
+    # @option  options [String] :daemon_group the group to change privileges
+    # @option  options [String] :stderr_trace the path of the file where to redirect STDERR
+    # @option  options [String] :stdout_trace the path of the file where to redirect STDOUT
+    # @option  options [Bool] :debug option to run foreground
     # @yield a process definion or block given
     # @example usage inline
     #    class Test
-    #      include Splash::Helpers::Application
+    #      include Splash::Helpers
     #      private :daemonize
     #      def initialize
     #        @loop = Proc::new do
@@ -62,7 +74,7 @@ module Splash
     #
     # @example usage block
     #    class Test
-    #      include Splash::Helpers::Application
+    #      include Splash::Helpers
     #      include Dorsal::Privates
     #      private :daemonize
     #      def initialize
@@ -88,15 +100,17 @@ module Splash
       fork do
         #Process.daemon
         File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]
-        uid = Etc.getpwnam(options[:daemon_user]).uid
-        gid = Etc.getgrnam(options[:daemon_group]).gid
-        Process::UID.change_privilege(uid)
-      #  Process::GID.change_privilege(gid)
-        $stdout.reopen(options[:stdout_trace], "w")
-        $stderr.reopen(options[:stderr_trace], "w")
+        if options[:daemon_user] and options[:daemon_group] then
+          uid = Etc.getpwnam(options[:daemon_user]).uid
+          gid = Etc.getgrnam(options[:daemon_group]).gid
+          Process::UID.change_privilege(uid)
+          #  Process::GID.change_privilege(gid)
+        end
+        $stdout.reopen(options[:stdout_trace], "w") if options[:stdout_trace]
+        $stderr.reopen(options[:stderr_trace], "w") if options[:stderr_trace]
 
         #$0 = options[:description]
-        Process.setproctitle options[:description]
+        Process.setproctitle options[:description] if options[:description]
 
         yield
 
@@ -110,6 +124,9 @@ module Splash
     # @param [Hash] options
     # @option options [String] :source le chemin source du fichier
     # @option options [String] :target le chemin cible du fichier
+    # @option options [String] :mode les droits du fichier du type Octal "XXX"
+    # @option options [String] :owner le owner du fichier
+    # @option options [String] :group le groupe du fichier
     def install_file(options = {})
       #begin
         FileUtils::copy options[:source], options[:target] #unless File::exist? options[:target]
@@ -124,6 +141,9 @@ module Splash
     # facilité de création de répertoire
     # @param [Hash] options
     # @option options [String] :path le répertoire à créer (relatif ou absolut)
+    # @option options [String] :mode les droits du fichier du type Octal "XXX"
+    # @option options [String] :owner le owner du fichier
+    # @option options [String] :group le groupe du fichier
     def make_folder(options = {})
       begin
         FileUtils::mkdir_p options[:path] unless File::exist? options[:path]

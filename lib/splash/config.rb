@@ -4,9 +4,10 @@ module Splash
     include Splash::Constants
 
 
-
+    # Class to manage configuration in Splash from Splash::Constants override by Yaml CONFIG
     class Configuration < Hash
       include Splash::Constants
+
       def initialize(config_file=CONFIG_FILE)
         config_from_file = readconf config_file
         self[:version] = VERSION
@@ -24,13 +25,23 @@ module Splash
         self[:pid_file] = (config_from_file[:daemon][:files][:pid_file])? config_from_file[:daemon][:files][:pid_file] : PID_FILE
         self[:stdout_trace] = (config_from_file[:daemon][:files][:stdout_trace])? config_from_file[:daemon][:files][:stdout_trace] : STDOUT_TRACE
         self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] : STDERR_TRACE
+
+        self[:transports] = {} ; self[:transports].merge! TRANSPORTS_STRUCT ; self[:transports].merge! config_from_file[:transports] if config_from_file[:transports]
+        self[:backends] = {} ; self[:backends].merge! BACKENDS_STRUCT ; self[:backends].merge! config_from_file[:backends] if config_from_file[:backends]
+
         self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
         self[:commands] = (config_from_file[:commands])? config_from_file[:commands] : {}
 
       end
 
-      def execution_template_path
-        return self[:execution_template_path]
+      # @!group accessors on configurations Items
+
+      def backends
+        return self[:backends]
+      end
+
+      def transports
+        return self[:transport]
       end
 
       def execution_template_tokens
@@ -87,6 +98,8 @@ module Splash
         return "#{self[:trace_path]}/#{self[:stderr_trace]}"
       end
 
+      # @!endgroup
+
       private
       def readconf(file = CONFIG_FILE)
         return YAML.load_file(file)[:splash]
@@ -95,12 +108,15 @@ module Splash
 
     end
 
-
+    # factory of Configuration Class instance
+    # @param [String] config_file the path of the YAML Config file
+    # @return [SPlash::Config::Configuration]
     def get_config(config_file=CONFIG_FILE)
       return Configuration::new config_file
     end
 
-
+    # Setup action method for installing Splash
+    # @return [Integer] an errorcode value
     def setupsplash
       conf_in_path = search_file_in_gem "prometheus-splash", "config/splash.yml"
       full_res = 0
@@ -148,6 +164,8 @@ module Splash
 
     end
 
+    # Sanitycheck action method for testing installation of Splash
+   # @return [Integer] an errorcode value
     def checkconfig
       puts "Splash -> sanitycheck : "
       config = get_config
@@ -202,6 +220,11 @@ module Splash
 
     private
 
+    # facilities to find a file in gem path
+    # @param [String] _gem a Gem name
+    # @param [String] _file a file relative path in the gem
+    # @return [String] the path of the file, if found.
+    # @return [False] if not found
     def search_file_in_gem(_gem,_file)
       if Gem::Specification.respond_to?(:find_by_name)
         begin

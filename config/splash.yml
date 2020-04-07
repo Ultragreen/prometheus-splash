@@ -6,9 +6,6 @@
     :execution:
       :path: /etc/splash_execution_report.tpl
   :backends:
-    :list:
-      - :file
-      - :redis
     :stores:
       :execution_trace:
           :type: :file

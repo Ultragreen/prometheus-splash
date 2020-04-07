@@ -1,8 +1,8 @@
 # Splash
 
-![Splash logo](assets/images/logo_splash_reduce.png) Orchestration and Supervision made easy
+![Splash logo](assets/images/logo_splash_reduce.png) _Orchestration and Supervision made easy_
 
-SPLASH is *Supervision with Prometheus of Logs and Asynchronous tasks for Services or Hosts*
+SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestration for Services or Hosts**
 
 
 Prometheus Logs and Batchs supervision over PushGateway
@@ -11,7 +11,31 @@ Prometheus Logs and Batchs supervision over PushGateway
 ## Preconfiguration
 
 You need a Prometheus PushGateway operational, if the service not run on localhost:9091,
-See Configuration chapter to precise it in the configuration
+See Prometheus server Configuration chapter to precise it in the configuration
+
+You need Ruby on the server you want to run Splash
+Splash is succesfully tested with Ruby 2.7.0, but it should works correctly with all Ruby 2.X versions.
+
+On Ubuntu :
+
+    # apt install ruby
+
+In some use case, Splash also require some other components :
+
+- Redis
+- RabbitMQ
+
+It's not strictly required, Redis is a real option for backend; you could configure backend to flat file, but
+RabbitMQ is required by the Splash Daemon when using host2host sequence execution.
+
+Redis, is usefull when you need a centralized Splash management.
+
+On Ubuntu :
+
+    # apt install redis-server rabbimq-server
+
+See Backends Configuration  and Transports Configuration to specify this services configurations
+
 
 ## Installation
 
@@ -448,6 +472,102 @@ If you want to prevent callback execution, as root :
         => exitcode 0
        * Prometheus Gateway notified.
        * Without callbacks sequences
+
+#### Display the last execution trace for a command
+
+If you want to view the last execution trace for  commande, (run with --trace : default)
+
+    # splash com lastrun
+    Splash command pwd previous execution report:
+
+    Command Execution report
+    ========================
+
+    Date START: 2020-04-07T18:25:22+02:00
+    Date END: 2020-04-07T18:25:22+02:00
+    Command : pwd
+    full command line : pwd
+    Description : run pwd
+    errorcode : pid 86782 exit 0
+    Execution time (sec) : 0.006568
+
+    STDOUT:
+    -------
+
+    /Users/ruydiaz/labo/prometheus-splash
+
+
+
+    STDERR:
+    -------
+### Advanced  Configuration
+
+#### Backend configuration
+
+For the moment Splash come with two types of backend :
+- :file if you would a standalone splash Usage
+- :redis if you want a distributed Splash usage
+
+backend are usabme for :
+
+- execution trace
+
+##### File backend
+
+The file backend is very simple to use :
+
+Edit /etc/splash.yml, as root :
+
+    # vi /etc/splash.yml
+    [...]
+    :backends:
+      :stores:
+        :execution_trace:
+            :type: :file
+            :path: /var/run/splash
+    [...]
+
+- :type must be :file
+- :path should be set to the dedicated executions traces files path (default : /var/run/splash )
+
+##### Redis backend
+
+A little bit more complicated for Redis :
+
+Edit /etc/splash.yml, as root :
+
+    # vi /etc/splash.yml
+    [...]
+    :backends:
+      :stores:
+        :execution_trace:
+          :type: :redis
+          :host: localhost
+          :port: 6379
+          #:auth: "mykey"
+          :base: 1
+    [...]
+
+- :type must be :redis
+- :host must be set as the Redis server hostname (default: localhost)
+- :port must be set as the Redis server port (default: 6379)
+- :base must be set as the Redis base number (default: 1)
+- :auth should be set if Redis need an simple authentification key <mykey>
+
+##### Prometheus PushGateway configuration
+
+Prometheus PushGateway could be configured in /etc/splash.yaml
+
+    # vi /etc/splash.yml
+    [...]
+      :prometheus:
+        :pushgateway:
+          :host: "localhost"
+          :port: 9091
+    [...]
+
+-  :host should be set as the Prometheus PushGateway hostname (default: localhost)
+-  :port should be set as the Prometheus PushGateway port (default: 9091)
 
 
 ## Contributing

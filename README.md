@@ -106,8 +106,6 @@ Config for log is a YAML list of Hash, with keys :
 - :log : a log absolut paths
 - :pattern : a regular expression splash need to detect
 
-### Testing Logs analyse with default configuration values
-
 
 #### Prerequisite
 
@@ -217,20 +215,114 @@ if Prometheus Gateway is not running or misconfigured, you could see :
 
 Otherwise Prometheus PushGateway have received the metrics :
 
-metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])
-@metric_missing = Prometheus::Client::Gauge.new(:logmissing, docstring: 'SPLASH metric log missing', labels: [:log ])
-@metric_lines = Prometheus::Client::Gauge.new(:loglines, docstring: 'SPLASH metric log lines numbers', labels: [:log ])
 
-- *logerrors* , Prometheus Gauge : with label: <the logname> and job: 'Splash', decription : SPLASH metric log error'
-  ->  <nb match> the number of pattern matching for the log
-- *logmissing*, Prometheus Gauge : with label: <the logname> and job: 'Splash', decription : SPLASH metric log missing'
-  -> 0 if log exist, 1 if log missing
-- *loglines*, Prometheus Gauge : with label: <the logname> and job: 'Splash', decription : SPLASH metric log line numbers'
-  -> 0 if log missing, <nb lines in the log> the number of lines in the logs
+- *logerrors*, Prometheus Gauge : with label: <the logname> and job: 'Splash'
+  => description : SPLASH metric log error'
+  => content :<nb match> the number of pattern matching for the log
+
+- *logmissing*, Prometheus Gauge : with label: <the logname> and job: 'Splash'
+  => description : SPLASH metric log missing'
+  => content :0 if log exist, 1 if log missing
+
+- *loglines*, Prometheus Gauge : with label: <the logname> and job: 'Splash'
+  => description : SPLASH metric log line numbers'
+  => content :0 if log missing, <nb lines in the log> the number of lines in the logs
 
 #### See it in Prometheus PushGateway
 
 ![prom PG logs](assets/images/prom_pg_logs.png)
+
+![prom PG details logs](assets/images/detail_prom_splash.png)
+
+
+### Commands Orchestration, running and monitoring
+
+#### List of commands
+
+To see all the commands in the 'commands' submenu :
+
+    $ splash commands help
+
+    $ splash commands                           
+    Commands:
+      splash commands help [COMMAND]   # Describe subcommands or one specific subcommand
+      splash commands lastrun COMMAND  # Show last running result for specific configured command COMMAND
+      splash commands list             # Show configured commands
+      splash commands run NAME         # run for command/sequence or ack result
+      splash commands show COMMAND     # Show specific configured command COMMAND
+      splash commands treeview         # Show commands sequence tree
+
+#### test with default configuration
+
+Commands or Commands Sequences must be defined in the main configuration file '/etc/splash.yml'
+
+*Exemple* in default configuration :
+
+    ### configuration of commands and scheduling
+      :commands:
+        :id_root:
+          :desc: run id command on root
+          :command: id root
+
+        :true_test:
+          :desc: "test command returning true : 0"
+          :command: "true"
+          :schedule:
+            :every: "1h"
+          :on_failure: :ls_slash_tmp
+          :on_success: :pwd
+
+        :false_test:
+          :desc: "test command returning false > 0"
+          :command: "false"
+          :schedule:
+            :every: "1h"
+          :on_failure: :ls_slash_tmp
+          :on_success: :pwd
+
+        :ls_slash_tmp:
+          :desc: list file in /tmp
+          :command: ls -al /tmp
+          :user: daemon
+          :on_success: :echo1
+
+        :pwd:
+          :desc: run pwd
+          :command: pwd
+          :on_success: :echo1
+          :on_failure: :echo2
+
+        :echo1:
+        :desc: echo 'foo'
+        :command: echo foo
+        :on_failure: :echo3
+
+      :echo2:
+        :desc: echo 'bar'
+        :command: echo bar
+
+      :echo3:
+        :desc: echo 'been'
+        :command: echo been
+
+A configuration block for commands must include :
+
+* *key* : a name as Symbol (:xxxxxx)
+* *values* : (hash)
+  * :desc : a brief Description
+  * :command : the full command line
+
+may include :
+
+* :on_failure: the name of an other defined command, to, execute if exit_code > 0
+* :on_success: the name of an other defined command, to, execute if exit_code = 0
+* :schedule:  (hash) a scheduling for daemon, after in this documentation, it support :
+  * :every: "<timing>" ex: "1s", "3m", "2h"
+  * :at: "<date/time>" ex: "2030/12/12 23:30:00"
+  * :cron: * * * * * a cron format
+
+[Rufus Scheduler Doc](https://github.com/jmettraux/rufus-scheduler)
+
 
 ## Contributing
 

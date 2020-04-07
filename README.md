@@ -1,6 +1,6 @@
 # Splash
 
-![Splash logo](assets/images/logo splash reduce.png) | Orchestration and Supervision made easy
+![Splash logo](assets/images/logo_splash_reduce.png) Orchestration and Supervision made easy
 
 SPLASH is *Supervision with Prometheus of Logs and Asynchronous tasks for Services or Hosts*
 

@@ -94,5 +94,5 @@
   :logs:
     - :log: /tmp/test
       :pattern: ERROR
-    - :log: /var/log/message
-      :pattern: error
+    - :log: /tmp/test2
+      :pattern: ERROR

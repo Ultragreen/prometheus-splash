@@ -232,6 +232,8 @@ Otherwise Prometheus PushGateway have received the metrics :
 
 #### See it in Prometheus PushGateway
 
+visit http://<prometheus_pushgateway_host>:<prometheus_pushgateway_port>/
+
 ![prom PG logs](assets/images/prom_pg_logs.png)
 
 ![prom PG details logs](assets/images/detail_prom_splash.png)

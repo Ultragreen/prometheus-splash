@@ -252,7 +252,7 @@ To see all the commands in the 'commands' submenu :
       splash commands show COMMAND     # Show specific configured command COMMAND
       splash commands treeview         # Show commands sequence tree
 
-#### test with default configuration
+#### Prepare test with default configuration
 
 Commands or Commands Sequences must be defined in the main configuration file '/etc/splash.yml'
 
@@ -314,6 +314,7 @@ A configuration block for commands must include :
 
 may include :
 
+* :user: the userneme to use to run the command
 * :on_failure: the name of an other defined command, to, execute if exit_code > 0
 * :on_success: the name of an other defined command, to, execute if exit_code = 0
 * :schedule:  (hash) a scheduling for daemon, after in this documentation, it support :
@@ -322,6 +323,127 @@ may include :
   * :cron: * * * * * a cron format
 
 [Rufus Scheduler Doc](https://github.com/jmettraux/rufus-scheduler)
+
+if you want to inject default configuration, again as root :
+
+  # splash conf set
+
+
+#### listing the defined Commands
+
+You could list the defined commands, in your case :
+
+    $ splash commands list
+    Splash configured commands :
+    * id_root
+    * true_test
+    * false_test
+    * ls_slash_tmp
+    * pwd
+    * echo1
+    * echo2
+    * echo3
+
+#### Show specific commands
+
+You could show a specific command :
+
+    $ splash com show pwd
+    Splash command : pwd
+      - command line : 'pwd'
+      - command description : 'run pwd'
+      - command failure callback : 'echo2'
+      - command success callback : 'echo1'
+
+#### View Sequence execution for commands
+
+You could trace execution sequence for a commands as a tree, with :
+
+    # splash com treeview
+    Command : true_test
+      * on failure => ls_slash_tmp
+        * on success => echo1
+          * on failure => echo3
+      * on success => pwd
+        * on failure => echo2
+        * on success => echo1
+          * on failure => echo3
+
+In your sample, in all case :
+- :true_test return 0
+- :pwd return 0
+- :echo1 return 0
+
+commands execution sequence will be :
+
+:true_test => :pwd => :echo1
+
+:ls_slash_tmp, :echo2 and :echo3 will be never executed.
+
+#### Executing a standalone command :
+
+Running a standalone command with ONLY as root
+
+    # splash com execute echo1
+    Executing command : 'echo1'
+      * Tracefull execution
+       => exitcode 0
+      * Prometheus Gateway notified.
+
+This command :
+
+1. Execute command line defined in command 'echo1' defined in  configurations
+2. Trace information in a execution report :
+  - :start_date  the complete date time of execution start.
+  - :end_date  the complete date time of execution end.
+  - :cmd_name the name of the command
+  - :cmd_line the complete command line executed
+  - :stdout STDOUT of the command
+  - :stderr STDERR of the command
+  - :desc the description of the command
+  - :status : PID and exit_code of the command
+  - :exec_time : the timing of the command
+3. Notify Prometheus
+
+There is some usefull modifiers for this command :
+
+    --no-trace : prevent Splash to write report for this execution in configured backend
+    --no-notify : prevent Splash to nofify Prometheus PushGateway metric (see later in this documentation)
+    --no-callback : never execute callback (see it after)
+
+
+
+#### Executing a sequence of callback Commands
+
+Splash allow execution of callback (:on_failure, :on_success), you have already see it in config sample.
+In our example, we have see :true_test have a execution sequence, we're going to test this, as root :
+
+    # splash com exe true_test
+    Executing command : 'true_test'
+      * Tracefull execution
+       => exitcode 0
+      * Prometheus Gateway notified.
+      * On success callback : pwd
+    Executing command : 'pwd'
+      * Tracefull execution
+       => exitcode 0
+      * Prometheus Gateway notified.
+      * On success callback : echo1
+    Executing command : 'echo1'
+    * Tracefull execution
+     => exitcode 0
+    * Prometheus Gateway notified.
+
+We could verify the sequence determined with lastrun command.
+
+If you want to prevent callback execution, as root :
+
+      # splash com exe true_test --no-callback
+      Executing command : 'true_test'
+       * Tracefull execution
+        => exitcode 0
+       * Prometheus Gateway notified.
+       * Without callbacks sequences
 
 
 ## Contributing

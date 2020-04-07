@@ -38,21 +38,24 @@ module CLISplash
     include Splash::Config
     include Splash::Backends
 
-    desc "run NAME", "run for command/sequence or ack result"
+    desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
-    Running  command or sequence or ack result
-    with --no-trace prevent storing execution trace in TRACE_PATH (see config file)
+    execute command or sequence or ack result
+    with --no-trace prevent storing execution trace in configured backend (see config file)
     with --ack, notify errorcode=0 to Prometheus PushGateway
     with --no-notify, bypass Prometheus notification
+    with --no-callback, never execute callback (:on_failure, :on_success)
+                        never follow sequences
     LONGDESC
     option :trace, :type => :boolean, :default => true
     option :ack, :type => :boolean, negate: false
     option :notify, :type => :boolean, :default => true
-    def wrap(name)
+    option :callback, :type => :boolean, :default => true
+    def execute(name)
       if is_root? then
         command =  Splash::CommandWrapper::new(name)
         command.ack if options[:ack]
-        command.call_and_notify trace: options[:trace], notify: options[:notify]
+        command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
       else
         $stderr.puts "Command wrapping need to be run as root"
         exit 60

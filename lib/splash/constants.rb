@@ -21,7 +21,7 @@ module Splash
     PROMETHEUS_PUSHGATEWAY_PORT = "9091"
 
     EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
-    EXECUTION_TEMPLATE_TOKENS_LIST = [:date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+    EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
 
     BACKENDS_STRUCT = { :list => [:file,:redis],
                         :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}

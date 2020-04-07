@@ -1,7 +1,8 @@
 Command Execution report
 ========================
 
-Date : %%DATE%%
+Date START: %%START_DATE%%
+Date END: %%END_DATE%%
 Command : %%CMD_NAME%%
 full command line : %%CMD_LINE%%
 Description : %%DESC%%

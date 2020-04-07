@@ -5,15 +5,6 @@
   :templates:
     :execution:
       :path: /etc/splash_execution_report.tpl
-      :tokens:
-        - :date
-        - :cmd_name
-        - :cmd_line
-        - :stdout
-        - :stderr
-        - :desc
-        - :status
-        - :exec_time
   :backends:
     :list:
       - :file

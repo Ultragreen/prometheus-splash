@@ -58,7 +58,7 @@ module Splash
       end
 
       def transports
-        return self[:transport]
+        return self[:transports]
       end
 
       def daemon_logmon_scheduling
@@ -137,12 +137,16 @@ module Splash
       conf_in_path = search_file_in_gem "prometheus-splash", "config/splash.yml"
       full_res = 0
       puts "Splash -> setup : "
-      print "* Installing Configuration file : #{CONFIG_FILE} : "
-      if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: Configuration.user_root, group: Configuration.group_root then
-        puts "[OK]"
+      unless options[:preserve] then
+        print "* Installing Configuration file : #{CONFIG_FILE} : "
+        if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: Configuration.user_root, group: Configuration.group_root then
+          puts "[OK]"
+        else
+          full_res =+ 1
+          puts "[KO]"
+        end
       else
-        full_res =+ 1
-        puts "[KO]"
+        puts "Config file preservation."
       end
       config = get_config
       report_in_path = search_file_in_gem "prometheus-splash", "templates/report.txt"

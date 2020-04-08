@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby -W:no-deprecated
-
+require 'socket'
+require 'yaml'
+require 'thread'
 
 begin
   require 'prometheus/client'
@@ -20,6 +22,7 @@ require 'splash/helpers'
 require 'splash/config'
 require 'splash/templates'
 require 'splash/backends'
+require 'splash/transports'
 
 require 'splash/commands'
 require 'splash/logs'
@@ -127,14 +130,24 @@ module CLISplash
 
 
     desc "lastrun COMMAND", "Show last running result for specific configured command COMMAND"
+    long_desc <<-LONGDESC
+    Show last running result for specific configured command COMMAND
+    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
+    LONGDESC
+    option :hostname, :type => :string
     def lastrun(command)
+      backend = get_backend :execution_trace
+      redis = (backend.class == Splash::Backends::Redis)? true : false
+      if not redis and options[:hostname] then
+        $stderr.puts "Remote execution report request only possible with Redis backend"
+      end
       list = get_config.commands
       if list.keys.include? command.to_sym then
         print "Splash command #{command} previous execution report:\n\n"
-        backend = get_backend :execution_trace
-        key = "#{command}_trace.last"
-        if backend.exist? key: key then
-          print backend.get key: key
+        req  = { :key => command}
+        req[:hostname] = options[:hostname] if options[:hostname]
+        if backend.exist? req then
+          print backend.get req
         else
           puts "Command not already runned."
         end
@@ -144,11 +157,58 @@ module CLISplash
       end
     end
 
+    desc "getreportlist COMMAND", "list all executions report results "
+    long_desc <<-LONGDESC
+    Show configured commands
+    with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)
+    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
+    with --all, get all execution report for all servers (only with Redis backend configured)
+    --all and --hostname are exclusives
+    LONGDESC
+    option :pattern, :type => :string
+    option :hostname, :type => :string
+    option :all, :type => :boolean, :negate => false
+    def getreportlist
+      if options[:hostname] and options[:all] then
+        $stderr.puts "--all option imcompatible with --hostname"
+        exit 40
+      end
+      backend = get_backend :execution_trace
+      redis = (backend.class == Splash::Backends::Redis)? true : false
+      if not redis and (options[:hostname] or options[:all]) then
+        $stderr.puts "Remote execution report request only possible with Redis backend"
+        exit 40
+      end
+      pattern = (options[:pattern])? options[:pattern] : '*'
+      if options[:all] then
+        res = backend.listall pattern
+      elsif options[:hostname]
+        res = backend.list pattern, options[:hostname]
+      else
+        res = backend.list pattern
+      end
+      print "List of Executions reports :\n\n"
+      puts "Not reports found" if res.empty?
+      res.each do |item|
+        if options[:all]
+          host,command = item.split('#')
+          puts " * Command : #{command} @ host : #{host}"
+        else
+          puts " * Command : #{item}"
+        end
+      end
+    end
+
+
+
   end
+
+
 
 
   class CLIController < Thor
     include Splash::LogsMonitor::DaemonController
+    include Splash::Transports
 
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
@@ -169,6 +229,26 @@ module CLISplash
       exit errorcode
     end
 
+    desc "ping HOSTNAME", "send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    def ping(hostname=Socket.gethostname)
+      puts "ctrl+c for interrupt"
+      queue = "splash.#{Socket.gethostname}.returncli"
+      order = {:verb => :ping, :payload => {:hostname => Socket.gethostname}, :return_to => queue}
+
+      lock = Mutex.new
+      condition = ConditionVariable.new
+      begin
+        get_default_subscriber(queue: queue).subscribe(timeout: 10) do |delivery_info, properties, payload|
+          puts YAML::load(payload)
+          lock.synchronize { condition.signal }
+        end
+        get_default_client.publish queue: "splash.#{hostname}.input", message: order.to_yaml
+        lock.synchronize { condition.wait(lock) }
+      rescue Interrupt
+        puts "Splash : ping : Interrupted by user. "
+        exit 33
+      end
+    end
 
   end
 
@@ -180,6 +260,11 @@ module CLISplash
     include Splash::Helpers
 
     desc "setup", "Setup installation fo Splash"
+    long_desc <<-LONGDESC
+    Setup installation fo Splash
+    with --preserve, preserve from reinstallation of the config
+    LONGDESC
+    option :preserve, :type => :boolean
     def setup
       errorcode = run_as_root :setupsplash
       exit errorcode

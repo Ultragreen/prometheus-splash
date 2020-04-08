@@ -81,7 +81,7 @@ module Splash
         tp.stderr = stderr
         tp.exec_time = time.to_s
         backend = get_backend :execution_trace
-        key = "#{@name}_trace.last"
+        key = @name
         backend.put key: key, value: tp.output
         exit_code = status.exitstatus
 

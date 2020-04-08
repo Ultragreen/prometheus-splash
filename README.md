@@ -57,7 +57,7 @@ As root or with rvmsudo, if you use RVM.
     * Creating/Checking trace file path : /var/lib/splash : [OK]
     Splash config successfully done.
 
-*WARNING : if you have already configured Splash, running this command without --prevent-configs flag, RESET the Splash Configuration.*
+*WARNING : if you have already configured Splash, running this command without --preserve flag, RESET the Splash Configuration.*
 
 
 As root, edit /etc/splash.conf and adapt Prometheus Pushgateway Configuration :
@@ -508,7 +508,7 @@ For the moment Splash come with two types of backend :
 - :file if you would a standalone splash Usage
 - :redis if you want a distributed Splash usage
 
-backend are usabme for :
+backend are usable for :
 
 - execution trace
 
@@ -568,6 +568,93 @@ Prometheus PushGateway could be configured in /etc/splash.yaml
 
 -  :host should be set as the Prometheus PushGateway hostname (default: localhost)
 -  :port should be set as the Prometheus PushGateway port (default: 9091)
+
+### The Splash daemon
+
+#### Introduction
+
+We're going to discover the Big part of Splash the Daemon, usefull to :
+
+- orchestration
+- scheduling
+- Log monitoring (without CRON scheduling)
+- host2host sequences execution (optionnal )
+
+#### Controlling the daemon
+
+TODO
+
+#### Configuring the daemon
+
+TODO
+
+
+### Ecosystem
+
+#### Execution report Template adaptions
+
+TODO
+
+#### Ubuntu Ansible playbook
+
+TODO
+
+#### Systemd integration fo daemon
+
+TODO
+
+#### CRON usage with or without rvmsudo
+
+TODO
+
+#### Default values for configuration
+
+ defined in the lib/splash/constants.rb
+
+```ruby
+
+# the only one non-overridable by the configuration
+CONFIG_FILE = "/etc/splash.yml"
+
+
+TRACE_PATH="/var/run/splash"
+
+DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
+DAEMON_PROCESS_NAME="Splash : daemon."
+DAEMON_PID_PATH="/var/run"
+DAEMON_PID_FILE="splash.pid"
+DAEMON_STDOUT_TRACE="stdout.txt"
+DAEMON_STDERR_TRACE="stderr.txt"
+
+AUTHOR="Romain GEORGES"
+EMAIL = "gems@ultragreen.net"
+COPYRIGHT="Ultragreen (c) 2020"
+LICENSE="BSD-2-Clause"
+
+PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
+PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+
+EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
+EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+
+BACKENDS_STRUCT = { :list => [:file,:redis],
+                    :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
+TRANSPORTS_STRUCT = { :list => [:rabbitmq],
+                    :active => :rabbitmq,
+                    :rabbitmq => { :url => 'amqp://localhost/'} }
+
+```
+
+
+#### Splash CLI return code significations
+
+TODO
+
+### In the Futur ?
+
+- IHM
+- Webservice
+
 
 
 ## Contributing

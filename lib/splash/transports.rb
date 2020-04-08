@@ -4,9 +4,9 @@ module Splash
   module Transports
     include Splash::Config
 
-    def get_default_subscriber
-      aclass = "Splash::Transports::#{get_config[:transports][:active].to_s.capitalize}::Suscriber"
-      return Kernel.const_get(aclass)::new
+    def get_default_subscriber(queue)
+      aclass = "Splash::Transports::#{get_config[:transports][:active].to_s.capitalize}::Subscriber"
+      return Kernel.const_get(aclass)::new(queue)
     end
 
     def get_default_client

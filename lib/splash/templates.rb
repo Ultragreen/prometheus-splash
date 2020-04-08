@@ -1,11 +1,14 @@
 module Splash
   module Templates
+
+    # KISS template Engine
     class Template
 
       attr_reader :list_token
       attr_reader :template_file
       attr_reader :content
 
+      # constructor : generate the pseudo accessor for template Class from token list
       def initialize(_options)
 
 
@@ -28,12 +31,17 @@ module Splash
         @list_token.each{|_token| eval("def #{_token}; @hash_token['#{_token}'] ;end")}
       end
 
+      # generic accessor
+      # @param [Symbol] _token in the token list
+      # @param [String] _value a text value
+      # @raise [ArgumentError] if _valu is not a String
       def token(_token,_value)
         raise ArgumentError::new('Not a String') unless _value.class == String
         @hash_token[_token.to_s] = _value
       end
 
-
+      # map a hash against templates token_list
+      # @param [Hash] _hash a hash data to map
       def map(_hash)
         _data = {}
         _hash.each { |item,val|
@@ -44,11 +52,14 @@ module Splash
         @hash_token = _data
       end
 
+      # collector for pseudo accessor to prevent bad mapping
+      # @raise [NotAToken] if caling an accessor not mapped in token list
       def method_missing(_name,*_args)
         raise NotAToken
       end
 
-
+      # the templater;proceed to templating
+      # @return [String] the template output
       def output
         _my_res = String::new('')
         _my_res = @content

@@ -1,3 +1,6 @@
+require 'socket'
+require 'yaml'
+
 module Splash
   module Orchestrator
 
@@ -15,11 +18,30 @@ module Splash
       end
     end
 
+    module Commander
+      include Splash::Transports
+      def send_message (options)
+        client = get_default_client
+        client.publish  options
+      end
+    end
+
+    module Grammar
+
+      VERBS=[:ping]
+
+      def ping(payload)
+        return "Pong : #{payload[:hostname]} !"
+      end
+    end
+
 
     class Scheduler
         include Splash::Constants
         include Splash::Helpers
         include Splash::Config
+        include Splash::Transports
+        include Splash::Orchestrator::Grammar
         def initialize
           @server  = Rufus::Scheduler::new
           @server.extend SchedulerHooks
@@ -35,7 +57,17 @@ module Splash
               $stderr.puts "PushGateway seems to be done, please start it."
             end
           end
-          @server.join
+          hostname = Socket.gethostname
+          transport = get_default_subscriber queue: "splash.#{hostname}.input"
+          transport.subscribe(:block => true) do |delivery_info, properties, body|
+            content = YAML::load(body)
+            if VERBS.include? content[:verb]
+              res = self.send content[:verb], content[:payload]
+              get_default_client.publish queue: content[:return_to], message: res.to_yaml
+            else
+              get_default_client.publish queue: content[:return_to], message: "Unkown verb #{content[:verb]}".to_yaml
+            end
+          end
         end
 
         def terminate

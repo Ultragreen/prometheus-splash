@@ -5,6 +5,9 @@ module Splash
     include Splash::Constants
     include Splash::Config
 
+
+    # LogScanner Constructor
+    # return [LogScanner]
     def initialize
       @logs_target = get_config.logs
       @config = get_config
@@ -17,6 +20,8 @@ module Splash
       @registry.register(@metric_lines)
     end
 
+
+    # start log analyse for log target in config
     def analyse
       @logs_target.each do |record|
         record[:count]=0 if record[:count].nil?
@@ -31,10 +36,12 @@ module Splash
       end
     end
 
+    # pseudo-accessor on @logs_target
     def output
       return @logs_target
     end
 
+    # start notification on prometheus for metric logerrors, logmissing; loglines
     def notify
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
         $stderr.puts "Prometheus PushGateway Service IS NOT running"

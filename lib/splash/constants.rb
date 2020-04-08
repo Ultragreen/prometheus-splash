@@ -1,6 +1,6 @@
 module Splash
   module Constants
-    VERSION = "0.0.3"
+    VERSION = "0.1.0"
 
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"
@@ -41,7 +41,7 @@ module Splash
     # the list of authorized tokens for template, carefull override,
     EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
 
-    # backends default settings 
+    # backends default settings
     BACKENDS_STRUCT = { :list => [:file,:redis],
                         :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
     # transports default settings

@@ -26,7 +26,8 @@ module Splash
 
     def ack
       puts "Sending ack for command : '#{@name}'"
-      notify(0)
+      time = 0
+      notify(0,0)
       exit 0
     end
 

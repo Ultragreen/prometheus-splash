@@ -35,7 +35,6 @@ module Splash
       end
     end
 
-
     class Scheduler
         include Splash::Constants
         include Splash::Helpers
@@ -46,8 +45,10 @@ module Splash
           @server  = Rufus::Scheduler::new
           @server.extend SchedulerHooks
           @server.init_log
+          @config = get_config
           @result = LogScanner::new
-          @server.every '20s' do
+          sched,value = @config.daemon_logmon_scheduling.flatten
+          @server.send sched,value do
             begin
               puts "Notify"
               @result.analyse

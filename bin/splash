@@ -1,33 +1,6 @@
 #!/usr/bin/env ruby -W:no-deprecated
-require 'socket'
-require 'yaml'
-require 'thread'
 
-begin
-  require 'prometheus/client'
-  require 'prometheus/client/push'
-  require 'thor'
-  require 'rufus-scheduler'
-
-rescue Gem::GemNotFoundException
-  $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
-  $stderr.puts "If you run on RVM, please run with rvmsudo and not with sudo."
-  $stderr.puts "If problem is percistant, please, proceed to new install and Setup."
-end
-
-require 'yaml'
-
-require 'splash/constants'
-require 'splash/helpers'
-require 'splash/config'
-require 'splash/templates'
-require 'splash/backends'
-require 'splash/transports'
-
-require 'splash/commands'
-require 'splash/logs'
-require 'splash/orchestrator'
-require 'splash/controller'
+require 'splash/dependencies'
 
 #inhibit warning : due to prometheus-client call to URI.encode warning
 $-w = nil
@@ -201,9 +174,27 @@ module CLISplash
 
 
 
+
   end
 
 
+  class Documentation < Thor
+    include Splash::Config
+
+    desc "readme", "Display README file"
+    option :formatted, :type => :boolean, :default => true
+    def readme
+      filename = search_file_in_gem("prometheus-splash","README.md")
+
+      if options[:formatted] then
+        content = TTY::Markdown.parse_file(filename)
+      else
+        conten = File::readlines(filename).join
+      end
+      pager = TTY::Pager.new
+      pager.page(content)
+    end
+  end
 
 
   class CLIController < Thor
@@ -364,6 +355,8 @@ class CLI < Thor
   subcommand "daemon", CLIController
   desc "config SUBCOMMAND ...ARGS", "config tools for Splash"
   subcommand "config", Config
+  desc "documentation SUBCOMMAND ...ARGS", "Documentation for Splash"
+  subcommand "documentation", Documentation
 end
 
 

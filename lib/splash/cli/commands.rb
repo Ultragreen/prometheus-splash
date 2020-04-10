@@ -5,6 +5,7 @@ module CLISplash
   class Commands < Thor
     include Splash::Config
     include Splash::Backends
+    include Splash::Exiter
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
@@ -25,8 +26,7 @@ module CLISplash
         command.ack if options[:ack]
         command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
       else
-        $stderr.puts "Command wrapping need to be run as root"
-        exit 60
+        splash_exit status: :error, case: :not_root
       end
     end
 

@@ -33,6 +33,7 @@ module Splash
           record[:status] = :missing
         end
       end
+      return {:case => :quiet_exit }
     end
 
     # pseudo-accessor on @logs_target
@@ -45,7 +46,7 @@ module Splash
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
         $stderr.puts "Prometheus PushGateway Service IS NOT running"
         $stderr.puts "Exit without notification."
-        exit 30
+        return  { :case => :service_dependence_missing, :more => "Prometheus Notification not send." }
       end
       puts "Sending metrics to Prometheus Pushgateway"
       @logs_target.each do |item|
@@ -60,6 +61,7 @@ module Splash
       url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
       Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
       puts "Sending done."
+      return {:case => :quiet_exit }
     end
 
   end

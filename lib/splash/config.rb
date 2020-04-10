@@ -175,11 +175,10 @@ module Splash
       end
 
       if full_res > 0 then
-        $stderr.puts "Splash config done with #{full_res} errors"
-        return 25
+        $stderr.puts " => #{full_res} errors occured"
+        return { :case => :splash_setup_error}
       else
-        puts "Splash config successfully done."
-        return 0
+        return { :case => :splash_setup_success }
       end
 
     end
@@ -230,11 +229,10 @@ module Splash
       end
 
       if full_res > 0 then
-        $stderr.puts "Sanitycheck finished with #{full_res} errors"
-        return 20
+        $stderr.puts " => #{full_res} errors occured"
+        return { :case => :splash_sanitycheck_error }
       else
-        puts "Sanitycheck finished with no errors"
-        return 0
+        return { :case => :splash_sanitycheck_success}
       end
     end
 

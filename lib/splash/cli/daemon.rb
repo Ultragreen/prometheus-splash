@@ -8,20 +8,20 @@ module CLISplash
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"
     def start
-      errorcode = run_as_root :startdaemon
-      exit errorcode
+      acase = run_as_root :startdaemon
+      splash_exit acase
     end
 
     desc "stop", "Stopping Logs Monitor Daemon"
     def stop
-      errorcode = run_as_root :stopdaemon
-      exit errorcode
+      acase = run_as_root :stopdaemon
+      splash_exit acase
     end
 
     desc "status", "Logs Monitor Daemon status"
     def status
-      errorcode = run_as_root :statusdaemon
-      exit errorcode
+      acase = run_as_root :statusdaemon
+      splash_exit acase
     end
 
     desc "ping HOSTNAME", "send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
@@ -39,9 +39,9 @@ module CLISplash
         end
         get_default_client.publish queue: "splash.#{hostname}.input", message: order.to_yaml
         lock.synchronize { condition.wait(lock) }
+        splash_exit case: :quiet_exit
       rescue Interrupt
-        puts "Splash : ping : Interrupted by user. "
-        exit 33
+        splash_exit status: :error, case: :interrupt, more: "Ping Command"
       end
     end
 

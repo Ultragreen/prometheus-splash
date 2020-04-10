@@ -10,9 +10,7 @@ module Splash
       def startdaemon(options = {})
         config = get_config
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
-          $stderr.puts "Prometheus PushGateway Service is not running,"
-          $stderr.puts " please start before running Splash daemon."
-          exit 11
+          return {:case => :service_dependence_missing :more => 'Prometheus Gateway'}
         end
 
         unless File::exist? config.full_pid_path then
@@ -25,10 +23,10 @@ module Splash
           if res == 0 then
             pid = `cat #{config.full_pid_path}`.to_i
             puts "Splash Daemon Started, with PID : #{pid}"
+            return {:case => :quiet_exit}
           else
-            $stderr.puts "Splash Daemon loading error"
+            return {:case => :unknown_error, :more => "Splash Daemon loading error"}
           end
-          return res
 
         else
           $stderr.puts "Pid File already exist, please verify if Splash daemon is running."

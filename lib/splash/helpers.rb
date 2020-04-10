@@ -31,11 +31,9 @@ module Splash
     # facilité pour s'assurer qu'on execute une méthode avec les droits root
     # @param [Symbol] method a method name th wrap
     # @return [void] le retour de la méthode wrappée
-    def run_as_root(method)
+    def run_as_root(method, options = {})
       unless is_root?
-        $stderr.puts "You need to be root to execute this subcommands : #{method.to_s}"
-        $stderr.puts "Please execute with sudo, or rvmsudo."
-        exit 10
+        return {:case => :not_root, :more => "subcommands : #{method.to_s}"}
       else
         return self.send method
       end

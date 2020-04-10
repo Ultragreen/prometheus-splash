@@ -16,6 +16,7 @@ module CLISplash
       end
       pager = TTY::Pager.new
       pager.page(content)
+      splash_exit case: :quiet_exit
     end
   end
 end

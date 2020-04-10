@@ -10,8 +10,7 @@ module Splash
       @config  = get_config
       @name = name
       unless @config.commands.keys.include? @name.to_sym then
-        $stderr.puts "Splash : command #{@name} is not defined in configuration"
-        exit 40
+        splash_exit case: :not_found, more: "command #{@name} is not defined in configuration"
       end
       @registry = Prometheus::Client.registry
       @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
@@ -23,16 +22,12 @@ module Splash
 
     def ack
       puts "Sending ack for command : '#{@name}'"
-      time = 0
       notify(0,0)
-      exit 0
     end
 
     def notify(value,time)
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
-        $stderr.puts "Prometheus PushGateway Service IS NOT running"
-        $stderr.puts "Exit without notification."
-        exit 30
+        splash_exit case: :service_dependence_missing, more: "Prometheus Notification not send."
       end
       @metric_exitcode.set(value)
       @metric_time.set(time)
@@ -44,6 +39,7 @@ module Splash
 
     def call_and_notify(options)
       puts "Executing command : '#{@name}' "
+      acase = { :case => :quiet_exit }
       start = Time.now
       start_date = DateTime.now.to_s
       unless options[:trace] then
@@ -101,7 +97,7 @@ module Splash
             @name = on_failure.to_s
             call_and_notify options
           else
-            $stderr.puts "on_failure call error : configuration mistake : #{on_failure} command inexistant."
+            acase = { :case => :configuration_error , :more => "on_failure call error : #{on_failure} command inexistant."}
           end
         end
         if on_success and exit_code == 0 then
@@ -116,8 +112,7 @@ module Splash
       else
         puts " * Without callbacks sequences"
       end
-
-      exit exit_code
+      return acase
     end
   end
 end

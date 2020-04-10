@@ -25,8 +25,9 @@ module CLISplash
         command =  Splash::CommandWrapper::new(name)
         command.ack if options[:ack]
         command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
+        splash_exit acase
       else
-        splash_exit status: :error, case: :not_root
+        splash_exit case: :not_root, :more => "Command execution"
       end
     end
 
@@ -45,6 +46,7 @@ module CLISplash
         puts "* on success => #{cmd[:on_success]}"
         treeview(cmd[:on_success],depht+2)
       end
+      splash_exit case: :quiet_exit
     end
 
 
@@ -67,6 +69,7 @@ module CLISplash
           puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
         end
       end
+      splash_exit case: :quiet_exit
     end
 
 
@@ -79,9 +82,9 @@ module CLISplash
         puts "   - command description : '#{list[command.to_sym][:desc]}'"
         puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
         puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
+        splash_exit case: :quiet_exit
       else
-        $stderr.puts "Command not configured"
-        exit 50
+        splash_exit case: :command_not_configured
       end
     end
 
@@ -96,7 +99,7 @@ module CLISplash
       backend = get_backend :execution_trace
       redis = (backend.class == Splash::Backends::Redis)? true : false
       if not redis and options[:hostname] then
-        $stderr.puts "Remote execution report request only possible with Redis backend"
+        splash_exit case: :redis_back_required, :more => "Remote execution report request"
       end
       list = get_config.commands
       if list.keys.include? command.to_sym then
@@ -108,9 +111,9 @@ module CLISplash
         else
           puts "Command not already runned."
         end
+        splash_exit case: :quiet_exit
       else
-        $stderr.puts "Command not configured"
-        exit 50
+        splash_exit case: :command_not_configured
       end
     end
 
@@ -127,14 +130,12 @@ module CLISplash
     option :all, :type => :boolean, :negate => false
     def getreportlist
       if options[:hostname] and options[:all] then
-        $stderr.puts "--all option imcompatible with --hostname"
-        exit 40
+        splash_exit case: :options_incompatibility, more: "--all, --hostname"
       end
       backend = get_backend :execution_trace
       redis = (backend.class == Splash::Backends::Redis)? true : false
       if not redis and (options[:hostname] or options[:all]) then
-        $stderr.puts "Remote execution report request only possible with Redis backend"
-        exit 40
+        splash_exit case: :redis_back_required, more: "Remote execution report Request"
       end
       pattern = (options[:pattern])? options[:pattern] : '*'
       if options[:all] then
@@ -154,6 +155,7 @@ module CLISplash
           puts " * Command : #{item}"
         end
       end
+      splash_exit case: :quiet_exit
     end
 
   end

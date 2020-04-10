@@ -7,7 +7,7 @@ module CLISplash
     desc "analyse", "analyze logs in config"
     def analyse
       results = Splash::LogScanner::new
-      results.analyse
+      res = results.analyse
       puts "SPlash Configured logs status :"
       full_status = true
       results.output.each do |result|
@@ -21,6 +21,7 @@ module CLISplash
       end
       display_status = (full_status)? "OK": "KO"
       puts "Global Status : [#{display_status}]"
+      return res
     end
 
     desc "monitor", "monitor logs in config"
@@ -28,6 +29,8 @@ module CLISplash
       result = Splash::LogScanner::new
       result.analyse
       result.notify
+      splash_exit result.notify
+
     end
 
     desc "show LOG", "show configured log monitoring for LOG"
@@ -37,9 +40,9 @@ module CLISplash
         record = log_record_set.first
         puts "Splash log monitor : #{record[:log]}"
         puts "  ->   pattern : /#{record[:pattern]}/"
+        splash_exit case: :quiet_exit
     else
-        $stderr.puts "log not configured"
-        exit 50
+        splash_exit case: :not_found, :more => "log not configured"
       end
     end
 

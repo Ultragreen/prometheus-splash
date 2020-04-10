@@ -23,8 +23,10 @@ module CLISplash
     def execute(name)
       if is_root? then
         command =  Splash::CommandWrapper::new(name)
-        command.ack if options[:ack]
-        command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
+        if options[:ack] then
+          splash_exit command.ack
+        end
+        acase = command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
         splash_exit acase
       else
         splash_exit case: :not_root, :more => "Command execution"
@@ -84,7 +86,7 @@ module CLISplash
         puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
         splash_exit case: :quiet_exit
       else
-        splash_exit case: :command_not_configured
+        splash_exit case: :not_found, :more => 'Command not configured'
       end
     end
 
@@ -99,7 +101,7 @@ module CLISplash
       backend = get_backend :execution_trace
       redis = (backend.class == Splash::Backends::Redis)? true : false
       if not redis and options[:hostname] then
-        splash_exit case: :redis_back_required, :more => "Remote execution report request"
+        splash_exit case: :specific_config_required, :more => "Redis backend is requiered for Remote execution report request"
       end
       list = get_config.commands
       if list.keys.include? command.to_sym then
@@ -117,12 +119,12 @@ module CLISplash
       end
     end
 
-    desc "getreportlist COMMAND", "list all executions report results "
+    desc "getreportlist", "list all executions report results "
     long_desc <<-LONGDESC
-    Show configured commands
-    with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)
-    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
-    with --all, get all execution report for all servers (only with Redis backend configured)
+    list all executions report results
+    with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)\n
+    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)\n
+    with --all, get all execution report for all servers (only with Redis backend configured)\n
     --all and --hostname are exclusives
     LONGDESC
     option :pattern, :type => :string

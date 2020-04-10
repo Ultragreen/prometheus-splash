@@ -3,6 +3,8 @@ module CLISplash
 
   class Logs < Thor
     include Splash::Config
+    include Splash::Exiter
+
 
     desc "analyse", "analyze logs in config"
     def analyse
@@ -21,7 +23,7 @@ module CLISplash
       end
       display_status = (full_status)? "OK": "KO"
       puts "Global Status : [#{display_status}]"
-      return res
+      splash_exit case: :quiet_exit
     end
 
     desc "monitor", "monitor logs in config"
@@ -62,6 +64,7 @@ module CLISplash
           puts "  ->   pattern : /#{record[:pattern]}/"
         end
       end
+      splash_exit case: :quiet_exit
     end
 
   end

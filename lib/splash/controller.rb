@@ -10,7 +10,7 @@ module Splash
       def startdaemon(options = {})
         config = get_config
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
-          return {:case => :service_dependence_missing :more => 'Prometheus Gateway'}
+          return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
 
         unless File::exist? config.full_pid_path then
@@ -29,30 +29,25 @@ module Splash
           end
 
         else
-          $stderr.puts "Pid File already exist, please verify if Splash daemon is running."
-          return 14
+          return {:case => :already_exist, :more => "Pid File, please verify if Splash daemon is running."}
         end
       end
 
       def stopdaemon(options = {})
           config = get_config
-          errorcode = 0
           if File.exist?(config.full_pid_path) then
-
             begin
               pid = `cat #{config.full_pid_path}`.to_i
               Process.kill("TERM", pid)
-              puts 'Splash stopped succesfully'
+              acase = {:case => :quiet_exit, :more => 'Splash stopped succesfully'}
             rescue Errno::ESRCH
-              $stderr.puts "Process of PID : #{pid} not found"
-              errorcode = 12
+              acase =  {:case => :not_found, :more => "Process of PID : #{pid} not found"}
             end
             FileUtils::rm config.full_pid_path if File::exist? config.full_pid_path
           else
-            $stderr.puts "Splash is not running"
-            errorcode = 13
+            acase =  {:case => :not_found, :more => "Splash is not running"}
           end
-          return errorcode
+          return acase
       end
 
       def statusdaemon
@@ -73,16 +68,11 @@ module Splash
           puts "and PID file don't exist"
         end
         if pid == realpid then
-          puts 'Status OK'
-          return 0
+          return {:case => :status_ok }
         elsif pid.empty? then
-          $stderr.puts "PID File error, you have to kill process manualy, with : '(sudo )kill -TERM #{realpid}'"
-          $stderr.puts "Status KO"
-          return 16
+          return {:case => :status_ko, :more => "PID File error, you have to kill process manualy, with : '(sudo )kill -TERM #{realpid}'"}
         elsif realpid.empty? then
-          $stderr.puts "Process Splash Dameon missing, run 'splash daemon stop' to reload properly"
-          $stderr.puts "Status KO"
-          return 17
+          return {:case => :status_ko, :more => "Process Splash Dameon missing, run 'splash daemon stop' to reload properly"}
         end
       end
 

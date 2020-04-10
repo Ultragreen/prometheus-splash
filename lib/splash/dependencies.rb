@@ -37,6 +37,7 @@ module Splash
     require 'splash/constants'
     require 'splash/helpers'
     require 'splash/config'
+    require 'splash/exiter'
     require 'splash/templates'
     require 'splash/backends'
     require 'splash/transports'

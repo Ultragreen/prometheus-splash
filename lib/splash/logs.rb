@@ -44,8 +44,6 @@ module Splash
     # start notification on prometheus for metric logerrors, logmissing; loglines
     def notify
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
-        $stderr.puts "Prometheus PushGateway Service IS NOT running"
-        $stderr.puts "Exit without notification."
         return  { :case => :service_dependence_missing, :more => "Prometheus Notification not send." }
       end
       puts "Sending metrics to Prometheus Pushgateway"

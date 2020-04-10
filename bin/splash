@@ -9,6 +9,8 @@ $-w = nil
 
 include Splash::Dependencies
 include Splash::Helpers
+include Splash::Exiter
+
 
 
  CLI.start(ARGV)

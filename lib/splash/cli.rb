@@ -1,3 +1,4 @@
+# coding: utf-8
 Dir[File.dirname(__FILE__) + '/cli/*.rb'].each {|file| require file  }
 
 class CLI < Thor

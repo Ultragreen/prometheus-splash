@@ -1,6 +1,4 @@
-require "redis"
-require "socket"
-
+# coding: utf-8
 module Splash
   module Backends
     class Redis

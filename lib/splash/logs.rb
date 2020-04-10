@@ -1,5 +1,4 @@
-require 'socket'
-
+# coding: utf-8
 module Splash
   class LogScanner
     include Splash::Constants

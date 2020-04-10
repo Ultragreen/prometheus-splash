@@ -1,11 +1,18 @@
+# coding: utf-8
 module Splash
   module Dependencies
 
 
     # Internal Ruby
+    require 'open3'
+    require 'date'
     require 'socket'
     require 'yaml'
     require 'thread'
+    require 'fileutils'
+    require 'etc'
+    require 'forwardable'
+
 
 
     # Rubygems
@@ -13,9 +20,11 @@ module Splash
       require 'prometheus/client'
       require 'prometheus/client/push'
       require 'thor'
+      require 'bunny'
       require 'rufus-scheduler'
       require 'tty-markdown'
       require 'tty-pager'
+      require "redis"
 
     rescue Gem::GemNotFoundException
       $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
@@ -24,7 +33,7 @@ module Splash
     end
 
 
-    # Splash 
+    # Splash
     require 'splash/constants'
     require 'splash/helpers'
     require 'splash/config'

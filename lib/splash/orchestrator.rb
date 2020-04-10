@@ -1,6 +1,4 @@
-require 'socket'
-require 'yaml'
-
+# coding: utf-8
 module Splash
   module Orchestrator
 

@@ -1,7 +1,4 @@
-require 'open3'
-require 'date'
-require 'socket'
-
+# coding: utf-8
 module Splash
   class CommandWrapper
     include Splash::Templates

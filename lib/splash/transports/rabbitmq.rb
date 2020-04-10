@@ -1,7 +1,4 @@
-require 'bunny'
-require 'yaml'
-require 'forwardable'
-
+# coding: utf-8
 module Splash
   module Transports
     module Rabbitmq

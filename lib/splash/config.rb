@@ -1,4 +1,4 @@
-require 'etc'
+# coding: utf-8
 module Splash
   module Config
     include Splash::Helpers

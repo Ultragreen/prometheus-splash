@@ -1,4 +1,4 @@
-
+# coding: utf-8
 module Splash
   module LogsMonitor
     module DaemonController

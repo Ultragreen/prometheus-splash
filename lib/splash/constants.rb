@@ -1,3 +1,4 @@
+# coding: utf-8
 module Splash
   module Constants
     VERSION = "0.1.0"

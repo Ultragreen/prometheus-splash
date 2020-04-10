@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby -W:no-deprecated
+# coding: utf-8
 
 require 'splash/dependencies'
 require 'splash/cli'

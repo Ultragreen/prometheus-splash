@@ -1,8 +1,4 @@
 # coding: utf-8
-require 'fileutils'
-require 'etc'
-
-# coding: utf-8
 module Splash
   module Helpers
 

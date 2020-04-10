@@ -3,6 +3,8 @@ module CLISplash
 
   class Documentation < Thor
     include Splash::Config
+    include Splash::Exiter
+
 
     desc "readme", "Display README file"
     option :formatted, :type => :boolean, :default => true

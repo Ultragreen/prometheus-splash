@@ -4,6 +4,8 @@ module CLISplash
   class CLIController < Thor
     include Splash::LogsMonitor::DaemonController
     include Splash::Transports
+    include Splash::Exiter
+
 
     option :foreground, :type => :boolean
     desc "start", "Starting Logs Monitor Daemon"

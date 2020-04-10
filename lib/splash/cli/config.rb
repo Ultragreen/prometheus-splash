@@ -4,6 +4,8 @@ module CLISplash
   class Config < Thor
     include Splash::Config
     include Splash::Helpers
+    include Splash::Exiter
+
 
     desc "setup", "Setup installation fo Splash"
     long_desc <<-LONGDESC

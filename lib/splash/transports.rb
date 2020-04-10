@@ -1,5 +1,4 @@
 # coding: utf-8
-Dir[File.dirname(__FILE__) + '/transports/*.rb'].each {|file| require file  }
 
 module Splash
   module Transports
@@ -17,3 +16,5 @@ module Splash
 
   end
 end
+
+Dir[File.dirname(__FILE__) + '/transports/*.rb'].each {|file| require file  }

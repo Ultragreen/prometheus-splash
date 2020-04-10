@@ -26,11 +26,18 @@ module Splash
 
     module Grammar
 
-      VERBS=[:ping]
+      include Splash::Config
+      VERBS=[:ping,:list_commands]
 
       def ping(payload)
         return "Pong : #{payload[:hostname]} !"
       end
+
+
+      def list_commands
+        return get_config.commands
+      end
+
     end
 
     class Scheduler
@@ -61,7 +68,11 @@ module Splash
           transport.subscribe(:block => true) do |delivery_info, properties, body|
             content = YAML::load(body)
             if VERBS.include? content[:verb]
-              res = self.send content[:verb], content[:payload]
+              if content[:payload] then
+                res = self.send content[:verb], content[:payload]
+              else
+                res = self.send content[:verb]
+              end
               get_default_client.publish queue: content[:return_to], message: res.to_yaml
             else
               get_default_client.publish queue: content[:return_to], message: "Unkown verb #{content[:verb]}".to_yaml

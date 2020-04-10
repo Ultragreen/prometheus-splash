@@ -1,8 +1,11 @@
 # coding: utf-8
+Dir[File.dirname(__FILE__) + '/config/*.rb'].each {|file| require file  }
+
 module Splash
   module Config
     include Splash::Helpers
     include Splash::Constants
+    include Splash::ConfigUtilities
 
 
     # Class to manage configuration in Splash from Splash::Constants override by Yaml CONFIG
@@ -35,22 +38,6 @@ module Splash
       end
 
       # @!group accessors on configurations Items
-
-      def Configuration.user_root
-        return Etc.getpwuid(0).name
-      end
-
-      def Configuration.group_root
-        return Etc.getgrgid(0).name
-      end
-
-      def user_root
-        return Configuration.user_root
-      end
-
-      def group_root
-        return Configuration.group_root
-      end
 
 
       def backends
@@ -131,142 +118,8 @@ module Splash
       return Configuration::new config_file
     end
 
-    # Setup action method for installing Splash
-    # @return [Integer] an errorcode value
-    def setupsplash
-      conf_in_path = search_file_in_gem "prometheus-splash", "config/splash.yml"
-      full_res = 0
-      puts "Splash -> setup : "
-      unless options[:preserve] then
-        print "* Installing Configuration file : #{CONFIG_FILE} : "
-        if install_file source: conf_in_path, target: CONFIG_FILE, mode: "644", owner: Configuration.user_root, group: Configuration.group_root then
-          puts "[OK]"
-        else
-          full_res =+ 1
-          puts "[KO]"
-        end
-      else
-        puts "Config file preservation."
-      end
-      config = get_config
-      report_in_path = search_file_in_gem "prometheus-splash", "templates/report.txt"
-      print "* Installing template file : #{config.execution_template_path} : "
-      if install_file source: report_in_path, target: config.execution_template_path, mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
-      else
-        full_res =+ 1
-        puts "[KO]"
-      end
 
-      print "* Creating/Checking pid file path : #{config[:pid_path]} : "
-      if make_folder path: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
-      else
-        full_res =+ 1
-        puts "[KO]"
-      end
 
-      print "* Creating/Checking trace file path : #{config[:trace_path]} : "
-      if make_folder path: config[:trace_path], mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
-      else
-        full_res =+ 1
-        puts "[KO]"
-      end
-
-      if full_res > 0 then
-        $stderr.puts " => #{full_res} errors occured"
-        return { :case => :splash_setup_error}
-      else
-        return { :case => :splash_setup_success }
-      end
-
-    end
-
-    # Sanitycheck action method for testing installation of Splash
-   # @return [Integer] an errorcode value
-    def checkconfig
-      puts "Splash -> sanitycheck : "
-      config = get_config
-      full_res = 0
-      print "* Config file : #{CONFIG_FILE} : "
-      res = verify_file(name: CONFIG_FILE, mode: "644", owner: config.user_root, group: config.group_root)
-      if res.empty? then
-        print "[OK]\n"
-      else
-        print "[KO]\n"
-        full_res =+ 1
-        puts "    pbm => #{res.map {|p| p.to_s}.join(',')}"
-      end
-
-      print "* PID Path : #{config[:pid_path]} : "
-      res = verify_folder(name: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root)
-      if res.empty? then
-        print "[OK]\n"
-      else
-        print "[KO]\n"
-        full_res =+ 1
-        puts "    pbm => #{res.map {|p| p.to_s}.join(',')}"
-
-      end
-
-      print "* trace Path : #{config[:trace_path]} : "
-      res = verify_folder(name: config[:trace_path], mode: "777", owner: config.user_root, group: config.group_root)
-      if res.empty? then
-        print "[OK]\n"
-      else
-        print "[KO]\n"
-        full_res =+ 1
-        puts "    pbm => #{res.map {|p| p.to_s}.join(',')}"
-      end
-
-      print "* Prometheus PushGateway Service running : "
-      if verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
-        print "[OK]\n"
-      else
-        print "[KO]\n"
-        full_res =+ 1
-      end
-
-      if full_res > 0 then
-        $stderr.puts " => #{full_res} errors occured"
-        return { :case => :splash_sanitycheck_error }
-      else
-        return { :case => :splash_sanitycheck_success}
-      end
-    end
-
-    private
-
-    # facilities to find a file in gem path
-    # @param [String] _gem a Gem name
-    # @param [String] _file a file relative path in the gem
-    # @return [String] the path of the file, if found.
-    # @return [False] if not found
-    def search_file_in_gem(_gem,_file)
-      if Gem::Specification.respond_to?(:find_by_name)
-        begin
-          spec = Gem::Specification.find_by_name(_gem)
-        rescue LoadError
-          spec = nil
-        end
-      else
-        spec = Gem.searcher.find(_gem)
-      end
-      if spec then
-        if Gem::Specification.respond_to?(:find_by_name)
-          res = spec.lib_dirs_glob.split('/')
-        else
-          res = Gem.searcher.lib_dirs_for(spec).split('/')
-        end
-        res.pop
-        services_path = res.join('/').concat("/#{_file}")
-        return services_path if File::exist?(services_path)
-        return false
-      else
-        return false
-      end
-    end
 
   end
 end

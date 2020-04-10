@@ -18,11 +18,14 @@ module Splash
 
         end
 
+
       end
 
 
       class Client
         include Splash::Config
+        include Splash::Transports
+
         def initialize
           @config = get_config.transports
           @connection = Bunny.new url: @config[:rabbitmq][:url]
@@ -39,6 +42,19 @@ module Splash
           return @channel.acknowledge(ack, false)
         end
 
+        def execute(order)
+          queue = order[:return_to]
+          lock = Mutex.new
+          res = nil
+          condition = ConditionVariable.new
+          get_default_subscriber(queue: queue).subscribe(timeout: 5) do |delivery_info, properties, payload|
+            res = YAML::load(payload)
+            lock.synchronize { condition.signal }
+          end
+          get_default_client.publish queue: order[:queue], message: order.to_yaml
+          lock.synchronize { condition.wait(lock) }
+          return res
+        end
 
         def get(options ={})
           queue = @channel.queue(options[:queue])

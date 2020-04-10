@@ -75,6 +75,11 @@ With :
 - SERVER : IP or fqdn of the Gateway.
 - PORT : the specific TCP port of the Gateway.
 
+If you have already setup, you could use --preserve option to keep your active configuration and report file on place
+This is usefull for automatique Idempotent installation like with Ansible :
+
+    # splash conf set --preserve
+
 
 ### Sanitycheck
 

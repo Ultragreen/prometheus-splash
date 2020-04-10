@@ -29,18 +29,11 @@ module CLISplash
     desc "ping HOSTNAME", "send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
     def ping(hostname=Socket.gethostname)
       puts "ctrl+c for interrupt"
-      queue = "splash.#{Socket.gethostname}.returncli"
-      order = {:verb => :ping, :payload => {:hostname => Socket.gethostname}, :return_to => queue}
-
-      lock = Mutex.new
-      condition = ConditionVariable.new
       begin
-        get_default_subscriber(queue: queue).subscribe(timeout: 10) do |delivery_info, properties, payload|
-          puts YAML::load(payload)
-          lock.synchronize { condition.signal }
-        end
-        get_default_client.publish queue: "splash.#{hostname}.input", message: order.to_yaml
-        lock.synchronize { condition.wait(lock) }
+        puts get_default_client.execute({ :verb => :ping,
+                                  :payload => {:hostname => Socket.gethostname},
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{hostname}.input" })
         splash_exit case: :quiet_exit
       rescue Interrupt
         splash_exit status: :error, case: :interrupt, more: "Ping Command"

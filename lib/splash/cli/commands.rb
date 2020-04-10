@@ -6,6 +6,7 @@ module CLISplash
     include Splash::Config
     include Splash::Backends
     include Splash::Exiter
+    include Splash::Transports
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
@@ -56,11 +57,26 @@ module CLISplash
     long_desc <<-LONGDESC
     Show configured commands
     with --detail, show command details
+    with --hostname, ask other splash daemon via transport
     LONGDESC
     option :detail, :type => :boolean
+    option :hostname, :type => :string
     def list
-      puts "Splash configured commands :"
-      list = get_config.commands
+      list = {}
+      if options[:hostname] then
+        puts "Remote Splash configured commands on #{options[:hostname]}:"
+        puts "ctrl+c for interrupt"
+        begin
+          list = get_default_client.execute({ :verb => :list_commands,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{options[:hostname]}.input" })
+        rescue Interrupt
+          splash_exit status: :error, case: :interrupt, more: "remote list Command"
+        end
+      else
+        puts "Splash configured commands :"
+        list = get_config.commands
+      end
       puts 'No configured commands found' if list.keys.empty?
       list.keys.each do |command|
         puts " * #{command.to_s}"
@@ -103,8 +119,11 @@ module CLISplash
       if not redis and options[:hostname] then
         splash_exit case: :specific_config_required, :more => "Redis backend is requiered for Remote execution report request"
       end
-      list = get_config.commands
-      if list.keys.include? command.to_sym then
+      list = get_config.commands.keys
+      if options[:hostname] then
+        list = backend.list("*", options[:hostname]).map(&:to_sym)
+      end
+      if list.include? command.to_sym then
         print "Splash command #{command} previous execution report:\n\n"
         req  = { :key => command}
         req[:hostname] = options[:hostname] if options[:hostname]
@@ -115,7 +134,7 @@ module CLISplash
         end
         splash_exit case: :quiet_exit
       else
-        splash_exit case: :command_not_configured
+        splash_exit case: :not_found, :more => "Command report never runned remotly" if options[:hostname]
       end
     end
 
@@ -137,7 +156,7 @@ module CLISplash
       backend = get_backend :execution_trace
       redis = (backend.class == Splash::Backends::Redis)? true : false
       if not redis and (options[:hostname] or options[:all]) then
-        splash_exit case: :redis_back_required, more: "Remote execution report Request"
+        splash_exit case: :specific_config_required, more: "Redis Backend requiered for Remote execution report Request"
       end
       pattern = (options[:pattern])? options[:pattern] : '*'
       if options[:all] then

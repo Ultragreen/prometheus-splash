@@ -7,6 +7,7 @@ module CLISplash
     include Splash::Backends
     include Splash::Exiter
     include Splash::Transports
+    include Splash::Templates
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
@@ -164,7 +165,12 @@ module CLISplash
         req  = { :key => command}
         req[:hostname] = options[:hostname] if options[:hostname]
         if backend.exist? req then
-          print backend.get req
+          res = backend.get req
+          tp = Template::new(
+              list_token: get_config.execution_template_tokens,
+              template_file: get_config.execution_template_path)
+          tp.map YAML::load(res)
+          print tp.output
         else
           puts "Command not already runned."
         end
@@ -180,11 +186,13 @@ module CLISplash
     with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)\n
     with --all, get all execution report for all servers (only with Redis backend configured)\n
+    with --detail, get major informations of each reports
     --all and --hostname are exclusives
     LONGDESC
     option :pattern, :type => :string
     option :hostname, :type => :string
     option :all, :type => :boolean, :negate => false
+    option :detail, :type => :boolean
     def getreportlist
       if options[:hostname] and options[:all] then
         splash_exit case: :options_incompatibility, more: "--all, --hostname"
@@ -205,11 +213,23 @@ module CLISplash
       print "List of Executions reports :\n\n"
       puts "Not reports found" if res.empty?
       res.each do |item|
+        host = ""
+        command = ""
         if options[:all]
           host,command = item.split('#')
           puts " * Command : #{command} @ host : #{host}"
         else
-          puts " * Command : #{item}"
+          command = item
+          puts " * Command : #{command}"
+        end
+        if options[:detail] then
+          req = { :key => command }
+          req[:hostname] = host if options[:all]
+          res = YAML::load(backend.get(req))
+          puts "   - Status : #{res[:status]}"
+          puts "   - Start date : #{res[:start_date]}"
+          puts "   - End date : #{res[:end_date]}"
+          puts "   - Execution time : #{res[:exec_time]}"
         end
       end
       splash_exit case: :quiet_exit

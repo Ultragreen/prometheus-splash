@@ -68,21 +68,20 @@ module Splash
         tp = Template::new(
             list_token: @config.execution_template_tokens,
             template_file: @config.execution_template_path)
-
-        tp.start_date = start_date
-        tp.end_date = DateTime.now.to_s
-        tp.cmd_name = @name
-        tp.cmd_line = @config.commands[@name.to_sym][:command]
-        tp.desc = @config.commands[@name.to_sym][:desc]
-        tp.status = status.to_s
-        tp.stdout = stdout
-        tp.stderr = stderr
-        tp.exec_time = time.to_s
+        data = Hash::new
+        data[:start_date] = start_date
+        data[:end_date] = DateTime.now.to_s
+        data[:cmd_name] = @name
+        data[:cmd_line] = @config.commands[@name.to_sym][:command]
+        data[:desc] = @config.commands[@name.to_sym][:desc]
+        data[:status] = status.to_s
+        data[:stdout] = stdout
+        data[:stderr] = stderr
+        data[:exec_time] = time.to_s
         backend = get_backend :execution_trace
         key = @name
-        backend.put key: key, value: tp.output
+        backend.put key: key, value: data.to_yaml
         exit_code = status.exitstatus
-
       end
 
       puts "  => exitcode #{exit_code}"

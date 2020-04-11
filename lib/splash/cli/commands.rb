@@ -10,25 +10,56 @@ module CLISplash
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
-    execute command or sequence or ack result
-    with --no-trace prevent storing execution trace in configured backend (see config file)
-    with --ack, notify errorcode=0 to Prometheus PushGateway
-    with --no-notify, bypass Prometheus notification
-    with --no-callback, never execute callback (:on_failure, :on_success)
+    execute command or sequence or ack result\n
+    with --no-trace prevent storing execution trace in configured backend (see config file)\n
+    with --ack, notify errorcode=0 to Prometheus PushGateway\n
+    with --no-notify, bypass Prometheus notification\n
+    with --no-callback, never execute callback (:on_failure, :on_success)\n
                         never follow sequences
+    with --hostname, execute on an other Splash daemon node
     LONGDESC
     option :trace, :type => :boolean, :default => true
     option :ack, :type => :boolean, negate: false
     option :notify, :type => :boolean, :default => true
     option :callback, :type => :boolean, :default => true
+    option :hostname, :type => :string
     def execute(name)
       if is_root? then
-        command =  Splash::CommandWrapper::new(name)
-        if options[:ack] then
-          splash_exit command.ack
+        if options[:hostname] then
+          puts "Remote Splash configured commands on #{options[:hostname]}:"
+          puts "ctrl+c for interrupt"
+          begin
+            transport = get_default_client
+            if transport.class == Hash  and transport.include? :case then
+              splash_exit transport
+            else
+              if options[:ack] then
+                res = transport.execute({ :verb => :ack_command,
+                                      payload: {:name => name},
+                                      :return_to => "splash.#{Socket.gethostname}.returncli",
+                                      :queue => "splash.#{options[:hostname]}.input" })
+                res[:more] = "Remote command : :ack_command OK"
+                splash_exit res
+              else
+                res = transport.execute({ :verb => :execute_command,
+                                    payload: {:name => name},
+                                    :return_to => "splash.#{Socket.gethostname}.returncli",
+                                    :queue => "splash.#{options[:hostname]}.input" })
+                res[:more] = "Remote command : :execute_command Scheduled"
+                splash_exit res
+              end
+            end
+          rescue Interrupt
+            splash_exit case: :interrupt, more: "Remote command exection"
+          end
+        else
+          command =  Splash::CommandWrapper::new(name)
+          if options[:ack] then
+            splash_exit command.ack
+          end
+          acase = command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
+          splash_exit acase
         end
-        acase = command.call_and_notify trace: options[:trace], notify: options[:notify], callback: options[:callback]
-        splash_exit acase
       else
         splash_exit case: :not_root, :more => "Command execution"
       end
@@ -67,11 +98,16 @@ module CLISplash
         puts "Remote Splash configured commands on #{options[:hostname]}:"
         puts "ctrl+c for interrupt"
         begin
-          list = get_default_client.execute({ :verb => :list_commands,
+          transport = get_default_client
+          if transport.class == Hash  and transport.include? :case then
+            splash_exit transport
+          else
+            list = transport.execute({ :verb => :list_commands,
                                   :return_to => "splash.#{Socket.gethostname}.returncli",
                                   :queue => "splash.#{options[:hostname]}.input" })
+          end
         rescue Interrupt
-          splash_exit status: :error, case: :interrupt, more: "remote list Command"
+          splash_exit case: :interrupt, more: "remote list Command"
         end
       else
         puts "Splash configured commands :"

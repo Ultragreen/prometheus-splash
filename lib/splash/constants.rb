@@ -48,7 +48,7 @@ module Splash
     # transports default settings
     TRANSPORTS_STRUCT = { :list => [:rabbitmq],
                         :active => :rabbitmq,
-                        :rabbitmq => { :url => 'amqp://localhost/'} }
+                        :rabbitmq => { :port => 5672, :host => "localhost"} }
 
 
 

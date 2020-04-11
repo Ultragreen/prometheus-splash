@@ -77,7 +77,7 @@ module Splash
       unless is_root?
         return {:case => :not_root, :more => "subcommands : #{method.to_s}"}
       else
-        return self.send method
+        return self.send method, options
       end
     end
 
@@ -89,7 +89,7 @@ module Splash
     # @option  options [String] :daemon_group the group to change privileges
     # @option  options [String] :stderr_trace the path of the file where to redirect STDERR
     # @option  options [String] :stdout_trace the path of the file where to redirect STDOUT
-    # @option  options [Bool] :debug option to run foreground
+    # @option  options [Bool] :foreground option to run foreground
     # @yield a process definion or block given
     # @example usage inline
     #    class Test
@@ -128,11 +128,11 @@ module Splash
     def daemonize(options)
       #Process.euid = 0
       #Process.egid = 0
-      return yield if options[:debug]
+
       trap("SIGINT"){ exit! 0 }
       trap("SIGTERM"){ exit! 0 }
       trap("SIGHUP"){ exit! 0 }
-
+      return yield if options[:foreground]
       fork do
         #Process.daemon
         File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]

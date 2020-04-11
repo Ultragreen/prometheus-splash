@@ -7,18 +7,20 @@ module Splash
     include Splash::Backends
     include Splash::Exiter
 
+
+    @@registry = Prometheus::Client.registry
+    @@metric_exitcode = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
+    @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
+    @@registry.register(@@metric_exitcode)
+    @@registry.register(@@metric_time)
+
     def initialize(name)
       @config  = get_config
+      @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
       @name = name
       unless @config.commands.keys.include? @name.to_sym then
         splash_exit case: :not_found, more: "command #{@name} is not defined in configuration"
       end
-      @registry = Prometheus::Client.registry
-      @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
-      @metric_exitcode = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
-      @metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
-      @registry.register(@metric_exitcode)
-      @registry.register(@metric_time)
     end
 
     def ack
@@ -30,10 +32,10 @@ module Splash
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
         return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
       end
-      @metric_exitcode.set(value)
-      @metric_time.set(time)
+      @@metric_exitcode.set(value)
+      @@metric_time.set(time)
       hostname = Socket.gethostname
-      Prometheus::Client::Push.new(@name, hostname, @url).add(@registry)
+      Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
       puts " * Prometheus Gateway notified."
       return { :case => :quiet_exit}
     end

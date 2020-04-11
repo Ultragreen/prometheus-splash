@@ -12,20 +12,19 @@ module Splash
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
           return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
-
         unless File::exist? config.full_pid_path then
           res = daemonize :description => config.daemon_process_name,
               :pid_file => config.full_pid_path,
               :stdout_trace => config.full_stdout_trace_path,
-              :stderr_trace => config.full_stderr_trace_path do
-              Scheduler::new
+              :stderr_trace => config.full_stderr_trace_path, :foreground => options[:foreground] do
+              Scheduler::new options
           end
           if res == 0 then
             pid = `cat #{config.full_pid_path}`.to_i
             puts "Splash Daemon Started, with PID : #{pid}"
             return {:case => :quiet_exit}
           else
-            return {:case => :unknown_error, :more => "Splash Daemon loading error"}
+            return {:case => :unknown_error, :more => "Splash Daemon loading error, see logs for more details"}
           end
 
         else

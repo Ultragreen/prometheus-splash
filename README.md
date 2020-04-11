@@ -480,7 +480,7 @@ If you want to prevent callback execution, as root :
 
 #### Display the last execution trace for a command
 
-If you want to view the last execution trace for  commande, (run with --trace : default)
+If you want to view the last execution trace for  commande, (only if executed with --trace : default)
 
     # splash com lastrun
     Splash command pwd previous execution report:
@@ -505,6 +505,11 @@ If you want to view the last execution trace for  commande, (run with --trace : 
 
     STDERR:
     -------
+
+
+Lastrun could receive the --hostname option to get the execution report of command
+
+
 ### Advanced  Configuration
 
 #### Backend configuration

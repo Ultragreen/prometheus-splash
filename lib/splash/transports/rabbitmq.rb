@@ -11,11 +11,17 @@ module Splash
 
         def initialize(options = {})
           @config = get_config.transports
-          @connection = Bunny.new url: @config[:rabbitmq][:url]
-          @connection.start
-          @channel = @connection.create_channel
-          @queue    = @channel.queue options[:queue]
-
+          host = @config[:rabbitmq][:host]
+          port = @config[:rabbitmq][:port]
+          @url = "amqp://#{host}:#{port}"
+          begin
+            @connection = Bunny.new url: @url
+            @connection.start
+            @channel = @connection.create_channel
+            @queue    = @channel.queue options[:queue]
+          rescue Bunny::Exception
+            return  { :case => :service_dependence_missing, :more => "RabbitMQ Transport not available." }
+          end
         end
 
 
@@ -28,11 +34,22 @@ module Splash
 
         def initialize
           @config = get_config.transports
-          @connection = Bunny.new url: @config[:rabbitmq][:url]
-          @connection.start
-          @channel = @connection.create_channel
+          host = @config[:rabbitmq][:host]
+          port = @config[:rabbitmq][:port]
+          @url = "amqp://#{host}:#{port}"
+          begin
+            @connection = Bunny.new url: @url
+            @connection.start
+            @channel = @connection.create_channel
+          rescue Bunny::Exception
+            return  { :case => :service_dependence_missing, :more => "RabbitMQ Transport not available." }
+          end
         end
 
+
+        def purge(options)
+          @channel.queue(options[:queue]).purge
+        end
 
         def publish(options ={})
           return @channel.default_exchange.publish(options[:message], :routing_key => options[:queue])

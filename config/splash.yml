@@ -20,6 +20,8 @@
     :active: :rabbitmq
     :rabbitmq:
       :url: amqp://127.0.0.1
+      :port: 5672
+      :host: "localhost"
   :daemon:
     :logmon_scheduling:
       :every: 20s

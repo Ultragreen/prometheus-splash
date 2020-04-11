@@ -4,14 +4,36 @@ module Splash
   module Transports
     include Splash::Config
 
-    def get_default_subscriber(queue)
-      aclass = "Splash::Transports::#{get_config[:transports][:active].to_s.capitalize}::Subscriber"
-      return Kernel.const_get(aclass)::new(queue)
+    def get_default_subscriber(options)
+      config = get_config.transports
+      transport = config[:active]
+      host = config[transport][:host]
+      port = config[transport][:port]
+      unless verify_service host: host, port: port then
+        return  { :case => :service_dependence_missing, :more => "RabbitMQ Transport not available." }
+       end
+      aclass = "Splash::Transports::#{transport.capitalize}::Subscriber"
+      begin
+        return Kernel.const_get(aclass)::new(options)
+      rescue
+        return { :case => :configuration_error, :more => "Transport specified for queue #{options[:queue]} inexistant : #{transport}"}
+      end
     end
 
     def get_default_client
-      aclass = "Splash::Transports::#{get_config[:transports][:active].to_s.capitalize}::Client"
-      return Kernel.const_get(aclass)::new
+      config = get_config.transports
+      transport = config[:active]
+      host = config[transport][:host]
+      port = config[transport][:port]
+      unless verify_service host: host, port: port then
+        return  { :case => :service_dependence_missing, :more => "RabbitMQ Transport not available." }
+       end
+      aclass = "Splash::Transports::#{transport.to_s.capitalize}::Client"
+      begin
+        return Kernel.const_get(aclass)::new
+      rescue
+        return { :case => :configuration_error, :more => "Transport specified inexistant : #{transport}"}
+      end
     end
 
   end

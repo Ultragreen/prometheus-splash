@@ -8,19 +8,52 @@ module CLISplash
 
 
     option :foreground, :type => :boolean
-    desc "start", "Starting Logs Monitor Daemon"
+    option :purge, :type => :boolean
+    option :scheduling, :type => :boolean, default: true
+    long_desc <<-LONGDESC
+    Starting Splash Daemon\n
+    With --foreground, run Splash in foreground\n
+    With --no-scheduling, inhibit commands scheduling\n
+    With --purge, Purge Input Queue for Splash Daemon
+    LONGDESC
+    desc "start", "Starting Splash Daemon"
     def start
-      acase = run_as_root :startdaemon
+      if options[:purge] then
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          queue = "splash.#{Socket.gethostname}.input"
+          transport.purge queue: queue
+          puts " * Queue : #{queue} purged"
+          splash_exit case: :quiet_exit
+        end
+      end
+      acase = run_as_root :startdaemon, options
       splash_exit acase
     end
 
-    desc "stop", "Stopping Logs Monitor Daemon"
+
+    desc "purge", "Purge Transport Input queue of Daemon"
+    def purge
+      transport = get_default_client
+      if transport.class == Hash  and transport.include? :case then
+        splash_exit transport
+      else
+        queue = "splash.#{Socket.gethostname}.input"
+        transport.purge queue: queue
+        puts " * Queue : #{queue} purged"
+        splash_exit case: :quiet_exit
+      end
+    end
+
+    desc "stop", "Stopping Splash Daemon"
     def stop
       acase = run_as_root :stopdaemon
       splash_exit acase
     end
 
-    desc "status", "Logs Monitor Daemon status"
+    desc "status", "Splash Daemon status"
     def status
       acase = run_as_root :statusdaemon
       splash_exit acase
@@ -30,11 +63,16 @@ module CLISplash
     def ping(hostname=Socket.gethostname)
       puts "ctrl+c for interrupt"
       begin
-        puts get_default_client.execute({ :verb => :ping,
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          puts transport.execute({ :verb => :ping,
                                   :payload => {:hostname => Socket.gethostname},
                                   :return_to => "splash.#{Socket.gethostname}.returncli",
                                   :queue => "splash.#{hostname}.input" })
-        splash_exit case: :quiet_exit
+          splash_exit case: :quiet_exit
+        end
       rescue Interrupt
         splash_exit status: :error, case: :interrupt, more: "Ping Command"
       end

@@ -64,8 +64,9 @@ module Splash
           lock = Mutex.new
           res = nil
           condition = ConditionVariable.new
-          get_default_subscriber(queue: queue).subscribe(timeout: 5) do |delivery_info, properties, payload|
+          get_default_subscriber(queue: queue).subscribe do |delivery_info, properties, payload|
             res = YAML::load(payload)
+
             lock.synchronize { condition.signal }
           end
           get_default_client.publish queue: order[:queue], message: order.to_yaml

@@ -6,6 +6,7 @@ module Splash
     include Splash::Helpers
     include Splash::Backends
     include Splash::Exiter
+    include Splash::Transports
 
 
     @@registry = Prometheus::Client.registry
@@ -42,58 +43,78 @@ module Splash
 
 
     def call_and_notify(options)
-      puts "Executing command : '#{@name}' "
       acase = { :case => :quiet_exit }
-      start = Time.now
-      start_date = DateTime.now.to_s
-      unless options[:trace] then
-        puts " * Traceless execution"
-        if @config.commands[@name.to_sym][:user] then
-          puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
-          system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
-        else
-          system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+      exit_code = 0
+      if @config.commands[@name.to_sym][:delegate_to] then
+        return { :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'} if options[:hostname]
+        puts "Remote command : #{@name} execution delegate to : #{@config.commands[@name.to_sym][:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}"
+        begin
+          transport = get_default_client
+          if transport.class == Hash  and transport.include? :case then
+            return transport
+          else
+            res = transport.execute({ :verb => :execute_command,
+              payload: {:name => @config.commands[@name.to_sym][:delegate_to][:remote_command].to_s},
+              :return_to => "splash.#{Socket.gethostname}.return",
+              :queue => "splash.#{@config.commands[@name.to_sym][:delegate_to][:host]}.input" })
+            exit_code = res[:exit_code]
+            puts "  => exitcode #{exit_code}"
+
+          end
         end
-        time = Time.now - start
-        exit_code = $?.exitstatus
       else
-        puts " * Tracefull execution"
-        if @config.commands[@name.to_sym][:user] then
-          puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
-          stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
+        puts "Executing command : '#{@name}' "
+        start = Time.now
+        start_date = DateTime.now.to_s
+        unless options[:trace] then
+          puts " * Traceless execution"
+          if @config.commands[@name.to_sym][:user] then
+            puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
+            system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+          else
+            system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+          end
+          time = Time.now - start
+          exit_code = $?.exitstatus
         else
-          stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
-        end
-        time = Time.now - start
-        tp = Template::new(
+          puts " * Tracefull execution"
+          if @config.commands[@name.to_sym][:user] then
+            puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
+            stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
+          else
+            stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
+          end
+          time = Time.now - start
+          tp = Template::new(
             list_token: @config.execution_template_tokens,
             template_file: @config.execution_template_path)
-        data = Hash::new
-        data[:start_date] = start_date
-        data[:end_date] = DateTime.now.to_s
-        data[:cmd_name] = @name
-        data[:cmd_line] = @config.commands[@name.to_sym][:command]
-        data[:desc] = @config.commands[@name.to_sym][:desc]
-        data[:status] = status.to_s
-        data[:stdout] = stdout
-        data[:stderr] = stderr
-        data[:exec_time] = time.to_s
-        backend = get_backend :execution_trace
-        key = @name
-        backend.put key: key, value: data.to_yaml
-        exit_code = status.exitstatus
+          data = Hash::new
+          data[:start_date] = start_date
+          data[:end_date] = DateTime.now.to_s
+          data[:cmd_name] = @name
+          data[:cmd_line] = @config.commands[@name.to_sym][:command]
+          data[:desc] = @config.commands[@name.to_sym][:desc]
+          data[:status] = status.to_s
+          data[:stdout] = stdout
+          data[:stderr] = stderr
+          data[:exec_time] = time.to_s
+          backend = get_backend :execution_trace
+          key = @name
+          backend.put key: key, value: data.to_yaml
+          exit_code = status.exitstatus
+        end
+
+        puts "  => exitcode #{exit_code}"
+        if options[:notify] then
+          acase = notify(exit_code,time.to_i)
+        else
+          puts " * Without Prometheus notification"
+        end
       end
 
-      puts "  => exitcode #{exit_code}"
-      if options[:notify] then
-        acase = notify(exit_code,time.to_i)
-      else
-        puts " * Without Prometheus notification"
-      end
       if options[:callback] then
         on_failure = (@config.commands[@name.to_sym][:on_failure])? @config.commands[@name.to_sym][:on_failure] : false
         on_success = (@config.commands[@name.to_sym][:on_success])? @config.commands[@name.to_sym][:on_success] : false
-
         if on_failure and exit_code > 0 then
           puts " * On failure callback : #{on_failure}"
           if @config.commands.keys.include?  on_failure then
@@ -115,6 +136,7 @@ module Splash
       else
         puts " * Without callbacks sequences"
       end
+      acase[:exit_code] = exit_code
       return acase
     end
   end

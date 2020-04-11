@@ -15,7 +15,7 @@ module Splash
         return get_config.commands
       end
 
-      def ack_command
+      def ack_command(payload)
         return self.execute command: payload[:name], ack: true
       end
 
@@ -27,15 +27,18 @@ module Splash
         end
         if payload.include? :schedule then
           sched,value = payload[:schedule].flatten
+          puts " * Schedule remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
+          @server.send sched,value do
+            self.execute command: payload[:name]
+          end
+          return { :case => :quiet_exit }
         else
-          sched = :in
-          value = '1s'
+          puts " * Execute direct command"
+          puts payload[:name]
+          res = self.execute command: payload[:name]
+          puts res.inspect
+          return res
         end
-        puts " * Schedule remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
-        @server.send sched,value do
-          self.execute command: payload[:name]
-        end
-        return { :case => :quiet_exit }
       end
 
     end

@@ -8,13 +8,13 @@ module CLISplash
 
 
     option :foreground, :type => :boolean
-    option :purge, :type => :boolean
+    option :purge, :type => :boolean, default: true
     option :scheduling, :type => :boolean, default: true
     long_desc <<-LONGDESC
     Starting Splash Daemon\n
     With --foreground, run Splash in foreground\n
     With --no-scheduling, inhibit commands scheduling\n
-    With --purge, Purge Input Queue for Splash Daemon
+    With --no-purge, inhibit purge Input Queue for Splash Daemon
     LONGDESC
     desc "start", "Starting Splash Daemon"
     def start
@@ -26,7 +26,6 @@ module CLISplash
           queue = "splash.#{Socket.gethostname}.input"
           transport.purge queue: queue
           puts " * Queue : #{queue} purged"
-          splash_exit case: :quiet_exit
         end
       end
       acase = run_as_root :startdaemon, options

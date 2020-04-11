@@ -1,6 +1,8 @@
 # coding: utf-8
 Dir[File.dirname(__FILE__) + '/orchestrator/*.rb'].each {|file| require file  }
 
+
+
 module Splash
   module Orchestrator
 
@@ -77,7 +79,7 @@ module Splash
           if options[:ack] then
             command.ack
           else
-            command.call_and_notify trace: true, notify: true, callback: true
+            return command.call_and_notify trace: true, notify: true, callback: true
           end
         end
 

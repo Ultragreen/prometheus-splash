@@ -27,6 +27,7 @@ module CLISplash
     def execute(name)
       if is_root? then
         if options[:hostname] then
+          splash_exit({ :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'}) if get_config.commands[name.to_sym][:delegate_to]
           puts "Remote Splash configured commands on #{options[:hostname]}:"
           puts "ctrl+c for interrupt"
           begin
@@ -122,6 +123,10 @@ module CLISplash
           puts "   - command description : '#{list[command][:desc]}'"
           puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
           puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
+          if list[command.to_sym][:schedule]
+            sched,val = list[command.to_sym][:schedule].flatten
+            puts "   - command scheduled : #{sched} #{val}."
+          end
         end
       end
       splash_exit case: :quiet_exit

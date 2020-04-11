@@ -78,6 +78,16 @@
     :echo3:
       :desc: echo 'been'
       :command: echo been
+    :rand_sleep_5:
+      :desc: sleep on a rand 5
+      :command: ruby -e 'sleep rand(5)'
+      :schedule:
+        :every: "10s"
+    :test_remote_call:
+      :desc: remote call test
+      :delegate_to:
+        :host: omicron
+        :remote_command: :echo2
 
 
 ### configuration of monitored logs

@@ -8,7 +8,7 @@ module Splash
     include Splash::Helpers
     # Setup action method for installing Splash
     # @return [Integer] an errorcode value
-    def setupsplash
+    def setupsplash(options = {})
       conf_in_path = search_file_in_gem "prometheus-splash", "config/splash.yml"
       full_res = 0
       puts "Splash -> setup : "

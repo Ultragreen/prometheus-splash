@@ -8,6 +8,10 @@ SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestra
 Prometheus Logs and Batchs supervision over PushGateway
 
 
+## Design
+
+![Splash Design](assets/images/splash_design.png)
+
 ## Preconfiguration
 
 You need a Prometheus PushGateway operational, if the service not run on localhost:9091,

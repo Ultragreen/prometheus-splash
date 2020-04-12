@@ -1,3 +1,4 @@
+# @option  options [String] :stdout_trace the path of the file where to redirect STDOUT
 # coding: utf-8
 module Splash
   module Helpers
@@ -89,6 +90,9 @@ module Splash
     # @option  options [String] :daemon_group the group to change privileges
     # @option  options [String] :stderr_trace the path of the file where to redirect STDERR
     # @option  options [String] :stdout_trace the path of the file where to redirect STDOUT
+    # @option  options [Proc] :sigint_handler handler Proc for SIGINT signal
+    # @option  options [Proc] :sigterm_handler handler Proc for SIGTERM signal
+    # @option  options [Proc] :sighup_handler handler Proc for SIGHuP signal
     # @option  options [Bool] :foreground option to run foreground
     # @yield a process definion or block given
     # @example usage inline
@@ -129,9 +133,27 @@ module Splash
       #Process.euid = 0
       #Process.egid = 0
 
-      trap("SIGINT"){ exit! 0 }
-      trap("SIGTERM"){ exit! 0 }
-      trap("SIGHUP"){ exit! 0 }
+      trap("SIGINT"){
+        if options[:sigint_handler] then
+          options[:sigint_handler].call
+        else
+          exit! 0
+        end
+      }
+      trap("SIGTERM"){
+        if options[:sigterm_handler] then
+          options[:sigterm_handler].call
+        else
+          exit! 0
+        end
+       }
+      trap("SIGHUP"){
+        if options[:sighup_handler] then
+          options[:sighup_handler].call
+        else
+          exit! 0
+        end
+       }
       return yield if options[:foreground]
       fork do
         #Process.daemon

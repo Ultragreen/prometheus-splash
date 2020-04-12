@@ -6,6 +6,7 @@ module Splash
       include Splash::Helpers
       include Splash::Config
       include Splash::Orchestrator
+      include Splash::Exiter
 
       def startdaemon(options = {})
         config = get_config
@@ -13,10 +14,15 @@ module Splash
           return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
         unless File::exist? config.full_pid_path then
-          res = daemonize :description => config.daemon_process_name,
+          daemon_config = {:description => config.daemon_process_name,
               :pid_file => config.full_pid_path,
               :stdout_trace => config.full_stdout_trace_path,
-              :stderr_trace => config.full_stderr_trace_path, :foreground => options[:foreground] do
+              :stderr_trace => config.full_stderr_trace_path,
+              :foreground => options[:foreground]
+            }
+
+          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler"] = Proc::new { splash_exit case: :quiet_exit } end
+          res = daemonize daemon_config do
               Scheduler::new options
           end
           if res == 0 then
@@ -49,7 +55,7 @@ module Splash
           return acase
       end
 
-      def statusdaemon
+      def statusdaemon(options = {})
         config = get_config
         pid = realpid = ''
         pid = `cat #{config.full_pid_path}`.to_s if File.exist?(config.full_pid_path)

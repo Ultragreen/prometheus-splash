@@ -16,7 +16,7 @@ module Splash
       begin
         return Kernel.const_get(aclass)::new(options)
       rescue
-        return { :case => :configuration_error, :more => "Transport specified for queue #{options[:queue]} inexistant : #{transport}"}
+        return { :case => :configuration_error, :more => "Transport specified for queue #{options[:queue]} configuration error : #{transport}"}
       end
     end
 
@@ -32,7 +32,7 @@ module Splash
       begin
         return Kernel.const_get(aclass)::new
       rescue
-        return { :case => :configuration_error, :more => "Transport specified inexistant : #{transport}"}
+        return { :case => :configuration_error, :more => "Transport configuration error : #{transport}"}
       end
     end
 

@@ -19,9 +19,11 @@
   :transports:
     :active: :rabbitmq
     :rabbitmq:
-      :url: amqp://127.0.0.1
+      :vhost: /
       :port: 5672
       :host: "localhost"
+      # :passwd: testpasswd
+      # :user: test
   :daemon:
     :logmon_scheduling:
       :every: 20s
@@ -88,6 +90,7 @@
       :delegate_to:
         :host: omicron
         :remote_command: :echo2
+      :on_success: :echo3
 
 
 ### configuration of monitored logs

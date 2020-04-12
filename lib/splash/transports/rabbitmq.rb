@@ -11,9 +11,15 @@ module Splash
 
         def initialize(options = {})
           @config = get_config.transports
+          @url = "amqp://"
           host = @config[:rabbitmq][:host]
           port = @config[:rabbitmq][:port]
-          @url = "amqp://#{host}:#{port}"
+          vhost = @config[:rabbitmq][:vhost]
+          if @config[:rabbitmq][:user] and @config[:rabbitmq][:passwd] then
+            creds = "#{@config[:rabbitmq][:user]}:#{@config[:rabbitmq][:passwd]}@"
+            @url << creds
+          end
+          @url << "#{host}:#{port}#{vhost}"
           begin
             @connection = Bunny.new url: @url
             @connection.start
@@ -34,9 +40,15 @@ module Splash
 
         def initialize
           @config = get_config.transports
+          @url = "amqp://"
           host = @config[:rabbitmq][:host]
           port = @config[:rabbitmq][:port]
-          @url = "amqp://#{host}:#{port}"
+          vhost = @config[:rabbitmq][:vhost]
+          if @config[:rabbitmq][:user] and @config[:rabbitmq][:passwd] then
+            creds = "#{@config[:rabbitmq][:user]}:#{@config[:rabbitmq][:passwd]}@"
+            @url << creds
+          end
+          @url << "#{host}:#{port}#{vhost}"
           begin
             @connection = Bunny.new url: @url
             @connection.start

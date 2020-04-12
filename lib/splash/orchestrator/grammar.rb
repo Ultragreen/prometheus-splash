@@ -34,9 +34,7 @@ module Splash
           return { :case => :quiet_exit }
         else
           puts " * Execute direct command"
-          puts payload[:name]
           res = self.execute command: payload[:name]
-          puts res.inspect
           return res
         end
       end

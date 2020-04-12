@@ -1,6 +1,17 @@
-SPLASH CHANGELOG
+# SPLASH CHANGELOG
 
 
-V 0.3.0 2020/04/11
+## V 0.3.0 2020/04/11
+
 * Begining of Changelog tracking
- 
+
+## V 0.4.0
+
+### DOC :
+
+* adding \n for LONGDESC Thor #14
+* Doc for command name format in YAML #2
+
+### CHANGE :
+
+* RabbitMQ Credentials and vhosts support #16

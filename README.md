@@ -362,10 +362,21 @@ may include :
 * :user: the userneme to use to run the command
 * :on_failure: the name of an other defined command, to, execute if exit_code > 0
 * :on_success: the name of an other defined command, to, execute if exit_code = 0
-* :schedule:  (hash) a scheduling for daemon, after in this documentation, it support :
+* :schedule:  (Hash) a scheduling for daemon, after in this documentation, it support :
   * :every: "<timing>" ex: "1s", "3m", "2h"
   * :at: "<date/time>" ex: "2030/12/12 23:30:00"
   * :cron: * * * * * a cron format
+* delegate_to: (Hash) a Slash delagation
+  * :host: the hostname of an other Confiugured Splash Node.
+  * :remote_command: a command defined in the remote Splash node Configuration
+
+_Remarque_ : Command name, as precise earlier in this documentation is Ruby Symbols ':xxxxx'.
+In YAML as a Hash key : ':xxxxxx: ', but as a value _':xxxxx'_, so the synthaxe for callbacks :
+
+    :on_success: :xxxxxx
+    :on_failure: :xxxxxx
+
+It's the same for :remote_command
 
 [Rufus Scheduler Doc](https://github.com/jmettraux/rufus-scheduler)
 

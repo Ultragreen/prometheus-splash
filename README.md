@@ -4,10 +4,18 @@
 
 SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestration for Services or Hosts**
 
+Author : Romain GEORGES <r.ma.n@ultragreen.net>
+COPYright : BSD-2-Clause (c) 2020 Ultragreen Software
+Web : http://www.ultragreen.net
+Github : https://github.com/Ultragreen/prometheus-splash
+Rubygems : https://rubygems.org/gems/prometheus-splash
+DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.3.0
+
 
 Prometheus Logs and Batchs supervision over PushGateway
 
 ![Ruby](https://github.com/Ultragreen/prometheus-splash/workflows/Ruby/badge.svg)
+[![Gem Version](https://badge.fury.io/rb/prometheus-splash.svg)](https://badge.fury.io/rb/prometheus-splash)
 
 ## Design
 

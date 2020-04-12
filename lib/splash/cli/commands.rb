@@ -68,6 +68,46 @@ module CLISplash
     end
 
 
+    desc "schedule NAME", "Schedule excution of command on Splash daemon"
+    long_desc <<-LONGDESC
+    Schedule excution of command on Splash daemon\n
+    with --hostname, Schedule on an other Splash daemon via transport\n
+    with --at TIME/DATE, Schedule at specified date/time, like 2030/12/12 23:30:00 or 12:00 \n
+    with --in TIMING, Schedule in specified timing, like 12s, 1m, 2h, 3m10s, 10d\n
+    --in and --at are imcompatibles.\n
+    WARNING : scheduling by CLI are not percisted, so use it only for specifics cases.\n
+    NOTES : Scheduling, force trace, notifying and callback.
+    LONGDESC
+    option :hostname, :type => :string
+    option :at, :type => :string
+    option :in, :type => :string
+    def schedule(name)
+      hostname = (options[:hostname])? options[:hostname] : Socket.gethostname
+      splash_exit({ :case => :options_incompatibility, :more => '--at or --in is required'}) unless options[:at] or options[:in]
+      splash_exit({ :case => :options_incompatibility, :more => '--at an --in'}) if options[:at] and options[:in]
+      puts "Remote Splash scheduling command on #{hostname}:"
+      puts "ctrl+c for interrupt"
+      begin
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          schedule = { :in => options[:in]} if options[:in]
+          schedule = { :at => options[:at]} if options[:at]
+          res = transport.execute({ :verb => :execute_command,
+                                  payload: {:name => name, :schedule => schedule},
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{hostname}.input" })
+          res[:more] = "Remote command : :execute_command with schedule"
+          splash_exit res
+        end
+      rescue Interrupt
+        splash_exit case: :interrupt, more: "Remote command exection"
+      end
+
+    end
+
+
     desc "treeview", "Show commands sequence tree"
     def treeview(command, depht = 0)
       puts "Command : #{command.to_s}" if depht == 0
@@ -90,7 +130,7 @@ module CLISplash
     long_desc <<-LONGDESC
     Show configured commands\n
     with --detail, show command details\n
-    with --hostname, ask other splash daemon via transport\n
+    with --hostname, ask other Splash daemon via transport\n
     LONGDESC
     option :detail, :type => :boolean
     option :hostname, :type => :string
@@ -142,6 +182,10 @@ module CLISplash
         puts "   - command description : '#{list[command.to_sym][:desc]}'"
         puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
         puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
+        if list[command.to_sym][:schedule]
+          sched,val = list[command.to_sym][:schedule].flatten
+          puts "   - command scheduled : #{sched} #{val}."
+        end
         splash_exit case: :quiet_exit
       else
         splash_exit case: :not_found, :more => 'Command not configured'

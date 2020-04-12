@@ -68,6 +68,7 @@ module Splash
               sched,value = config[command][:schedule].flatten
               puts "   => Scheduling command #{command.to_s}"
               @server.send sched,value do
+                puts "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}"
                 self.execute command: command.to_s
               end
             end

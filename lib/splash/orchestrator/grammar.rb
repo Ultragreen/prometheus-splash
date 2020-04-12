@@ -29,6 +29,7 @@ module Splash
           sched,value = payload[:schedule].flatten
           puts " * Schedule remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
           @server.send sched,value do
+            puts "Executing Scheduled command #{payload[:name]} for Scheduling : #{sched.to_s} #{value}"
             self.execute command: payload[:name]
           end
           return { :case => :quiet_exit }

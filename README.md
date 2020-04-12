@@ -294,6 +294,13 @@ To see all the commands in the 'commands' submenu :
 
 Commands or Commands Sequences must be defined in the main configuration file '/etc/splash.yml'
 
+Command name must be Ruby Symbols, so in the YAML file, it must look like :
+
+    :xxxxxx:
+
+_with x in the following list [A-Za-z_0-9]_
+
+
 *Exemple* in default configuration :
 
     ### configuration of commands and scheduling

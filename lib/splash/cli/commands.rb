@@ -16,7 +16,7 @@ module CLISplash
     with --ack, notify errorcode=0 to Prometheus PushGateway\n
     with --no-notify, bypass Prometheus notification\n
     with --no-callback, never execute callback (:on_failure, :on_success)\n
-                        never follow sequences
+                        never follow sequences\n
     with --hostname, execute on an other Splash daemon node
     LONGDESC
     option :trace, :type => :boolean, :default => true
@@ -88,9 +88,9 @@ module CLISplash
 
     desc "list", "Show configured commands"
     long_desc <<-LONGDESC
-    Show configured commands
-    with --detail, show command details
-    with --hostname, ask other splash daemon via transport
+    Show configured commands\n
+    with --detail, show command details\n
+    with --hostname, ask other splash daemon via transport\n
     LONGDESC
     option :detail, :type => :boolean
     option :hostname, :type => :string
@@ -151,7 +151,7 @@ module CLISplash
 
     desc "lastrun COMMAND", "Show last running result for specific configured command COMMAND"
     long_desc <<-LONGDESC
-    Show last running result for specific configured command COMMAND
+    Show last running result for specific configured command COMMAND\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
     LONGDESC
     option :hostname, :type => :string
@@ -187,11 +187,11 @@ module CLISplash
 
     desc "getreportlist", "list all executions report results "
     long_desc <<-LONGDESC
-    list all executions report results
+    list all executions report results\n
     with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)\n
     with --all, get all execution report for all servers (only with Redis backend configured)\n
-    with --detail, get major informations of each reports
+    with --detail, get major informations of each reports\n
     --all and --hostname are exclusives
     LONGDESC
     option :pattern, :type => :string

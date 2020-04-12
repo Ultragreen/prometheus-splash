@@ -9,7 +9,7 @@ module CLISplash
 
     desc "setup", "Setup installation fo Splash"
     long_desc <<-LONGDESC
-    Setup installation fo Splash
+    Setup installation fo Splash\n
     with --preserve, preserve from reinstallation of the config
     LONGDESC
     option :preserve, :type => :boolean

@@ -50,7 +50,7 @@ module CLISplash
 
     desc "list", "Show configured logs monitoring"
     long_desc <<-LONGDESC
-    Show configured logs monitoring
+    Show configured logs monitoring\n
     with --detail, show logs monitor details
     LONGDESC
     option :detail, :type => :boolean

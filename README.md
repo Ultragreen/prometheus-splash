@@ -7,6 +7,7 @@ SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestra
 
 Prometheus Logs and Batchs supervision over PushGateway
 
+![Ruby](https://github.com/Ultragreen/prometheus-splash/workflows/Ruby/badge.svg)
 
 ## Design
 

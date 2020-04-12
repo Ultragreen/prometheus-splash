@@ -174,8 +174,31 @@ module CLISplash
 
 
     desc "show COMMAND", "Show specific configured command COMMAND"
+    long_desc <<-LONGDESC
+    Show specific configured command COMMAND\n
+    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
+    LONGDESC
+    option :hostname, :type => :string
     def show(command)
-      list = get_config.commands
+      list = {}
+      if options[:hostname] then
+        puts "Remote Splash configured commands on #{options[:hostname]}:"
+        puts "ctrl+c for interrupt"
+        begin
+          transport = get_default_client
+          if transport.class == Hash  and transport.include? :case then
+            splash_exit transport
+          else
+            list = transport.execute({ :verb => :list_commands,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{options[:hostname]}.input" })
+          end
+        rescue Interrupt
+          splash_exit case: :interrupt, more: "remote list Command"
+        end
+      else
+        list = get_config.commands
+      end
       if list.keys.include? command.to_sym then
         puts "Splash command : #{command}"
         puts "   - command line : '#{list[command.to_sym][:command]}'"

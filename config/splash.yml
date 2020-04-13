@@ -2,6 +2,9 @@
 :splash:
 
 ### Main Configuration
+  :loggers:
+    :level: :info
+    :file: /var/log/splash.log
   :templates:
     :execution:
       :path: /etc/splash_execution_report.tpl
@@ -9,7 +12,7 @@
     :stores:
       :execution_trace:
           :type: :file
-          :path: /tmp/splash
+          :path: /var/run/splash
 #      :execution_trace:
 #        :type: :redis
 #        :host: localhost
@@ -29,7 +32,7 @@
       :every: 20s
     :process_name: "Splash : daemon."
     :paths:
-      :pid_path: /tmp
+      :pid_path: /var/run/
       :trace_path: /tmp/splash
     :files:
       :stdout_trace: stdout.txt

@@ -50,7 +50,7 @@ module Splash
                         :active => :rabbitmq,
                         :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
 
-
+    LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual]; :default => :cli }
 
   end
 end

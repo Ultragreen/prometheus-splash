@@ -4,13 +4,12 @@
 
 SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestration for Services or Hosts**
 
-* Author : Romain GEORGES 
+* Author : Romain GEORGES
 * COPYright : BSD-2-Clause (c) 2020 Ultragreen Software
 * Web : http://www.ultragreen.net
 * Github : https://github.com/Ultragreen/prometheus-splash
 * Rubygems : https://rubygems.org/gems/prometheus-splash
 * DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.3.0
-
 
 Prometheus Logs and Batchs supervision over PushGateway
 
@@ -736,3 +735,8 @@ EXIT_MAP= {
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+
+## Context
+
+*Massively made during COVID-19 containment : #StayAtHomeSoftware*

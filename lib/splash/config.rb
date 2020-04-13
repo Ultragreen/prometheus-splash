@@ -31,6 +31,7 @@ module Splash
 
         self[:transports] = {} ; self[:transports].merge! TRANSPORTS_STRUCT ; self[:transports].merge! config_from_file[:transports] if config_from_file[:transports]
         self[:backends] = {} ; self[:backends].merge! BACKENDS_STRUCT ; self[:backends].merge! config_from_file[:backends] if config_from_file[:backends]
+        self[:loggers] = {} ; self[:loggers].merge! LOGGERS_STRUCT ; self[:loggers].merge! config_from_file[:loggers] if config_from_file[:loggers]
 
         self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
         self[:commands] = (config_from_file[:commands])? config_from_file[:commands] : {}

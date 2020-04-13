@@ -10,7 +10,11 @@ $-w = nil
 include Splash::Dependencies
 include Splash::Helpers
 include Splash::Exiter
+include Splash::Loggers
 
+
+logger  =  get_logger
+p logger
 
 
  CLI.start(ARGV)

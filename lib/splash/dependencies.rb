@@ -24,6 +24,7 @@ module Splash
       require 'rufus-scheduler'
       require 'tty-markdown'
       require 'tty-pager'
+      require 'tty-logger'
       require "redis"
 
     rescue Gem::GemNotFoundException
@@ -41,6 +42,7 @@ module Splash
     require 'splash/templates'
     require 'splash/backends'
     require 'splash/transports'
+    require 'splash/loggers'
 
     require 'splash/commands'
     require 'splash/logs'

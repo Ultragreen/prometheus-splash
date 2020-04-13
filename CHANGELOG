@@ -5,7 +5,7 @@
 
 * Begining of Changelog tracking
 
-## V 0.4.0
+## V 0.4.0 2020/04/14
 
 ### DOC :
 
@@ -15,3 +15,12 @@
 ### CHANGE :
 
 * RabbitMQ Credentials and vhosts support #16
+* backend hardening #18
+* remote show with --hostname #12
+
+
+### FEATURE :
+
+* CLI colors and logger CLI /dual #8
+* Log for splash daemon #6
+* Schedule command via daemon execute and --hostname #11

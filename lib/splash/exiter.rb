@@ -1,6 +1,7 @@
 # coding: utf-8
 module Splash
   module Exiter
+    include Splash::Loggers
     EXIT_MAP= {
 
        # context execution
@@ -34,15 +35,16 @@ module Splash
     }
 
     def splash_exit(options = {})
+      log = get_logger
       mess = ""
       mess = EXIT_MAP[options[:case]][:message] if EXIT_MAP[options[:case]].include? :message
       mess << " : " unless mess.empty? or not options[:more]
       mess << "#{options[:more]}" if options[:more]
       if  EXIT_MAP[options[:case]][:code] == 0 then
-        puts mess unless mess.empty?
+        log.success mess unless mess.empty?
         exit 0
       else
-        $stderr.puts mess unless mess.empty?
+        log.fatal mess unless mess.empty?
         exit EXIT_MAP[options[:case]][:code]
       end
     end

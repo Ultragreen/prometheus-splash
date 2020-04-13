@@ -40,6 +40,9 @@ module Splash
 
       # @!group accessors on configurations Items
 
+      def loggers
+        return self[:loggers]
+      end
 
       def backends
         return self[:backends]

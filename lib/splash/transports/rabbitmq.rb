@@ -37,6 +37,7 @@ module Splash
       class Client
         include Splash::Config
         include Splash::Transports
+        include Splash::Loggers
 
         def initialize
           @config = get_config.transports
@@ -81,6 +82,7 @@ module Splash
 
             lock.synchronize { condition.signal }
           end
+          get_logger.send "Verb : #{order[:verb].to_s} to queue : #{order[:queue]}."
           get_default_client.publish queue: order[:queue], message: order.to_yaml
           lock.synchronize { condition.wait(lock) }
           return res

@@ -2,9 +2,10 @@
 module CLISplash
 
   class Config < Thor
-    include Splash::Config
+    include Splash::ConfigUtilities
     include Splash::Helpers
     include Splash::Exiter
+    include Splash::Loggers
 
 
     desc "setup", "Setup installation fo Splash"
@@ -14,7 +15,7 @@ module CLISplash
     LONGDESC
     option :preserve, :type => :boolean
     def setup
-      acase = run_as_root :setupsplash
+      acase = run_as_root :setupsplash, options
       splash_exit acase
     end
 
@@ -26,9 +27,10 @@ module CLISplash
 
     desc "version", "display current Splash version"
     def version
+      log = get_logger
       config = get_config
-      puts "Splash version : #{config.version}, Author : #{config.author}"
-      puts config.copyright
+      log.info "Splash version : #{config.version}, Author : #{config.author}"
+      log_info config.copyright
       splash_exit case: :quiet_exit
     end
 

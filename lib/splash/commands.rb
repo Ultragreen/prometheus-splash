@@ -25,7 +25,7 @@ module Splash
     end
 
     def ack
-      puts "Sending ack for command : '#{@name}'"
+      get_logger.info "Sending ack for command : '#{@name}'"
       notify(0,0)
     end
 
@@ -37,17 +37,18 @@ module Splash
       @@metric_time.set(time)
       hostname = Socket.gethostname
       Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
-      puts " * Prometheus Gateway notified."
+      get_logger.ok "Prometheus Gateway notified."
       return { :case => :quiet_exit}
     end
 
 
     def call_and_notify(options)
+      log = get_logger
       acase = { :case => :quiet_exit }
       exit_code = 0
       if @config.commands[@name.to_sym][:delegate_to] then
         return { :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'} if options[:hostname]
-        puts "Remote command : #{@name} execution delegate to : #{@config.commands[@name.to_sym][:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}"
+        log.send "Remote command : #{@name} execution delegate to : #{@config.commands[@name.to_sym][:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}"
         begin
           transport = get_default_client
           if transport.class == Hash  and transport.include? :case then
@@ -58,18 +59,18 @@ module Splash
               :return_to => "splash.#{Socket.gethostname}.return",
               :queue => "splash.#{@config.commands[@name.to_sym][:delegate_to][:host]}.input" })
             exit_code = res[:exit_code]
-            puts "  => exitcode #{exit_code}"
+            log.receive "return with exitcode #{exit_code}"
 
           end
         end
       else
-        puts "Executing command : '#{@name}' "
+        log.info "Executing command : '#{@name}' "
         start = Time.now
         start_date = DateTime.now.to_s
         unless options[:trace] then
-          puts " * Traceless execution"
+          log.item "Traceless execution"
           if @config.commands[@name.to_sym][:user] then
-            puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
+            log.item "Execute with user : #{@config.commands[@name.to_sym][:user]}."
             system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
           else
             system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
@@ -77,9 +78,9 @@ module Splash
           time = Time.now - start
           exit_code = $?.exitstatus
         else
-          puts " * Tracefull execution"
+          log.item "Tracefull execution"
           if @config.commands[@name.to_sym][:user] then
-            puts " * Execute with user : #{@config.commands[@name.to_sym][:user]}."
+            log.item "Execute with user : #{@config.commands[@name.to_sym][:user]}."
             stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
           else
             stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
@@ -103,12 +104,12 @@ module Splash
           backend.put key: key, value: data.to_yaml
           exit_code = status.exitstatus
         end
-
-        puts "  => exitcode #{exit_code}"
+        log.ok "Command executed"
+        log.arrow "exitcode #{exit_code}"
         if options[:notify] then
           acase = notify(exit_code,time.to_i)
         else
-          puts " * Without Prometheus notification"
+          log.item "Without Prometheus notification"
         end
       end
 
@@ -116,7 +117,7 @@ module Splash
         on_failure = (@config.commands[@name.to_sym][:on_failure])? @config.commands[@name.to_sym][:on_failure] : false
         on_success = (@config.commands[@name.to_sym][:on_success])? @config.commands[@name.to_sym][:on_success] : false
         if on_failure and exit_code > 0 then
-          puts " * On failure callback : #{on_failure}"
+          log.item "On failure callback : #{on_failure}"
           if @config.commands.keys.include?  on_failure then
             @name = on_failure.to_s
             call_and_notify options
@@ -125,16 +126,16 @@ module Splash
           end
         end
         if on_success and exit_code == 0 then
-          puts " * On success callback : #{on_success}"
+          log.item "On success callback : #{on_success}"
           if @config.commands.keys.include?  on_success then
             @name = on_success.to_s
             call_and_notify options
           else
-            $stderr.puts "on_success call error : configuration mistake : #{on_success} command inexistant."
+            acase = { :case => :configuration_error , :more => "on_success call error : #{on_failure} command inexistant."}
           end
         end
       else
-        puts " * Without callbacks sequences"
+        log.item "Without callbacks sequences"
       end
       acase[:exit_code] = exit_code
       return acase

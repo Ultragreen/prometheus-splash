@@ -7,9 +7,11 @@ module Splash
       include Splash::Config
       include Splash::Orchestrator
       include Splash::Exiter
+      include Splash::Loggers
 
       def startdaemon(options = {})
         config = get_config
+        log = get_logger
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
           return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
@@ -21,16 +23,17 @@ module Splash
               :foreground => options[:foreground]
             }
 
-          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler"] = Proc::new { splash_exit case: :quiet_exit } end
+          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  ObjectSpace.each_object(Splash::Orchestrator::Scheduler).first.shutdown } end
           res = daemonize daemon_config do
               Scheduler::new options
           end
+          sleep 1
           if res == 0 then
             pid = `cat #{config.full_pid_path}`.to_i
-            puts "Splash Daemon Started, with PID : #{pid}"
-            return {:case => :quiet_exit}
+            log.ok "Splash Daemon Started, with PID : #{pid}"
+            return {:case => :quiet_exit, :more => "Splash Daemon successfully loaded."}
           else
-            return {:case => :unknown_error, :more => "Splash Daemon loading error, see logs for more details"}
+            return {:case => :unknown_error, :more => "Splash Daemon loading error, see logs for more details."}
           end
 
         else
@@ -56,6 +59,7 @@ module Splash
       end
 
       def statusdaemon(options = {})
+        log = get_logger
         config = get_config
         pid = realpid = ''
         pid = `cat #{config.full_pid_path}`.to_s if File.exist?(config.full_pid_path)
@@ -63,14 +67,14 @@ module Splash
         pid.chomp!
         realpid.chomp!
         unless realpid.empty? then
-          print "Splash Process is running with PID #{realpid} "
+          log.item "Splash Process is running with PID #{realpid} "
         else
-          print 'Splash Process not found '
+          log.item 'Splash Process not found '
         end
         unless pid.empty? then
-          puts "and PID file exist with PID #{pid}"
+          log.item "and PID file exist with PID #{pid}"
         else
-          puts "and PID file don't exist"
+          log.item "and PID file don't exist"
         end
         if pid == realpid then
           return {:case => :status_ok }

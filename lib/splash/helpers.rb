@@ -154,8 +154,12 @@ module Splash
           exit! 0
         end
        }
-      return yield if options[:foreground]
+      if options[:foreground]
+        change_logger logger: :dual
+        return yield
+      end
       fork do
+        change_logger logger: :daemon
         #Process.daemon
         File.open(options[:pid_file],"w"){|f| f.puts Process.pid } if options[:pid_file]
         if options[:daemon_user] and options[:daemon_group] then

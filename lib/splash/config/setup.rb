@@ -22,36 +22,40 @@ module Splash
           puts "[KO]"
         end
       else
-        puts "Config file preservation."
+        puts "Config file preservation, verify your homemade templates."
       end
       config = get_config
+      self.extend Splash::Loggers
+      log = get_logger
+      log.ok "Splash Initialisation"
       report_in_path = search_file_in_gem "prometheus-splash", "templates/report.txt"
-      print "* Installing template file : #{config.execution_template_path} : "
+      target =  "Installing template file : #{config.execution_template_path}"
       if install_file source: report_in_path, target: config.execution_template_path, mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
+        log.ok target
       else
         full_res =+ 1
-        puts "[KO]"
+        log.ko target
       end
 
-      print "* Creating/Checking pid file path : #{config[:pid_path]} : "
+      target = "Creating/Checking pid file path : #{config[:pid_path]}"
       if make_folder path: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
+        log.ok target
       else
         full_res =+ 1
-        puts "[KO]"
+        log.ko target
       end
 
-      print "* Creating/Checking trace file path : #{config[:trace_path]} : "
+      target = "Creating/Checking trace file path : #{config[:trace_path]} : "
       if make_folder path: config[:trace_path], mode: "644", owner: config.user_root, group: config.group_root then
-        puts "[OK]"
+        log.ok target
       else
         full_res =+ 1
-        puts "[KO]"
+        log.ko target
       end
+
 
       if full_res > 0 then
-        $stderr.puts " => #{full_res} errors occured"
+        log.error "#{full_res} errors occured"
         return { :case => :splash_setup_error}
       else
         return { :case => :splash_setup_success }

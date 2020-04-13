@@ -3,9 +3,14 @@ module Splash
   module Backends
     class File
       include Splash::Config
+      include Splash::Exiter
+      include Splash::Helpers
+      include Splash::Loggers
+
       def initialize(store)
         @config = get_config[:backends][:stores][store]
         @path = @config[:path]
+        ensure_backend
       end
 
       def list(pattern='*')
@@ -34,6 +39,17 @@ module Splash
       private
       def suffix_trace(astring)
         return "#{astring}.trace"
+      end
+
+      def ensure_backend
+        unless verify_folder(name: @config[:path], mode: "644", owner: get_config.user_root, group: get_config.group_root).empty? then
+          get_logger.warn "File Backend folder : #{@config[:path]} is missing"
+          if make_folder path: @config[:path], mode: "644", owner: get_config.user_root, group: get_config.group_root then
+            get_logger.ok "File Backend folder : #{@config[:path]} created"
+          else
+            splash_exit case: :configuration_error, more: "File backend creation error"
+          end
+        end
       end
 
     end

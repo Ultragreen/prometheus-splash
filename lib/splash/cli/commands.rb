@@ -8,6 +8,7 @@ module CLISplash
     include Splash::Exiter
     include Splash::Transports
     include Splash::Templates
+    include Splash::Loggers
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
@@ -25,11 +26,12 @@ module CLISplash
     option :callback, :type => :boolean, :default => true
     option :hostname, :type => :string
     def execute(name)
+      log = get_logger
       if is_root? then
         if options[:hostname] then
           splash_exit({ :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'}) if get_config.commands[name.to_sym][:delegate_to]
-          puts "Remote Splash configured commands on #{options[:hostname]}:"
-          puts "ctrl+c for interrupt"
+          log.info "Remote Splash configured commands on #{options[:hostname]}:"
+          log.info "ctrl+c for interrupt"
           begin
             transport = get_default_client
             if transport.class == Hash  and transport.include? :case then
@@ -82,11 +84,12 @@ module CLISplash
     option :at, :type => :string
     option :in, :type => :string
     def schedule(name)
+      log = get_logger
       hostname = (options[:hostname])? options[:hostname] : Socket.gethostname
       splash_exit({ :case => :options_incompatibility, :more => '--at or --in is required'}) unless options[:at] or options[:in]
       splash_exit({ :case => :options_incompatibility, :more => '--at an --in'}) if options[:at] and options[:in]
-      puts "Remote Splash scheduling command on #{hostname}:"
-      puts "ctrl+c for interrupt"
+      log.info "Remote Splash scheduling command on #{hostname}:"
+      log.info "ctrl+c for interrupt"
       begin
         transport = get_default_client
         if transport.class == Hash  and transport.include? :case then
@@ -98,6 +101,7 @@ module CLISplash
                                   payload: {:name => name, :schedule => schedule},
                                   :return_to => "splash.#{Socket.gethostname}.returncli",
                                   :queue => "splash.#{hostname}.input" })
+          log.receive "Execute command sheduled confirmed"
           res[:more] = "Remote command : :execute_command with schedule"
           splash_exit res
         end
@@ -110,16 +114,17 @@ module CLISplash
 
     desc "treeview", "Show commands sequence tree"
     def treeview(command, depht = 0)
-      puts "Command : #{command.to_s}" if depht == 0
+      log  = get_logger
+      log.info "Command : #{command.to_s}" if depht == 0
       cmd  = get_config.commands[command.to_sym]
       if cmd[:on_failure] then
-        print " " * depht + " "
-        puts "* on failure => #{cmd[:on_failure]}"
+        spacer=  " " * depht + " "
+        log.flat "#{spacer}* on failure => #{cmd[:on_failure]}"
         treeview(cmd[:on_failure], depht+2)
       end
       if cmd[:on_success] then
-        print " " * depht + " "
-        puts "* on success => #{cmd[:on_success]}"
+        spacer = " " * depht + " "
+        log.flat "#{spacer}* on success => #{cmd[:on_success]}"
         treeview(cmd[:on_success],depht+2)
       end
       splash_exit case: :quiet_exit
@@ -135,10 +140,11 @@ module CLISplash
     option :detail, :type => :boolean
     option :hostname, :type => :string
     def list
+      log = get_logger
       list = {}
       if options[:hostname] then
-        puts "Remote Splash configured commands on #{options[:hostname]}:"
-        puts "ctrl+c for interrupt"
+        log.info "Remote Splash configured commands on #{options[:hostname]}:"
+        log.info  "ctrl+c for interrupt"
         begin
           transport = get_default_client
           if transport.class == Hash  and transport.include? :case then
@@ -152,20 +158,20 @@ module CLISplash
           splash_exit case: :interrupt, more: "remote list Command"
         end
       else
-        puts "Splash configured commands :"
+        log.info "Splash configured commands :"
         list = get_config.commands
       end
-      puts 'No configured commands found' if list.keys.empty?
+      log.ko 'No configured commands found' if list.keys.empty?
       list.keys.each do |command|
-        puts " * #{command.to_s}"
+        log.item "#{command.to_s}"
         if options[:detail] then
-          puts "   - command line : '#{list[command][:command]}'"
-          puts "   - command description : '#{list[command][:desc]}'"
-          puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
-          puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
+          log.arrow "command line : '#{list[command][:command]}'"
+          log.arrow "command description : '#{list[command][:desc]}'"
+          log.arrow "command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
+          log.arrow "command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
           if list[command.to_sym][:schedule]
             sched,val = list[command.to_sym][:schedule].flatten
-            puts "   - command scheduled : #{sched} #{val}."
+            log.arrow "command scheduled : #{sched} #{val}."
           end
         end
       end
@@ -180,10 +186,11 @@ module CLISplash
     LONGDESC
     option :hostname, :type => :string
     def show(command)
+      log = get_logger
       list = {}
       if options[:hostname] then
-        puts "Remote Splash configured commands on #{options[:hostname]}:"
-        puts "ctrl+c for interrupt"
+        log.info "Remote Splash configured commands on #{options[:hostname]}:"
+        log.info "ctrl+c for interrupt"
         begin
           transport = get_default_client
           if transport.class == Hash  and transport.include? :case then
@@ -200,14 +207,14 @@ module CLISplash
         list = get_config.commands
       end
       if list.keys.include? command.to_sym then
-        puts "Splash command : #{command}"
-        puts "   - command line : '#{list[command.to_sym][:command]}'"
-        puts "   - command description : '#{list[command.to_sym][:desc]}'"
-        puts "   - command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
-        puts "   - command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
+        log.info "Splash command : #{command}"
+        log.item "command line : '#{list[command.to_sym][:command]}'"
+        log.item "command description : '#{list[command.to_sym][:desc]}'"
+        log.item "command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
+        log.item "command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
         if list[command.to_sym][:schedule]
           sched,val = list[command.to_sym][:schedule].flatten
-          puts "   - command scheduled : #{sched} #{val}."
+          log.item "command scheduled : #{sched} #{val}."
         end
         splash_exit case: :quiet_exit
       else
@@ -223,6 +230,7 @@ module CLISplash
     LONGDESC
     option :hostname, :type => :string
     def lastrun(command)
+      log = get_logger
       backend = get_backend :execution_trace
       redis = (backend.class == Splash::Backends::Redis)? true : false
       if not redis and options[:hostname] then
@@ -233,7 +241,7 @@ module CLISplash
         list = backend.list("*", options[:hostname]).map(&:to_sym)
       end
       if list.include? command.to_sym then
-        print "Splash command #{command} previous execution report:\n\n"
+        log.info "Splash command #{command} previous execution report:\n"
         req  = { :key => command}
         req[:hostname] = options[:hostname] if options[:hostname]
         if backend.exist? req then
@@ -242,9 +250,9 @@ module CLISplash
               list_token: get_config.execution_template_tokens,
               template_file: get_config.execution_template_path)
           tp.map YAML::load(res)
-          print tp.output
+          log.flat tp.output
         else
-          puts "Command not already runned."
+          log.ko "Command not already runned."
         end
         splash_exit case: :quiet_exit
       else
@@ -266,6 +274,7 @@ module CLISplash
     option :all, :type => :boolean, :negate => false
     option :detail, :type => :boolean
     def getreportlist
+      log = get_logger
       if options[:hostname] and options[:all] then
         splash_exit case: :options_incompatibility, more: "--all, --hostname"
       end
@@ -282,26 +291,26 @@ module CLISplash
       else
         res = backend.list pattern
       end
-      print "List of Executions reports :\n\n"
-      puts "Not reports found" if res.empty?
+      log.info "List of Executions reports :\n"
+      log.ko "Not reports found" if res.empty?
       res.each do |item|
         host = ""
         command = ""
         if options[:all]
           host,command = item.split('#')
-          puts " * Command : #{command} @ host : #{host}"
+          log.item "Command : #{command} @ host : #{host}"
         else
           command = item
-          puts " * Command : #{command}"
+          log.item "Command : #{command}"
         end
         if options[:detail] then
           req = { :key => command }
           req[:hostname] = host if options[:all]
           res = YAML::load(backend.get(req))
-          puts "   - Status : #{res[:status]}"
-          puts "   - Start date : #{res[:start_date]}"
-          puts "   - End date : #{res[:end_date]}"
-          puts "   - Execution time : #{res[:exec_time]}"
+          log.arrow "Status : #{res[:status]}"
+          log.arrow "Start date : #{res[:start_date]}"
+          log.arrow "End date : #{res[:end_date]}"
+          log.arrow "Execution time : #{res[:exec_time]}"
         end
       end
       splash_exit case: :quiet_exit

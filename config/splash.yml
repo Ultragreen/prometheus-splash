@@ -4,7 +4,11 @@
 ### Main Configuration
   :loggers:
     :level: :info
-    :file: /var/log/splash.log
+    :daemon:
+      :file: /var/log/splash.log
+    :cli:
+      :emoji: true
+      :color: true
   :templates:
     :execution:
       :path: /etc/splash_execution_report.tpl
@@ -32,7 +36,7 @@
       :every: 20s
     :process_name: "Splash : daemon."
     :paths:
-      :pid_path: /var/run/
+      :pid_path: /var/run
       :trace_path: /tmp/splash
     :files:
       :stdout_trace: stdout.txt

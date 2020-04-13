@@ -5,6 +5,7 @@ module CLISplash
     include Splash::LogsMonitor::DaemonController
     include Splash::Transports
     include Splash::Exiter
+    include Splash::Loggers
 
 
     option :foreground, :type => :boolean
@@ -18,6 +19,7 @@ module CLISplash
     LONGDESC
     desc "start", "Starting Splash Daemon"
     def start
+      log = get_logger
       if options[:purge] then
         transport = get_default_client
         if transport.class == Hash  and transport.include? :case then
@@ -25,7 +27,7 @@ module CLISplash
         else
           queue = "splash.#{Socket.gethostname}.input"
           transport.purge queue: queue
-          puts " * Queue : #{queue} purged"
+          log.info "Queue : #{queue} purged"
         end
       end
       acase = run_as_root :startdaemon, options
@@ -35,13 +37,14 @@ module CLISplash
 
     desc "purge", "Purge Transport Input queue of Daemon"
     def purge
+      log = get_logger
       transport = get_default_client
       if transport.class == Hash  and transport.include? :case then
         splash_exit transport
       else
         queue = "splash.#{Socket.gethostname}.input"
         transport.purge queue: queue
-        puts " * Queue : #{queue} purged"
+        log.ok "Queue : #{queue} purged"
         splash_exit case: :quiet_exit
       end
     end
@@ -60,13 +63,14 @@ module CLISplash
 
     desc "ping HOSTNAME", "send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
     def ping(hostname=Socket.gethostname)
-      puts "ctrl+c for interrupt"
+      log = get_logger
+      log.info "ctrl+c for interrupt"
       begin
         transport = get_default_client
         if transport.class == Hash  and transport.include? :case then
           splash_exit transport
         else
-          puts transport.execute({ :verb => :ping,
+          log.receive transport.execute({ :verb => :ping,
                                   :payload => {:hostname => Socket.gethostname},
                                   :return_to => "splash.#{Socket.gethostname}.returncli",
                                   :queue => "splash.#{hostname}.input" })

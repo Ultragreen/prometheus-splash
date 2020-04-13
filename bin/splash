@@ -11,10 +11,14 @@ include Splash::Dependencies
 include Splash::Helpers
 include Splash::Exiter
 include Splash::Loggers
+include Splash::Config
 
+unless verify_file(name: CONFIG_FILE, mode: "644", owner: user_root, group: group_root).empty? then
+  puts 'ERROR: Splash need reconfiguration : execution abort, '
+  puts ' => Restart after rebuild (recheck for homemade templates) :'
 
-logger  =  get_logger
-p logger
+  acase = run_as_root :setupsplash
+  splash_exit acase
+end
 
-
- CLI.start(ARGV)
+CLI.start(ARGV)

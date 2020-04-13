@@ -1,7 +1,7 @@
 # coding: utf-8
 module Splash
   module Constants
-    VERSION = "0.3.0"
+    VERSION = "0.4.0"
 
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"
@@ -47,10 +47,14 @@ module Splash
                         :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
     # transports default settings
     TRANSPORTS_STRUCT = { :list => [:rabbitmq],
-                        :active => :rabbitmq,
-                        :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
+                          :active => :rabbitmq,
+                          :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
 
-    LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual], :default => :cli, :level => :info, :file => '/var/log/splash.log'   }
+    LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual],
+                       :default => :cli,
+                       :level => :info,
+                       :daemon => {:file => '/var/log/splash.log'},
+                       :cli => {:color => true, :emoji => true }  }
 
   end
 end

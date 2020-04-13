@@ -4,7 +4,15 @@ module Splash
     module Grammar
 
       include Splash::Config
-      VERBS=[:ping,:list_commands,:execute_command,:ack_command]
+      include Splash::Loggers
+
+
+      VERBS=[:ping,:list_commands,:execute_command,:ack_command, :shutdown]
+
+
+      def shutdown
+        self.terminate
+      end
 
       def ping(payload)
         return "Pong : #{payload[:hostname]} !"
@@ -22,19 +30,19 @@ module Splash
 
       def execute_command(payload)
         unless get_config.commands.include? payload[:name].to_sym
-          puts " * Command not found"
+          @log.item "Command not found"
           return { :case => :not_found }
         end
         if payload.include? :schedule then
           sched,value = payload[:schedule].flatten
-          puts " * Schedule remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
+          @log.schedule "remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
           @server.send sched,value do
-            puts "Executing Scheduled command #{payload[:name]} for Scheduling : #{sched.to_s} #{value}"
+            @log.trigger "Executing Scheduled command #{payload[:name]} for Scheduling : #{sched.to_s} #{value}"
             self.execute command: payload[:name]
           end
           return { :case => :quiet_exit }
         else
-          puts " * Execute direct command"
+          @log.info "Execute direct command"
           res = self.execute command: payload[:name]
           return res
         end

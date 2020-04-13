@@ -12,27 +12,30 @@ module Splash
         include Splash::Config
         include Splash::Transports
         include Splash::Orchestrator::Grammar
+        include Splash::Loggers
+
         def initialize(options = {})
+          @log = get_logger
           $stdout.sync = true
           $stderr.sync = true
           @server  = Rufus::Scheduler::new
           @server.extend SchedulerHooks
           @config = get_config
           @result = LogScanner::new
-          puts "Splash Orchestrator starting :"
+          @log.info "Splash Orchestrator starting :"
           if options[:scheduling] then
-            puts " * Initializing commands Scheduling."
+            @log.item "Initializing commands Scheduling."
             self.init_commands_scheduling
           end
           sched,value = @config.daemon_logmon_scheduling.flatten
-          puts " * Initializing logs monitorings & notifications."
+          @log.item "Initializing logs monitorings & notifications."
           @server.send sched,value do
             begin
+              @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}"
               @result.analyse
               @result.notify
-              $stdout.flush
             rescue Errno::ECONNREFUSED
-              $stderr.puts "PushGateway seems to be done, please start it."
+              @log.error "PushGateway seems to be done, please start it."
             end
           end
           hostname = Socket.gethostname
@@ -43,21 +46,26 @@ module Splash
           transport.subscribe(:block => true) do |delivery_info, properties, body|
             content = YAML::load(body)
             if VERBS.include? content[:verb]
-              puts "Receive valid remote order, verb : #{content[:verb].to_s}"
+              @log.receive "Valid remote order, verb : #{content[:verb].to_s}"
               if content[:payload] then
                 res = self.send content[:verb], content[:payload]
               else
                 res = self.send content[:verb]
               end
               get_default_client.publish queue: content[:return_to], message: res.to_yaml
+              @log.send "Result to #{content[:return_to]}."
             else
-              puts "Receive INVALID remote order, verb : #{content[:verb].to_s}"
+              @log.receive "INVALID remote order, verb : #{content[:verb].to_s}"
               get_default_client.publish queue: content[:return_to], message: "Unkown verb #{content[:verb]}".to_yaml
             end
           end
         end
 
         def terminate
+          @log.info "Splash daemon shutdown"
+          @server.shutdown
+          change_logger logger: :cli
+          splash_exit case: :quiet_exit 
         end
 
         private
@@ -66,9 +74,9 @@ module Splash
             commands = config.select{|key,value| value.include? :schedule}.keys
             commands.each do |command|
               sched,value = config[command][:schedule].flatten
-              puts "   => Scheduling command #{command.to_s}"
+              @log.arrow "Scheduling command #{command.to_s}"
               @server.send sched,value do
-                puts "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}"
+                @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}"
                 self.execute command: command.to_s
               end
             end

@@ -43,13 +43,14 @@ module Splash
 
     # start notification on prometheus for metric logerrors, logmissing; loglines
     def notify
+      log = get_logger
       unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
         return  { :case => :service_dependence_missing, :more => "Prometheus Notification not send." }
       end
-      puts "Sending metrics to Prometheus Pushgateway"
+      log.info "Sending metrics to Prometheus Pushgateway"
       @logs_target.each do |item|
         missing = (item[:status] == :missing)? 1 : 0
-        puts " * Sending metrics for #{item[:log]}"
+        log.item "Sending metrics for #{item[:log]}"
         @metric_count.set(item[:count], labels: { log: item[:log] })
         @metric_missing.set(missing, labels: { log: item[:log] })
         lines = (item[:lines])? item[:lines] : 0
@@ -58,7 +59,7 @@ module Splash
       hostname = Socket.gethostname
       url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
       Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
-      puts "Sending done."
+      log.ok "Sending to Prometheus PushGateway done."
       return {:case => :quiet_exit }
     end
 

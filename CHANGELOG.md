@@ -30,3 +30,10 @@
 ### FIX :
 
 * Unix rights on trace,stores,pid path to 644 => 755 #19
+
+## V0.4.2 2020/04/15
+
+### FIX :
+
+* REOPEN : Unix rights on trace,stores,pid path to 644 => 755 #19
+* ruby 2.5 error with w-deprecated on sheebang, removing #20

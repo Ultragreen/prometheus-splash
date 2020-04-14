@@ -38,7 +38,7 @@ module Splash
       end
 
       target = "Creating/Checking pid file path : #{config[:pid_path]}"
-      if make_folder path: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root then
+      if make_folder path: config[:pid_path], mode: "755", owner: config.user_root, group: config.group_root then
         log.ok target
       else
         full_res =+ 1
@@ -46,7 +46,7 @@ module Splash
       end
 
       target = "Creating/Checking trace file path : #{config[:trace_path]} : "
-      if make_folder path: config[:trace_path], mode: "644", owner: config.user_root, group: config.group_root then
+      if make_folder path: config[:trace_path], mode: "755", owner: config.user_root, group: config.group_root then
         log.ok target
       else
         full_res =+ 1

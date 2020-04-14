@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -W:no-deprecated
+#!/usr/bin/env ruby 
 # coding: utf-8
 
 require 'splash/dependencies'

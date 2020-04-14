@@ -37,3 +37,10 @@
 
 * REOPEN : Unix rights on trace,stores,pid path to 644 => 755 #19
 * ruby 2.5 error with w-deprecated on sheebang, removing #20
+
+## V0.4.3 2020/04/15
+
+### FIX :
+
+* private method for ruby 2.5 (self) #21
+* treeview partial display because of lake of recursion #22

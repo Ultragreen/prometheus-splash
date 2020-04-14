@@ -25,7 +25,7 @@ module Splash
           @log.info "Splash Orchestrator starting :"
           if options[:scheduling] then
             @log.item "Initializing commands Scheduling."
-            self.init_commands_scheduling
+            init_commands_scheduling
           end
           sched,value = @config.daemon_logmon_scheduling.flatten
           @log.item "Initializing logs monitorings & notifications."
@@ -65,7 +65,7 @@ module Splash
           @log.info "Splash daemon shutdown"
           @server.shutdown
           change_logger logger: :cli
-          splash_exit case: :quiet_exit 
+          splash_exit case: :quiet_exit
         end
 
         private
@@ -77,7 +77,7 @@ module Splash
               @log.arrow "Scheduling command #{command.to_s}"
               @server.send sched,value do
                 @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}"
-                self.execute command: command.to_s
+                execute command: command.to_s
               end
             end
 

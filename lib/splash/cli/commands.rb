@@ -127,7 +127,6 @@ module CLISplash
         log.flat "#{spacer}* on success => #{cmd[:on_success]}"
         treeview(cmd[:on_success],depht+2)
       end
-      splash_exit case: :quiet_exit
     end
 
 

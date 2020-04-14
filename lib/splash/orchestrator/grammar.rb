@@ -11,7 +11,7 @@ module Splash
 
 
       def shutdown
-        self.terminate
+        terminate
       end
 
       def ping(payload)
@@ -24,7 +24,7 @@ module Splash
       end
 
       def ack_command(payload)
-        return self.execute command: payload[:name], ack: true
+        return execute command: payload[:name], ack: true
       end
 
 
@@ -38,7 +38,7 @@ module Splash
           @log.schedule "remote call command #{payload[:name]}, scheduling : #{sched.to_s} #{value}"
           @server.send sched,value do
             @log.trigger "Executing Scheduled command #{payload[:name]} for Scheduling : #{sched.to_s} #{value}"
-            self.execute command: payload[:name]
+            execute command: payload[:name]
           end
           return { :case => :quiet_exit }
         else

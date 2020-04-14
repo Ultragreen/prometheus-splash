@@ -24,7 +24,7 @@ module Splash
       end
 
       target = "PID Path : #{config[:pid_path]}"
-      res = verify_folder(name: config[:pid_path], mode: "644", owner: config.user_root, group: config.group_root)
+      res = verify_folder(name: config[:pid_path], mode: "755", owner: config.user_root, group: config.group_root)
       if res.empty? then
         log.ok target
       else
@@ -35,7 +35,7 @@ module Splash
       end
 
       target =  "Trace Path : #{config[:trace_path]}"
-      res = verify_folder(name: config[:trace_path], mode: "644", owner: config.user_root, group: config.group_root)
+      res = verify_folder(name: config[:trace_path], mode: "755", owner: config.user_root, group: config.group_root)
       if res.empty? then
         log.ok target
       else

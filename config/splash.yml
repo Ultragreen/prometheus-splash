@@ -16,7 +16,7 @@
     :stores:
       :execution_trace:
           :type: :file
-          :path: /var/run/splash
+          :path: /var/run/splash/executions
 #      :execution_trace:
 #        :type: :redis
 #        :host: localhost
@@ -36,8 +36,8 @@
       :every: 20s
     :process_name: "Splash : daemon."
     :paths:
-      :pid_path: /var/run
-      :trace_path: /tmp/splash
+      :pid_path: /var/run/splash
+      :trace_path: /var/run/splash/traces
     :files:
       :stdout_trace: stdout.txt
       :stderr_trace: stderr.txt

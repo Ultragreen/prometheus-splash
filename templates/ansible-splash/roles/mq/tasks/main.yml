@@ -1,0 +1,42 @@
+---
+- name : MQ install MQ service (RabbitMQ)
+  package:
+    pkg: rabbitmq-server
+    state: present
+
+- name: MQ enable rabbitmq plugins
+  rabbitmq_plugin: names=rabbitmq_management,rabbitmq_tracing,rabbitmq_federation state=enabled
+  notify: restart rabbitmq
+
+- name: add Admin users
+  rabbitmq_user:
+    user: "{{ mq_admin_username }}"
+    password: "{{ mq_admin_password }}"
+    tags: administrator,"{{ mq_admin_username }}"
+    vhost: /
+    configure_priv: .*
+    write_priv: .*
+    read_priv: .*
+    state: present
+
+
+- name: remove default guest user
+  rabbitmq_user:
+    user: guest
+    state: absent
+
+
+- name: MQ Configure Splash vhost
+  rabbitmq_vhost:
+    name: "{{ mq_splash_vhost }}"
+    state: present
+
+- name: MQ Add Splash service user
+  rabbitmq_user:
+    user: "{{ mq_splash_username }}"
+    password: "{{ mq_splash_password }}"
+    vhost: "{{ mq_splash_vhost}}"
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present

@@ -1,0 +1,15 @@
+[PROD:children]
+backend
+mq
+splash_nodes
+
+
+[backend]
+backend ansible_host=127.0.0.1
+
+[mq]
+mq ansible_host=127.0.0.1
+
+
+[splash_nodes]
+node1 ansible_host=127.0.0.1

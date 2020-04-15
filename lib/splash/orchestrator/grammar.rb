@@ -43,7 +43,7 @@ module Splash
           return { :case => :quiet_exit }
         else
           @log.info "Execute direct command"
-          res = self.execute command: payload[:name]
+          res = execute command: payload[:name]
           return res
         end
       end

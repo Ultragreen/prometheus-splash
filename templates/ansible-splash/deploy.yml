@@ -1,0 +1,21 @@
+---
+- name: Deploy RabbitMQ
+  #become: yes
+  hosts: mq
+  tasks:
+  - include_role:
+      name: mq
+    when: "mq == True"
+
+- name:  Deploy Backend
+  become: yes
+  hosts: backend
+  tasks:
+  - include_role:
+      name: backend
+    when: "backend == True"
+
+- name: Deploy Splash
+  become: yes
+  hosts: splash_nodes
+  roles:

@@ -1,0 +1,4 @@
+- name : BACKEND install service (Redis)
+  package:
+    pkg: redis-server
+    state: present

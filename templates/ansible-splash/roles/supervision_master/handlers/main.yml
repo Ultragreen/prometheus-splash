@@ -2,3 +2,7 @@
 - name: restart Prometheus
   service: name=prometheus state=restarted
   become: yes
+
+- name: restart Alertmanager
+  service: name=prometheus-alertmanager state=restarted
+  become: yes

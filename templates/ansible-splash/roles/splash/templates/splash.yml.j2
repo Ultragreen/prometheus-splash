@@ -15,14 +15,11 @@
   :backends:
     :stores:
       :execution_trace:
-          :type: :file
-          :path: /var/run/splash/executions
-#      :execution_trace:
-#        :type: :redis
-#        :host: localhost
-#        :port: 6379
-#        #:auth: "mykey"
-#        :base: 1
+        :type: :redis
+        :host: "{{ redis_host }}"
+        :port: "{{ redis_port }}"
+        :auth: "{{ redis_password }}"
+        :base: "{{ redis_base }}"
   :transports:
     :active: :rabbitmq
     :rabbitmq:
@@ -44,8 +41,8 @@
       :pid_file: splash.pid
   :prometheus:
     :pushgateway:
-      :host: "localhost"
-      :port: 9091
+      :host: "{{ pushgateway_host }}"
+      :port: "{{ pushgateway_port }}"
 
 
 ### configuration of commands and scheduling

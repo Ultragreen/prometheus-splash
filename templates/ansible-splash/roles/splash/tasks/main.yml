@@ -12,7 +12,7 @@
 - name: SPLASH Check if setup done
   stat:
     path: /etc/splash.yml
-    register: stat_result
+  register: stat_result
 
 - name: SPLASH Installation
   shell: splash conf set
@@ -20,8 +20,8 @@
 
 - name: SPLASH Configuration
   template:
-    src: splash.yml
-    dest: /et/splash.yml
+    src: splash.yml.j2
+    dest: /etc/splash.yml
     owner: root
     group: root
     mode: 0644

@@ -12,7 +12,7 @@
 - name: SUPERVISION Configuration
   template:
     src: prometheus.yml.j2
-    dest: /etc/prometheus/prometheus.conf
+    dest: /etc/prometheus/prometheus.yml
     owner: root
     group: root
     mode: 0644
@@ -22,8 +22,8 @@
 - name: SUPERVISION Configuration
   template:
     src: alertmanager.yml.j2
-    dest: /etc/prometheus/alertmanager.yml.j2
+    dest: /etc/prometheus/alertmanager.yml
     owner: root
     group: root
     mode: 0644
-  notify: restart Prometheus
+  notify: restart Alertmanager

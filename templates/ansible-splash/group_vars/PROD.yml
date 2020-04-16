@@ -2,10 +2,21 @@
 backend: True
 mq: True
 
+#password need to e in a vault
 
+mq_port:
 mq_admin_username: admin
-mq_admin_password: adminmdppwd
+mq_admin_password: XXXXXXX
 
 mq_splash_username: splash
-mq_splash_password: mdptest
-mq_splash_vhost: /splash
+mq_splash_password: XXXXXXX
+mq_splash_vhost: splash
+
+pushgateway_host: localhost
+pushgateway_port: 9091
+
+
+redis_host: localhost
+redis_port: 6379
+redis_base: 1
+redis_password: XXXXXXXX

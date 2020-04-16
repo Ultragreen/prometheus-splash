@@ -2,3 +2,12 @@
   package:
     pkg: redis-server
     state: present
+
+- name: BACKEND Configuration
+  template:
+    src: redis.conf.j2
+    dest: /et/redis/redis.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart Redis

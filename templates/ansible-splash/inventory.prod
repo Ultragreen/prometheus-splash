@@ -3,6 +3,8 @@
 backend
 mq
 splash_nodes
+supervision_master
+supervision_gateway
 
 
 [backend]

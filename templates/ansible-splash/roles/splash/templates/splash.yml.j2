@@ -1,0 +1,108 @@
+# Splash Configuration
+:splash:
+
+### Main Configuration
+  :loggers:
+    :level: :info
+    :daemon:
+      :file: /var/log/splash.log
+    :cli:
+      :emoji: true
+      :color: true
+  :templates:
+    :execution:
+      :path: /etc/splash_execution_report.tpl
+  :backends:
+    :stores:
+      :execution_trace:
+          :type: :file
+          :path: /var/run/splash/executions
+#      :execution_trace:
+#        :type: :redis
+#        :host: localhost
+#        :port: 6379
+#        #:auth: "mykey"
+#        :base: 1
+  :transports:
+    :active: :rabbitmq
+    :rabbitmq:
+      :vhost: {{ mq_splash_vhost }}
+      :port: {{ mq_port }}
+      :host: {{ hostvars[groups['mq'][0]]['ansible_host'] }}
+      :passwd: {{ mq_splash_password }}
+      :user: {{ mq_splash_username }}
+  :daemon:
+    :logmon_scheduling:
+      :every: 20s
+    :process_name: "Splash : daemon."
+    :paths:
+      :pid_path: /var/run/splash
+      :trace_path: /var/run/splash/traces
+    :files:
+      :stdout_trace: stdout.txt
+      :stderr_trace: stderr.txt
+      :pid_file: splash.pid
+  :prometheus:
+    :pushgateway:
+      :host: "localhost"
+      :port: 9091
+
+
+### configuration of commands and scheduling
+  :commands:
+    :id_root:
+      :desc: run id command on root
+      :command: id root
+    :true_test:
+      :desc: "test command returning true : 0"
+      :command: "true"
+      :schedule:
+        :every: "1h"
+      :on_failure: :ls_slash_tmp
+      :on_success: :pwd
+    :false_test:
+      :desc: "test command returning false > 0"
+      :command: "false"
+      :schedule:
+        :every: "1h"
+      :on_failure: :ls_slash_tmp
+      :on_success: :pwd
+    :ls_slash_tmp:
+      :desc: list file in /tmp
+      :command: ls -al /tmp
+      :user: daemon
+      :on_success: :echo1
+    :pwd:
+      :desc: run pwd
+      :command: pwd
+      :on_success: :echo1
+      :on_failure: :echo2
+    :echo1:
+      :desc: echo 'foo'
+      :command: echo foo
+      :on_failure: :echo3
+    :echo2:
+      :desc: echo 'bar'
+      :command: echo bar
+    :echo3:
+      :desc: echo 'been'
+      :command: echo been
+    :rand_sleep_5:
+      :desc: sleep on a rand 5
+      :command: ruby -e 'sleep rand(5)'
+      :schedule:
+        :every: "10s"
+    :test_remote_call:
+      :desc: remote call test
+      :delegate_to:
+        :host: omicron
+        :remote_command: :echo2
+      :on_success: :echo3
+
+
+### configuration of monitored logs
+  :logs:
+    - :log: /tmp/test
+      :pattern: ERROR
+    - :log: /tmp/test2
+      :pattern: ERROR

@@ -1,0 +1,18 @@
+---
+- name : Supervision install master service (Prometheus)
+  package:
+    pkg: prometheus
+    state: present
+  when: prometheus == true
+
+- name : Supervision install alert service (alertmanager)
+  package:
+    pkg: prometheus-alertmanager
+    state: present
+  when: alertmanager == true
+
+- name : Supervision install PushGateway service (alertmanager)
+  package:
+    pkg: prometheus-alertmanager
+    state: present
+  when: pushgateway == true

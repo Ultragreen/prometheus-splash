@@ -21,7 +21,7 @@ module Splash
           end
           @url << "#{host}:#{port}#{vhost}"
           begin
-            @connection = Bunny.new url: @url
+            @connection = Bunny.new @url
             @connection.start
             @channel = @connection.create_channel
             @queue    = @channel.queue options[:queue]
@@ -51,7 +51,7 @@ module Splash
           end
           @url << "#{host}:#{port}#{vhost}"
           begin
-            @connection = Bunny.new url: @url
+            @connection = Bunny.new @url
             @connection.start
             @channel = @connection.create_channel
           rescue Bunny::Exception

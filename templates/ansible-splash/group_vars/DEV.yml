@@ -7,4 +7,4 @@ mq_admin_password: adminmdppwd
 
 mq_splash_username: splash
 mq_splash_password: mdptest
-mq_splash_vhost: /splash
+mq_splash_vhost: splash

@@ -1,0 +1,19 @@
+---
+- name : SUPERVISION install master service (Prometheus)
+  package:
+    pkg: prometheus
+    state: present
+
+- name : SUPERVISION install alert service (alertmanager)
+  package:
+    pkg: prometheus-alertmanager
+    state: present
+
+- name: SUPERVISION Configuration
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart Prometheus

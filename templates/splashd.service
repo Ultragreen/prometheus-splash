@@ -3,13 +3,14 @@ Description=Splash Daemon
 After=network-online.target
 
 [Service]
-Type=simple
+Type=forking
 
-User=splash
-Group=splash
+User=root
+Group=root
 UMask=007
 
-ExecStart=/splash daemon start
+ExecStart=/usr/local/bin/splash daemon start
+ExecStop=/usr/local/bin/splash daemon stop
 
 Restart=on-failure
 

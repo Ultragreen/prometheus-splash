@@ -15,7 +15,20 @@
       name: backend
     when: "backend == True"
 
+- name: Deploy Supervision Master
+  become: yes
+  hosts: supervision_master
+  roles:
+    - supervision
+
+- name: Deploy Supervision Gateway
+  become: yes
+  hosts: supervision_gateway
+  roles:
+    - supervision
+
 - name: Deploy Splash
   become: yes
   hosts: splash_nodes
   roles:
+    - splash

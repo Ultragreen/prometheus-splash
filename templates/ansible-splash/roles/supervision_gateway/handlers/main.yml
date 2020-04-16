@@ -1,0 +1,4 @@
+---
+- name: restart Prometheus Gateway
+  service: name=prometheus-pushgateway state=restarted
+  become: yes

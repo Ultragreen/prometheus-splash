@@ -1,3 +1,4 @@
+# TEMPLATE
 [PROD:children]
 backend
 mq
@@ -5,11 +6,19 @@ splash_nodes
 
 
 [backend]
-backend ansible_host=127.0.0.1
+backend ansible_host=X.X.X.X
 
 [mq]
-mq ansible_host=127.0.0.1
+mq ansible_host=X.X.X.X
 
 
 [splash_nodes]
-node1 ansible_host=127.0.0.1
+node1 ansible_host=X.X.X.X
+node2 ansible_host=X.X.X.X
+
+
+[supervision_gateway]
+pushgateway ansible_host=X.X.X.X
+
+[supervision_master]
+prometheus ansible_host=X.X.X.X

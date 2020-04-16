@@ -19,13 +19,13 @@
   become: yes
   hosts: supervision_master
   roles:
-    - supervision
+    - supervision_master
 
 - name: Deploy Supervision Gateway
   become: yes
   hosts: supervision_gateway
   roles:
-    - supervision
+    - supervision_gateway
 
 - name: Deploy Splash
   become: yes

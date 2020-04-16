@@ -14,7 +14,7 @@
     path: /etc/splash.yml
     register: stat_result
 
-- name: SPLASH I
+- name: SPLASH Installation
   shell: splash conf set
   when: not stat_result.stat.exists
 

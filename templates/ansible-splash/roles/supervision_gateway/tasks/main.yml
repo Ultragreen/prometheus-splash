@@ -3,13 +3,3 @@
   package:
     pkg: prometheus-pushgateway
     state: present
-
-
-- name: SUPERVISION Gateway Configuration
-  template:
-    src: prometheus.yml.j2
-    dest: /etc/prometheus.conf
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart Prometheus

@@ -1,10 +1,11 @@
 ---
-backend: True
-mq: True
+install_backend: true
+install_mq: true
+
 
 #password need to e in a vault
 
-mq_port:
+mq_port: 5672
 mq_admin_username: admin
 mq_admin_password: XXXXXXX
 
@@ -20,3 +21,5 @@ redis_host: localhost
 redis_port: 6379
 redis_base: 1
 redis_password: XXXXXXXX
+
+patch_etc_hosts: false

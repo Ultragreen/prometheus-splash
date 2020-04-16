@@ -1,8 +1,10 @@
 ---
-backend: True
-mq: True
+install_backend: true
+install_mq: true
+patch_etc_hosts: true
 
-mq_port:
+
+mq_port: 5672
 mq_admin_username: admin
 mq_admin_password: adminmdppwd
 

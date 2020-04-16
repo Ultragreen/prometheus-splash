@@ -1,6 +1,6 @@
 ---
 - name: PREPARE TESTING ocalhost entries for test
-  hosts:
+  hosts: supervision_master
   tasks:
     lineinfile:
       path: /etc/hosts

@@ -2,7 +2,7 @@
 - name: PREPARE TESTING ocalhost entries for test
   hosts: supervision_master
   tasks:
-    lineinfile:
+  - lineinfile:
       path: /etc/hosts
       regexp: '^127\.0\.0\.1'
       line: "127.0.0.1 localhost {{ groups['backend'][0] }} {{ groups['mq'][0] }} {{ groups['splash_nodes'][0] }} {{ groups['supervision_master'][0] }} {{ groups['supervision_gateway'][0] }}"
@@ -15,7 +15,7 @@
 
 
 - name: Deploy RabbitMQ
-  #become: yes
+  become: yes
   hosts: mq
   tasks:
   - include_role:

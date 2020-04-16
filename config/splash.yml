@@ -28,7 +28,7 @@
     :rabbitmq:
       :vhost: /
       :port: 5672
-      :host: "localhost"
+      :host: localhost
       # :passwd: testpasswd
       # :user: test
   :daemon:

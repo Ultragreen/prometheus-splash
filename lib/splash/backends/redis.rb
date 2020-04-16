@@ -6,7 +6,9 @@ module Splash
       def initialize(store)
         @hostname = Socket.gethostname
         @config = get_config[:backends][:stores][store]
-        @store = ::Redis.new :host => @config[:host], :port => @config[:port], :db => @config[:base].to_i
+        conf = { :host => @config[:host], :port => @config[:port], :db => @config[:base].to_i}
+        conf[:password] = @config[:auth] if @config[:auth]
+        @store = ::Redis.new conf
         @redis_cli_cmd = `which redis-cli`
         @store.auth(@config[:auth]) if @config[:auth]
       end

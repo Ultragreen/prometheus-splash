@@ -55,4 +55,11 @@
 
 ### DOC :
 
-* prepare Vagrantfile and Ansible playbook 
+* prepare Vagrantfile and Ansible playbook
+
+
+## V 0.4.5 2020/04/17
+
+### FIX :
+
+* RabbitMQ Exception catching + refacto connection #31  

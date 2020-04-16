@@ -1,7 +1,7 @@
 # coding: utf-8
 module Splash
   module Constants
-    VERSION = "0.4.3"
+    VERSION = "0.4.4"
 
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"

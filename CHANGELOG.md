@@ -31,16 +31,28 @@
 
 * Unix rights on trace,stores,pid path to 644 => 755 #19
 
-## V0.4.2 2020/04/15
+## V 0.4.2 2020/04/15
 
 ### FIX :
 
 * REOPEN : Unix rights on trace,stores,pid path to 644 => 755 #19
 * ruby 2.5 error with w-deprecated on sheebang, removing #20
 
-## V0.4.3 2020/04/15
+## V 0.4.3 2020/04/15
 
 ### FIX :
 
 * private method for ruby 2.5 (self) #21
 * treeview partial display because of lake of recursion #22
+
+## V 0.4.4 2020/04/17
+
+### FIX :
+
+* Redis auth #33
+* RabbitMQ param url not hash in initialize #29
+* UTF8 detection without TERM ENV var #30
+
+### DOC :
+
+* prepare Vagrantfile and Ansible playbook 

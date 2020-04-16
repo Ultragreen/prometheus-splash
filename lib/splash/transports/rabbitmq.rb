@@ -11,17 +11,16 @@ module Splash
 
         def initialize(options = {})
           @config = get_config.transports
-          @url = "amqp://"
+
           host = @config[:rabbitmq][:host]
           port = @config[:rabbitmq][:port]
-          vhost = @config[:rabbitmq][:vhost]
-          if @config[:rabbitmq][:user] and @config[:rabbitmq][:passwd] then
-            creds = "#{@config[:rabbitmq][:user]}:#{@config[:rabbitmq][:passwd]}@"
-            @url << creds
-          end
-          @url << "#{host}:#{port}#{vhost}"
+          vhost = (@config[:rabbitmq][:vhost])? @config[:rabbitmq][:vhost] : '/'
+          passwd = (@config[:rabbitmq][:passwd])? @config[:rabbitmq][:passwd] : 'guest'
+          user = (@config[:rabbitmq][:user])? @config[:rabbitmq][:user] : 'guest'
+          conf  = { :host => host, :vhost => vhost, :user => user, :password => passwd, :port => port.to_i}
+
           begin
-            @connection = Bunny.new @url
+            @connection = Bunny.new conf
             @connection.start
             @channel = @connection.create_channel
             @queue    = @channel.queue options[:queue]
@@ -41,21 +40,19 @@ module Splash
 
         def initialize
           @config = get_config.transports
-          @url = "amqp://"
           host = @config[:rabbitmq][:host]
           port = @config[:rabbitmq][:port]
-          vhost = @config[:rabbitmq][:vhost]
-          if @config[:rabbitmq][:user] and @config[:rabbitmq][:passwd] then
-            creds = "#{@config[:rabbitmq][:user]}:#{@config[:rabbitmq][:passwd]}@"
-            @url << creds
-          end
-          @url << "#{host}:#{port}#{vhost}"
+          vhost = (@config[:rabbitmq][:vhost])? @config[:rabbitmq][:vhost] : '/'
+          passwd = (@config[:rabbitmq][:passwd])? @config[:rabbitmq][:passwd] : 'guest'
+          user = (@config[:rabbitmq][:user])? @config[:rabbitmq][:user] : 'guest'
+          conf  = { :host => host, :vhost => vhost, :user => user, :password => passwd, :port => port.to_i}
+
           begin
-            @connection = Bunny.new @url
+            @connection = Bunny.new conf 
             @connection.start
             @channel = @connection.create_channel
           rescue Bunny::Exception
-            return  { :case => :service_dependence_missing, :more => "RabbitMQ Transport not available." }
+            splash_exit  case: :service_dependence_missing, more: "RabbitMQ Transport not available."
           end
         end
 

@@ -19,17 +19,6 @@ module CLISplash
     LONGDESC
     desc "start", "Starting Splash Daemon"
     def start
-      log = get_logger
-      if options[:purge] then
-        transport = get_default_client
-        if transport.class == Hash  and transport.include? :case then
-          splash_exit transport
-        else
-          queue = "splash.#{Socket.gethostname}.input"
-          transport.purge queue: queue
-          log.info "Queue : #{queue} purged"
-        end
-      end
       acase = run_as_root :startdaemon, options
       splash_exit acase
     end

@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rufus-scheduler','~> 3.6.0'
   spec.add_runtime_dependency 'redis','~> 4.1.3'
   spec.add_runtime_dependency 'bunny','~> 2.15.0'
+  spec.add_runtime_dependency 'ps-ruby','~> 0.0.4'
   spec.add_runtime_dependency 'tty-markdown','~> 0.6.0'
   spec.add_runtime_dependency 'tty-pager','~> 0.12.1'
   spec.add_runtime_dependency 'colorize','~> 0.8.1'

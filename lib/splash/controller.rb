@@ -12,10 +12,30 @@ module Splash
       def startdaemon(options = {})
         config = get_config
         log = get_logger
+
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
           return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
+        realpid = get_processes pattern: get_config.daemon_process_name
+        foreground  = get_processes patterns: [ "splash", "foreground" ]
+        unless foreground.empty? or options[:foreground] then
+          return {:case => :already_exist, :more => "Splash Process already launched on foreground "}
+        end
+
         unless File::exist? config.full_pid_path then
+          unless realpid.empty? then
+            return {:case => :already_exist, :more => "Splash Process already launched "}
+          end
+          if options[:purge] then
+            transport = get_default_client
+            if transport.class == Hash  and transport.include? :case then
+              splash_exit transport
+            else
+              queue = "splash.#{Socket.gethostname}.input"
+              transport.purge queue: queue
+              log.info "Queue : #{queue} purged"
+            end
+          end
           daemon_config = {:description => config.daemon_process_name,
               :pid_file => config.full_pid_path,
               :stdout_trace => config.full_stdout_trace_path,
@@ -63,9 +83,13 @@ module Splash
         config = get_config
         pid = realpid = ''
         pid = `cat #{config.full_pid_path}`.to_s if File.exist?(config.full_pid_path)
-        realpid = get_process pattern: get_config.daemon_process_name
+        listpid = get_processes({ :pattern => get_config.daemon_process_name})
         pid.chomp!
-        realpid.chomp!
+        if listpid.empty? then
+          realpid = ''
+        else
+          realpid = listpid.first
+        end
         unless realpid.empty? then
           log.item "Splash Process is running with PID #{realpid} "
         else

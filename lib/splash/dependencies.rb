@@ -26,6 +26,7 @@ module Splash
       require 'tty-pager'
       require 'colorize'
       require "redis"
+      require 'ps-ruby'
 
     rescue Gem::GemNotFoundException
       $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."

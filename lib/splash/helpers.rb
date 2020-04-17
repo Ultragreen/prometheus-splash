@@ -13,18 +13,20 @@ module Splash
       return Etc.getgrgid(0).name
     end
 
-    # facilité pour récupérer un PID depuis une regexp
+    # facilité pour récupérer les PID depuis une regexp
     # @param [Hash] options
-    # @option options [String] :pattern une regexp
+    # @option options [String] :pattern un motif de regexp
+    # @option options [Array] :patterns Un tableau de motif de regexp
     # @return [String] le PID
-    def get_process(options = {})
-      pattern = options[:pattern]
-      res = `ps aux|grep '#{pattern}'|grep -v grep`.to_s
-      unless res.empty? then
-        return res.split(/\s+/)[1]
-      else
-        return ''
+    def get_processes(options = {})
+      patterns = []
+      patterns  = options[:patterns] if options[:patterns]
+      patterns << options[:pattern] if options[:pattern]
+      res = PS.get_all_processes
+      patterns.each do |item|
+        res = res.find_processes item
       end
+      return res.pick_attr('PID')
     end
 
 
@@ -156,7 +158,10 @@ module Splash
        }
       if options[:foreground]
         change_logger logger: :dual
+        Process.setproctitle options[:description] if options[:description]
+        p $0
         return yield
+        p 'titi'
       end
       fork do
         change_logger logger: :daemon

@@ -16,6 +16,21 @@
       regexp: '^127\.0\.1\.1'
     when: patch_etc_hosts
 
+- name: PREPARE packages
+  hosts: supervision_master #for real usage => precise all
+  tasks:
+    apt:
+      update_cache: yes
+      force_apt_get: yes
+      cache_valid_time: 3600
+      pkg:
+      - python-apt
+      - screen
+      - emacs-nox
+      - htop
+
+
+
 - name: Deploy RabbitMQ
   become: yes
   hosts: mq

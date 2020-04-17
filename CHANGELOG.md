@@ -72,9 +72,11 @@
 * auto setup root check without /etc/splash.yml #34
 * empty hostname with --hostname #27
 * foreground execution control #24
+* root required for file backend with command last and get #36
 
 ### FEATURES
 
 * command treeview with --hostname #28
 * log horodating with PID #35
 * quiet mode + no-colors and no-emoji #5
+* correlation id in log for daemon #15

@@ -50,13 +50,14 @@ module CLISplash
                                     payload: {:name => name},
                                     :return_to => "splash.#{Socket.gethostname}.returncli",
                                     :queue => "splash.#{options[:hostname]}.input" })
-                res[:more] = "Remote command : :execute_command Scheduled"
-                splash_exit res
               end
             end
           rescue Interrupt
             splash_exit case: :interrupt, more: "Remote command exection"
           end
+          log.receive "Command execute confirmation"
+          res[:more] = "Remote command : :execute_command Scheduled"
+          splash_exit res
         else
           command =  Splash::CommandWrapper::new(name)
           if options[:ack] then
@@ -102,32 +103,61 @@ module CLISplash
                                   payload: {:name => name, :schedule => schedule},
                                   :return_to => "splash.#{Socket.gethostname}.returncli",
                                   :queue => "splash.#{hostname}.input" })
-          log.receive "Execute command sheduled confirmed"
-          res[:more] = "Remote command : :execute_command with schedule"
-          splash_exit res
         end
       rescue Interrupt
         splash_exit case: :interrupt, more: "Remote command exection"
       end
+      log.receive "Execute command sheduled confirmed"
+      res[:more] = "Remote command : :execute_command with schedule"
+      splash_exit res
 
     end
 
 
     desc "treeview", "Show commands sequence tree"
-    def treeview(command, depht = 0)
+    long_desc <<-LONGDESC
+    Show commands sequence tree\n
+    with --hostname, ask other Splash daemon via transport\n
+    LONGDESC
+    option :hostname, :type => :string
+    def treeview(command)
+      depht = 0
       log  = get_logger
+      if options[:hostname] then
+        options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
+        log.info "Remote Splash scheduling command on #{options[:hostname]}:"
+        log.info "ctrl+c for interrupt"
+        begin
+          transport = get_default_client
+          if transport.class == Hash  and transport.include? :case then
+            splash_exit transport
+          else
+            commands = transport.execute({ :verb => :list_commands,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{options[:hostname]}.input" })
+          end
+        rescue Interrupt
+          splash_exit case: :interrupt, more: "Remote command exection"
+        end
+        log.receive "Receving list of commands from #{options[:hostname]}"
+      else
+        commands  = get_config.commands
+      end
       log.info "Command : #{command.to_s}" if depht == 0
-      cmd  = get_config.commands[command.to_sym]
-      if cmd[:on_failure] then
-        spacer=  " " * depht + " "
-        log.flat "#{spacer}* on failure => #{cmd[:on_failure]}"
-        treeview(cmd[:on_failure], depht+2)
+      aproc = Proc::new do |command,depht|
+        cmd  = commands[command.to_sym]
+        if cmd[:on_failure] then
+          spacer=  " " * depht + " "
+          log.flat "#{spacer}* on failure => #{cmd[:on_failure]}"
+          aproc.call(cmd[:on_failure], depht+2)
+        end
+        if cmd[:on_success] then
+          spacer = " " * depht + " "
+          log.flat "#{spacer}* on success => #{cmd[:on_success]}"
+          aproc.call(cmd[:on_success],depht+2)
+        end
       end
-      if cmd[:on_success] then
-        spacer = " " * depht + " "
-        log.flat "#{spacer}* on success => #{cmd[:on_success]}"
-        treeview(cmd[:on_success],depht+2)
-      end
+      aproc.call(command,depht)
     end
 
 
@@ -158,10 +188,11 @@ module CLISplash
         rescue Interrupt
           splash_exit case: :interrupt, more: "remote list Command"
         end
+        log.receive "Receving list of commands from #{options[:hostname]}"
       else
-        log.info "Splash configured commands :"
         list = get_config.commands
       end
+      log.info "Splash configured commands :"
       log.ko 'No configured commands found' if list.keys.empty?
       list.keys.each do |command|
         log.item "#{command.to_s}"
@@ -205,6 +236,7 @@ module CLISplash
         rescue Interrupt
           splash_exit case: :interrupt, more: "remote list Command"
         end
+        log.receive "Receving list of commands from #{options[:hostname]}"
       else
         list = get_config.commands
       end

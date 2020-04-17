@@ -71,3 +71,4 @@
 
 * auto setup root check without /etc/splash.yml #34
 * empty hostname with --hostname #27
+* foreground execution control #24

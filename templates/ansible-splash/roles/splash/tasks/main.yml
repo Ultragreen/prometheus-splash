@@ -8,6 +8,7 @@
   gem:
     name: prometheus-splash
     state: present
+    user_install: no
 
 - name: SPLASH Check if setup done
   stat:

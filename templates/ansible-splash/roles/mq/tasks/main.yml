@@ -17,7 +17,9 @@
     mode: 0644
   notify: restart Rabbitmq
 
-
+- name: MQ Force restart RabbitMQ for conf update directly
+  meta: flush_handlers
+  
 - name: add Admin users
   rabbitmq_user:
     node: "rabbit@{{ groups['mq'][0] }}"

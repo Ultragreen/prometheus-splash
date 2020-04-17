@@ -76,3 +76,4 @@
 ### FEATURES
 
 * command treeview with --hostname #28
+* log horodating with PID #35 

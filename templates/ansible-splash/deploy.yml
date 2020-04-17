@@ -12,12 +12,15 @@
     when: patch_etc_hosts
 
 
+- name: Update apt-get repo and cache
+  hosts: all
 
 
 - name: Deploy RabbitMQ
   become: yes
   hosts: mq
   tasks:
+  - apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
   - include_role:
       name: mq
     when: install_mq
@@ -26,6 +29,7 @@
   become: yes
   hosts: backend
   tasks:
+  - apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
   - include_role:
       name: backend
     when: install_backend
@@ -33,17 +37,23 @@
 - name: Deploy Supervision Master
   become: yes
   hosts: supervision_master
+  tasks:
+  - apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
   roles:
     - supervision_master
 
 - name: Deploy Supervision Gateway
   become: yes
   hosts: supervision_gateway
+  tasks:
+  - apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
   roles:
     - supervision_gateway
 
 - name: Deploy Splash
   become: yes
   hosts: splash_nodes
+  tasks:
+  - apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
   roles:
     - splash

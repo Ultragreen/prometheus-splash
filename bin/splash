@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 # coding: utf-8
 
 require 'splash/dependencies'
@@ -14,11 +14,16 @@ include Splash::Loggers
 include Splash::Config
 
 unless verify_file(name: CONFIG_FILE, mode: "644", owner: user_root, group: group_root).empty? then
-  puts 'ERROR: Splash need reconfiguration : execution abort, '
-  puts ' => Restart after rebuild (recheck for homemade templates) :'
+  puts 'Splash need reconfiguration : Auto setup launch'
 
-  acase = run_as_root :setupsplash
-  splash_exit acase
+  if is_root? then
+    acase = setupsplash
+    splash_exit acase
+  else
+    puts 'ERROR : auto setup not start, because your not root, please run as root :'
+    puts '(sudo or rvmsudo) splash [conf setup]'
+    exit 50
+  end
 end
 
 CLI.start(ARGV)

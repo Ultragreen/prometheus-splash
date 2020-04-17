@@ -6,6 +6,21 @@ class CLI < Thor
     true
   end
 
+
+  def initialize(*args)
+    super
+    log = get_logger
+    options[:colors.to_s]
+    log.emoji  = options[:emoji.to_s]
+    log.color  = options[:colors.to_s]
+  end
+
+  class_option :quiet, :desc => "Quiet mode, limit output to :fatal", :aliases => "-q", :type => :boolean
+  class_option :emoji, :desc => "Display Emoji", :type => :boolean, :default => true
+  class_option :colors, :desc => "Display colors", :type => :boolean, :default => true
+
+
+
   include CLISplash
   desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision"
   subcommand "commands", Commands

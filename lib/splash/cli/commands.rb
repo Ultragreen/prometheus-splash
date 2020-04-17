@@ -27,6 +27,7 @@ module CLISplash
     option :hostname, :type => :string
     def execute(name)
       log = get_logger
+      log.level = :fatal if options[:quiet]
       if is_root? then
         if options[:hostname] then
           options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
@@ -87,6 +88,7 @@ module CLISplash
     option :in, :type => :string
     def schedule(name)
       log = get_logger
+      log.level = :fatal if options[:quiet]
       hostname = (options[:hostname])? options[:hostname] : Socket.gethostname
       splash_exit({ :case => :options_incompatibility, :more => '--at or --in is required'}) unless options[:at] or options[:in]
       splash_exit({ :case => :options_incompatibility, :more => '--at an --in'}) if options[:at] and options[:in]

@@ -40,6 +40,8 @@ module CLISplash
 
     desc "monitor", "monitor logs in config"
     def monitor
+      log = get_logger
+      log.level = :fatal if options[:quiet]
       result = Splash::LogScanner::new
       result.analyse
       result.notify

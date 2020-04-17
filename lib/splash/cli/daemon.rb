@@ -27,6 +27,7 @@ module CLISplash
     desc "purge", "Purge Transport Input queue of Daemon"
     def purge
       log = get_logger
+      log.level = :fatal if options[:quiet]
       transport = get_default_client
       if transport.class == Hash  and transport.include? :case then
         splash_exit transport

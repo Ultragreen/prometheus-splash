@@ -12,7 +12,7 @@ module Splash
       def startdaemon(options = {})
         config = get_config
         log = get_logger
-
+        log.level = :fatal if options[:quiet]
         unless verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
           return {:case => :service_dependence_missing, :more => 'Prometheus Gateway'}
         end
@@ -63,6 +63,8 @@ module Splash
 
       def stopdaemon(options = {})
           config = get_config
+          log = get_logger
+          log.level = :fatal if options[:quiet]
           if File.exist?(config.full_pid_path) then
             begin
               pid = `cat #{config.full_pid_path}`.to_i

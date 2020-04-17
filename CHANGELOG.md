@@ -76,4 +76,5 @@
 ### FEATURES
 
 * command treeview with --hostname #28
-* log horodating with PID #35 
+* log horodating with PID #35
+* quiet mode + no-colors and no-emoji #5

@@ -115,11 +115,14 @@ module Splash
 
     end
 
+
+
+    @@config=nil
     # factory of Configuration Class instance
     # @param [String] config_file the path of the YAML Config file
     # @return [SPlash::Config::Configuration]
     def get_config(config_file=CONFIG_FILE)
-      return Configuration::new config_file
+      return @@config ||= Configuration::new(config_file)
     end
 
 

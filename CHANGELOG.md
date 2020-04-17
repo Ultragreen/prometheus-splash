@@ -63,3 +63,11 @@
 ### FIX :
 
 * RabbitMQ Exception catching + refacto connection #31  
+
+
+## V 0.5.0 2020/04/17
+
+### FIX
+
+* auto setup root check without /etc/splash.yml #34
+* empty hostname with --hostname #27

@@ -29,6 +29,7 @@ module CLISplash
       log = get_logger
       if is_root? then
         if options[:hostname] then
+          options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
           splash_exit({ :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'}) if get_config.commands[name.to_sym][:delegate_to]
           log.info "Remote Splash configured commands on #{options[:hostname]}:"
           log.info "ctrl+c for interrupt"
@@ -80,7 +81,7 @@ module CLISplash
     WARNING : scheduling by CLI are not percisted, so use it only for specifics cases.\n
     NOTES : Scheduling, force trace, notifying and callback.
     LONGDESC
-    option :hostname, :type => :string
+    option :hostname, :type => :string, :default => Socket.gethostname
     option :at, :type => :string
     option :in, :type => :string
     def schedule(name)
@@ -142,6 +143,7 @@ module CLISplash
       log = get_logger
       list = {}
       if options[:hostname] then
+        options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
         log.info "Remote Splash configured commands on #{options[:hostname]}:"
         log.info  "ctrl+c for interrupt"
         begin
@@ -188,6 +190,7 @@ module CLISplash
       log = get_logger
       list = {}
       if options[:hostname] then
+        options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
         log.info "Remote Splash configured commands on #{options[:hostname]}:"
         log.info "ctrl+c for interrupt"
         begin
@@ -237,6 +240,7 @@ module CLISplash
       end
       list = get_config.commands.keys
       if options[:hostname] then
+        options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
         list = backend.list("*", options[:hostname]).map(&:to_sym)
       end
       if list.include? command.to_sym then
@@ -274,6 +278,7 @@ module CLISplash
     option :detail, :type => :boolean
     def getreportlist
       log = get_logger
+      options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
       if options[:hostname] and options[:all] then
         splash_exit case: :options_incompatibility, more: "--all, --hostname"
       end

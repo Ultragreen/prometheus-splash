@@ -16,9 +16,11 @@ module Splash
 
 
       def log(options)
+        pid = Process.pid.to_s
+        date = DateTime.now.to_s
         level = (ALIAS.keys.include? options[:level])?  ALIAS[options[:level]] : options[:level]
         if @active_levels.include? level then
-          @stream.puts "#{alt(options[:level])} #{options[:message]}"
+          @stream.puts "[#{date}] (#{pid}) #{alt(options[:level])} : #{options[:message]}"
         end
       end
 

@@ -12,14 +12,14 @@
 * adding \n for LONGDESC Thor #14
 * Doc for command name format in YAML #2
 
-### CHANGE :
+### CHANGES :
 
 * RabbitMQ Credentials and vhosts support #16
 * backend hardening #18
 * remote show with --hostname #12
 
 
-### FEATURE :
+### FEATURES :
 
 * CLI colors and logger CLI /dual #8
 * Log for splash daemon #6
@@ -72,3 +72,7 @@
 * auto setup root check without /etc/splash.yml #34
 * empty hostname with --hostname #27
 * foreground execution control #24
+
+### FEATURES
+
+* command treeview with --hostname #28

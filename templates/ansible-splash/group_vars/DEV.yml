@@ -7,6 +7,8 @@ patch_etc_hosts: true
 mq_port: 5672
 mq_admin_username: admin
 mq_admin_password: adminmdppwd
+mq_ip: 127.0.0.1
+mq_nodename: rabbit
 
 mq_splash_username: splash
 mq_splash_password: mdptest

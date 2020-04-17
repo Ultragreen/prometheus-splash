@@ -1,5 +1,5 @@
 
 ---
-- name: restart rabbitmq
+- name: restart Rabbitmq
   service: name=rabbitmq-server state=restarted
   become: yes

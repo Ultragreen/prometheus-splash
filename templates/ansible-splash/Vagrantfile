@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
      sudo apt-add-repository --yes --update ppa:ansible/ansible
-     apt-get install -y git ansible
+     apt-get install -y git ansible python-apt
      git clone https://github.com/Ultragreen/prometheus-splash.git
      cd prometheus-splash/templates/ansible-splash
      ansible-playbook -i inventory.dev deploy.yml

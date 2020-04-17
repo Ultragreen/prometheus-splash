@@ -1,6 +1,7 @@
 ---
-- name: PREPARE TESTING localhost entries for test
+- name: PREPARE TESTING localhost entries for test #only for testing with Vagrant, remove for real usages
   hosts: supervision_master
+  become: yes
   tasks:
   - lineinfile:
       path: /etc/hosts
@@ -18,8 +19,9 @@
 
 - name: PREPARE packages
   hosts: supervision_master #for real usage => precise all
+  become: yes
   tasks:
-    apt:
+  - apt:
       update_cache: yes
       force_apt_get: yes
       cache_valid_time: 3600

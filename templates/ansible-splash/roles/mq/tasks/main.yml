@@ -6,7 +6,17 @@
 
 - name: MQ enable rabbitmq plugins
   rabbitmq_plugin: names=rabbitmq_management,rabbitmq_tracing,rabbitmq_federation state=enabled
-  notify: restart rabbitmq
+  notify: restart Rabbitmq
+
+- name: MQ Configuration
+  template:
+    src: rabbitmq-env.conf.j2
+    dest: /etc/rabbitmq/rabbitmq-env.conf
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0644
+  notify: restart Rabbitmq
+
 
 - name: add Admin users
   rabbitmq_user:
@@ -36,7 +46,7 @@
 
 - name: MQ Add Splash service user
   rabbitmq_user:
-    node: "rabbit@{{ groups['mq'][0] }}" 
+    node: "rabbit@{{ groups['mq'][0] }}"
     user: "{{ mq_splash_username }}"
     password: "{{ mq_splash_password }}"
     vhost: "{{ mq_splash_vhost}}"

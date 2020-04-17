@@ -20,13 +20,19 @@ module Splash
         date = DateTime.now.to_s
         level = (ALIAS.keys.include? options[:level])?  ALIAS[options[:level]] : options[:level]
         if @active_levels.include? level then
-          @stream.puts "[#{date}] (#{pid}) #{alt(options[:level])} : #{options[:message]}"
+          unless options[:session].empty? then
+            @stream.puts "[#{date}] (#{pid}) (#{options[:session]}) #{alt(options[:level])} : #{options[:message]}"
+          else
+            @stream.puts "[#{date}] (#{pid}) #{alt(options[:level])} : #{options[:message]}"
+          end
         end
       end
 
       def close
         @stream.close
       end
+
+
 
     end
 

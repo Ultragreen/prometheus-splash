@@ -30,7 +30,7 @@ module CLISplash
       log = get_logger
       config = get_config
       log.info "Splash version : #{config.version}, Author : #{config.author}"
-      log_info config.copyright
+      log.info config.copyright
       splash_exit case: :quiet_exit
     end
 

@@ -44,7 +44,6 @@ module CLISplash
       log.level = :fatal if options[:quiet]
       result = Splash::LogScanner::new
       result.analyse
-      result.notify
       splash_exit result.notify
 
     end

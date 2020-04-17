@@ -31,11 +31,12 @@ module Splash
           @log.item "Initializing logs monitorings & notifications."
           @server.send sched,value do
             begin
-              @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}"
+              session = get_session
+              @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
               @result.analyse
-              @result.notify
+              @result.notify :session => session
             rescue Errno::ECONNREFUSED
-              @log.error "PushGateway seems to be done, please start it."
+              @log.error "PushGateway seems to be done, please start it.", session
             end
           end
           hostname = Socket.gethostname
@@ -45,17 +46,15 @@ module Splash
           end
           transport.subscribe(:block => true) do |delivery_info, properties, body|
             content = YAML::load(body)
+            session = get_session
+            content[:session] = session
             if VERBS.include? content[:verb]
-              @log.receive "Valid remote order, verb : #{content[:verb].to_s}"
-              if content[:payload] then
-                res = self.send content[:verb], content[:payload]
-              else
-                res = self.send content[:verb]
-              end
+              @log.receive "Valid remote order, verb : #{content[:verb].to_s}", session
+              res = self.send content[:verb], content
               get_default_client.publish queue: content[:return_to], message: res.to_yaml
-              @log.send "Result to #{content[:return_to]}."
+              @log.send "Result to #{content[:return_to]}.", session
             else
-              @log.receive "INVALID remote order, verb : #{content[:verb].to_s}"
+              @log.receive "INVALID remote order, verb : #{content[:verb].to_s}", session
               get_default_client.publish queue: content[:return_to], message: "Unkown verb #{content[:verb]}".to_yaml
             end
           end
@@ -76,8 +75,9 @@ module Splash
               sched,value = config[command][:schedule].flatten
               @log.arrow "Scheduling command #{command.to_s}"
               @server.send sched,value do
-                @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}"
-                execute command: command.to_s
+                session  = get_session
+                @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
+                execute command: command.to_s, session: session
               end
             end
 
@@ -88,7 +88,7 @@ module Splash
           if options[:ack] then
             command.ack
           else
-            return command.call_and_notify trace: true, notify: true, callback: true
+            return command.call_and_notify trace: true, notify: true, callback: true, session: options[:session]
           end
         end
 

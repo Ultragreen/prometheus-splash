@@ -272,6 +272,7 @@ module CLISplash
       if not redis and options[:hostname] then
         splash_exit case: :specific_config_required, :more => "Redis backend is requiered for Remote execution report request"
       end
+      splash_exit case: :not_root if not is_root? and not redis
       list = get_config.commands.keys
       if options[:hostname] then
         options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
@@ -321,6 +322,7 @@ module CLISplash
       if not redis and (options[:hostname] or options[:all]) then
         splash_exit case: :specific_config_required, more: "Redis Backend requiered for Remote execution report Request"
       end
+      splash_exit case: :not_root if not is_root? and not redis
       pattern = (options[:pattern])? options[:pattern] : '*'
       if options[:all] then
         res = backend.listall pattern

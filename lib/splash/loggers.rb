@@ -18,6 +18,10 @@ module Splash
 #      end
     end
 
+    def get_session
+      return "#{Time.now.to_i.to_s}#{rand(999)}"
+    end
+
 
     def change_logger(options = {})
       options[:force] = true
@@ -34,13 +38,13 @@ module Splash
         :schedule => :info, :arrow => :info, :send => :info,
         :receive => :info, :error => :result, :success => :result }
       LEVELS.each do |method|
-        define_method(method) do |message|
-            self.log({ :level => method, :message => message})
+        define_method(method) do |message,session = ''|
+            self.log({ :level => method, :message => message, :session => session})
         end
       end
       ALIAS.keys.each do |method|
-        define_method(method) do |message|
-            self.log({ :level => method, :message => message})
+        define_method(method) do |message,session = ''|
+            self.log({ :level => method, :message => message, :session => session})
         end
       end
       def initialize

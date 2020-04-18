@@ -15,8 +15,11 @@ module Splash
         include Splash::Logs
         include Splash::Commands
 
+
         def initialize(options = {})
           @log = get_logger
+          self.extend Splash::Daemon::Metrics
+          @metric_manager = get_metrics_manager
           $stdout.sync = true
           $stderr.sync = true
           @server  = Rufus::Scheduler::new
@@ -33,6 +36,7 @@ module Splash
           @server.send sched,value do
             begin
               session = get_session
+              @metric_manager.inc_monitoring
               @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
               @result.analyse
               @result.notify :session => session
@@ -40,6 +44,18 @@ module Splash
               @log.error "PushGateway seems to be done, please start it.", session
             end
           end
+
+          sched,value = @config.daemon_metrics_scheduling.flatten
+
+          @log.item "Initializing Splash metrics notifications."
+          @server.send sched,value do
+            begin
+              @metric_manager.notify
+            rescue Errno::ECONNREFUSED
+              @log.error "PushGateway seems to be done, please start it."
+            end
+          end
+
           hostname = Socket.gethostname
           transport = get_default_subscriber queue: "splash.#{hostname}.input"
           if transport.class == Hash and transport.include? :case then
@@ -89,6 +105,7 @@ module Splash
           if options[:ack] then
             command.ack
           else
+            @metric_manager.inc_execution
             return command.call_and_notify trace: true, notify: true, callback: true, session: options[:session]
           end
         end

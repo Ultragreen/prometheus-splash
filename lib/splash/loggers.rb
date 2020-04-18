@@ -10,12 +10,12 @@ module Splash
     def get_logger(options = {})
       logger = (get_config.loggers[:list].include? options[:logger])? options[:logger].to_s : get_config.loggers[:default].to_s
       aclass = "Splash::Loggers::#{logger.capitalize}"
-#      begin
+      begin
         return @@logger = Kernel.const_get(aclass)::new if options[:force]
         return @@logger ||= Kernel.const_get(aclass)::new
-#      rescue
-#        splash_exit case: :configuration_error, more: "Logger specified inexistant : #{logger}"
-#      end
+      rescue
+        splash_exit case: :configuration_error, more: "Logger specified inexistant : #{logger}"
+      end
     end
 
     def get_session
@@ -24,19 +24,20 @@ module Splash
 
 
     def change_logger(options = {})
+      level = get_logger.level
       options[:force] = true
-      get_logger(options)
+      get_logger(options).level = level
     end
 
-
+    LEVELS = [:debug, :warn, :info, :result, :fatal, :unknown]
+    ALIAS = {:flat => :info, :item => :info, :ok => :info, :ko => :info, :trigger => :info,
+      :schedule => :info, :arrow => :info, :send => :info,
+      :receive => :info, :error => :result, :success => :result }
 
     class LoggerTemplate
       include Splash::Config
 
-      LEVELS = [:debug, :warn, :info, :result, :fatal, :unknown]
-      ALIAS = {:flat => :info, :item => :info, :ok => :info, :ko => :info, :trigger => :info,
-        :schedule => :info, :arrow => :info, :send => :info,
-        :receive => :info, :error => :result, :success => :result }
+
       LEVELS.each do |method|
         define_method(method) do |message,session = ''|
             self.log({ :level => method, :message => message, :session => session})

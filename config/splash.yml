@@ -34,6 +34,8 @@
   :daemon:
     :logmon_scheduling:
       :every: 20s
+    :metrics_scheduling:
+      :every: 20s
     :process_name: "Splash : daemon."
     :paths:
       :pid_path: /var/run/splash

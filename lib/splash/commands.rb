@@ -10,7 +10,7 @@ module Splash
       include Splash::Transports
 
 
-      @@registry = Prometheus::Client.registry
+      @@registry = Prometheus::Client::Registry::new
       @@metric_exitcode = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
       @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
       @@registry.register(@@metric_exitcode)

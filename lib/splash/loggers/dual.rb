@@ -1,10 +1,22 @@
 module Splash
   module Loggers
 
-    class Dual < Splash::Loggers::LoggerTemplate
+    class Dual #< Splash::Loggers::LoggerTemplate
+
+
       include Splash::Config
 
 
+      LEVELS.each do |method|
+        define_method(method) do |message,session = ''|
+            self.log({ :level => method, :message => message, :session => session})
+        end
+      end
+      ALIAS.keys.each do |method|
+        define_method(method) do |message,session = ''|
+            self.log({ :level => method, :message => message, :session => session})
+        end
+      end
 
       def initialize
         super
@@ -17,6 +29,10 @@ module Splash
         @log2.log options
       end
 
+      def level=(level)
+        @log1.level=level
+        @log2.level=level
+      end
     end
   end
 end

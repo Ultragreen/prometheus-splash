@@ -11,7 +11,7 @@ module Splash
       def initialize
         @logs_target = get_config.logs
         @config = get_config
-        @registry = Prometheus::Client.registry
+        @registry = Prometheus::Client::Registry::new
         @metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])
         @metric_missing = Prometheus::Client::Gauge.new(:logmissing, docstring: 'SPLASH metric log missing', labels: [:log ])
         @metric_lines = Prometheus::Client::Gauge.new(:loglines, docstring: 'SPLASH metric log lines numbers', labels: [:log ])

@@ -11,9 +11,10 @@ class CLI < Thor
     super
     log = get_logger
     options[:colors.to_s]
-    log.level = :debug if options[:debug.to_s]
+    log.level = :debug if options[:debug]
     log.emoji  = options[:emoji.to_s]
     log.color  = options[:colors.to_s]
+    log.debug  "DEBUG activated" if options[:debug]
   end
 
   class_option :quiet, :desc => "Quiet mode, limit output to :fatal", :aliases => "-q", :type => :boolean

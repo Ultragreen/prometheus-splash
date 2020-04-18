@@ -88,11 +88,18 @@
 ### CHANGES
 
 * short Alias for commands without --no-[xxxx] #38
+* REFACTO : namespaces
+ * Splash::Commands
+ * Splash::Log
+ * Splash::Daemon
+ * Splash::Daemon::Orchestrator
+
 
 ### FEATURES
 
 * flush backend arg in config #41
 * adding global --debug flag
+* adding splash Daemon metrics #25
 
 ### DOC
 
@@ -103,3 +110,5 @@
 
 * Ansible Splash role handler error
 * Ansible Splash role logrotate copytruncate for splash logs
+* Prometheus Registry mismatch=> cumulative metrics on each groups #42
+* logger Dual level conservation #43

@@ -159,9 +159,7 @@ module Splash
       if options[:foreground]
         change_logger logger: :dual
         Process.setproctitle options[:description] if options[:description]
-        p $0
         return yield
-        p 'titi'
       end
       fork do
         change_logger logger: :daemon

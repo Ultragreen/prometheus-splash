@@ -20,6 +20,7 @@ module Splash
 
        # global
        :quiet_exit => {:code => 0},
+       :error_exit => {:code => 99, :message => "Operation failure"},
 
        # events
        :interrupt => {:message => "Splash user operation interrupted", :code => 33},

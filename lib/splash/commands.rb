@@ -101,6 +101,7 @@ module Splash
           data[:exec_time] = time.to_s
           backend = get_backend :execution_trace
           key = @name
+          
           backend.put key: key, value: data.to_yaml
           exit_code = status.exitstatus
         end

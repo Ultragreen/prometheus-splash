@@ -25,7 +25,7 @@ module CLISplash
       splash_exit acase
     end
 
-    desc "version", "display current Splash version"
+    desc "version", "Display current Splash version"
     def version
       log = get_logger
       config = get_config
@@ -33,6 +33,13 @@ module CLISplash
       log.info config.copyright
       splash_exit case: :quiet_exit
     end
+
+    desc "service", "Install Splashd Systemd service"
+    def service
+      acase = run_as_root :addservice
+      splash_exit acase
+    end
+
 
   end
 

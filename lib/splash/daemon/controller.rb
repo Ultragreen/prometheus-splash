@@ -1,7 +1,7 @@
 # coding: utf-8
 module Splash
-  module LogsMonitor
-    module DaemonController
+  module Daemon
+    module Controller
       include Splash::Constants
       include Splash::Helpers
       include Splash::Config

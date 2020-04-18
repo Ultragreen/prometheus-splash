@@ -2,7 +2,7 @@
 module CLISplash
 
   class CLIController < Thor
-    include Splash::LogsMonitor::DaemonController
+    include Splash::Daemon::Controller
     include Splash::Transports
     include Splash::Exiter
     include Splash::Loggers

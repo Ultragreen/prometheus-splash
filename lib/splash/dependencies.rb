@@ -49,7 +49,7 @@ module Splash
     require 'splash/commands'
     require 'splash/logs'
     require 'splash/orchestrator'
-    require 'splash/controller'
+    require 'splash/daemon'
 
   end
 end

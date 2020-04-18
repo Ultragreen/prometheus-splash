@@ -11,6 +11,7 @@ class CLI < Thor
     super
     log = get_logger
     options[:colors.to_s]
+    log.level = :debug if options[:debug.to_s]
     log.emoji  = options[:emoji.to_s]
     log.color  = options[:colors.to_s]
   end
@@ -18,7 +19,7 @@ class CLI < Thor
   class_option :quiet, :desc => "Quiet mode, limit output to :fatal", :aliases => "-q", :type => :boolean
   class_option :emoji, :desc => "Display Emoji", :type => :boolean, :default => true
   class_option :colors, :desc => "Display colors", :type => :boolean, :default => true
-
+  class_option :debug, :desc => "Set log level to :debug", :aliases => "-d", :type => :boolean
 
 
   include CLISplash

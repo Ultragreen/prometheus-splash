@@ -81,3 +81,10 @@
 * quiet mode + no-colors and no-emoji #5
 * correlation id in log for daemon #15
 * systemd Splashd service installation #32
+
+
+## V 0.5.1 2020/04/17
+
+### FEATURES
+
+* flush backend arg in config #41

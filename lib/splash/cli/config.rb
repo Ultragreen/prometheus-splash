@@ -40,6 +40,12 @@ module CLISplash
       splash_exit acase
     end
 
+    desc "flushbackend", "Flush configured backend"
+    def flushbackend
+      acase = run_as_root :flush_backend
+      splash_exit acase
+    end
+
 
   end
 

@@ -26,7 +26,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: restart Splash
+  notify: restart Splashd
 
 - name: SPLASH Check if Systemd service installed
   stat:

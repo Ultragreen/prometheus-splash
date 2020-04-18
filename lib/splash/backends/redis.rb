@@ -9,7 +9,7 @@ module Splash
         conf = { :host => @config[:host], :port => @config[:port], :db => @config[:base].to_i}
         conf[:password] = @config[:auth] if @config[:auth]
         @store = ::Redis.new conf
-        @redis_cli_cmd = `which redis-cli`
+        #@redis_cli_cmd = `which redis-cli`
         @store.auth(@config[:auth]) if @config[:auth]
       end
 
@@ -37,8 +37,8 @@ module Splash
       end
 
       def flush
-        `#{@redis_cli_cmd} -n 3 flushdb`
-        # @@store.flushdb
+        #`#{@redis_cli_cmd} -n #{@config[:base]} flushdb`
+        @store.flushdb
       end
 
       def exist?(options)

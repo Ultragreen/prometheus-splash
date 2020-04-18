@@ -36,6 +36,10 @@ module Splash
         return ::File.exist?("#{@path}/#{suffix_trace(options[:key])}")
       end
 
+      def flush
+        Dir.glob("#{@path}/*.trace").each { |file| ::File.delete(file)}
+      end
+
       private
       def suffix_trace(astring)
         return "#{astring}.trace"

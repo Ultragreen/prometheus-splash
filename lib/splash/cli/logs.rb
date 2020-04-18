@@ -7,12 +7,12 @@ module CLISplash
     include Splash::Logs
 
 
-    desc "analyse", "analyze logs in config"
+    desc "analyse", "analyze logs defined in Splash config"
     def analyse
       log  = get_logger
       results = LogScanner::new
       res = results.analyse
-      log.info "SPlash Configured logs status :"
+      log.info "SPlash Configured log monitors :"
       full_status = true
       results.output.each do |result|
         if result[:status] == :clean then
@@ -30,7 +30,7 @@ module CLISplash
 
         full_status = false unless result[:status] == :clean
       end
-      display_status = (full_status)? "OK": "KO"
+
       if full_status then
         log.ok "Global status : no error found"
       else
@@ -39,7 +39,7 @@ module CLISplash
       splash_exit case: :quiet_exit
     end
 
-    desc "monitor", "monitor logs in config"
+    desc "monitor", "monitor logs defined in Splash config"
     def monitor
       log = get_logger
       log.level = :fatal if options[:quiet]
@@ -49,7 +49,7 @@ module CLISplash
 
     end
 
-    desc "show LOG", "show configured log monitoring for LOG"
+    desc "show LOG", "show Splash configured log monitoring for LOG"
     def show(logrecord)
       log = get_logger
       log_record_set = get_config.logs.select{|item| item[:log] == logrecord }
@@ -63,7 +63,7 @@ module CLISplash
       end
     end
 
-    desc "list", "Show configured logs monitoring"
+    desc "list", "List all Splash configured logs monitoring"
     long_desc <<-LONGDESC
     Show configured logs monitoring\n
     with --detail, show logs monitor details
@@ -77,7 +77,7 @@ module CLISplash
       log_record_set.each do |record|
         log.item "log monitor : #{record[:log]}"
         if options[:detail] then
-          log.flat "  ->   pattern : /#{record[:pattern]}/"
+          log.arrow "pattern : /#{record[:pattern]}/"
         end
       end
       splash_exit case: :quiet_exit

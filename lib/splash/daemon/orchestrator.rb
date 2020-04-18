@@ -13,6 +13,7 @@ module Splash
         include Splash::Daemon::Orchestrator::Grammar
         include Splash::Loggers
         include Splash::Logs
+        include Splash::Processes
         include Splash::Commands
 
 
@@ -25,28 +26,53 @@ module Splash
           @server  = Rufus::Scheduler::new
           @server.extend SchedulerHooks
           @config = get_config
-          @result = LogScanner::new
+
           @log.info "Splash Orchestrator starting :"
           if options[:scheduling] then
             @log.item "Initializing commands Scheduling."
             init_commands_scheduling
           end
-          sched,value = @config.daemon_logmon_scheduling.flatten
-          @log.item "Initializing logs monitorings & notifications."
-          @server.send sched,value do
-            begin
-              session = get_session
-              @metric_manager.inc_monitoring
-              @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
-              @result.analyse
-              @result.notify :session => session
-            rescue Errno::ECONNREFUSED
-              @log.error "PushGateway seems to be done, please start it.", session
+
+          if @config.logs.empty? then
+            @log.item "No logs to monitor"
+          else
+            sched,value = @config.daemon_procmon_scheduling.flatten
+            @log.item "Initializing logs monitorings & notifications."
+            @log_result = LogScanner::new
+            @server.send sched,value do
+              begin
+                session = get_session
+                @metric_manager.inc_logs_monitoring
+                @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
+                @log_result.analyse
+                @log_result.notify :session => session
+              rescue Errno::ECONNREFUSED
+                @log.error "PushGateway seems to be done, please start it.", session
+              end
             end
           end
 
-          sched,value = @config.daemon_metrics_scheduling.flatten
+          if @config.processes.empty? then
+            @log.item "No processes to monitor"
+          else
+            sched,value = @config.daemon_logmon_scheduling.flatten
+            @log.item "Initializing processes monitorings & notifications."
+            @process_result = ProcessScanner::new
+            @server.send sched,value do
+              begin
+                session = get_session
+                @metric_manager.inc_processes_monitoring
+                @log.trigger "Processes monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
+                @process_result.analyse
+                @process_result.notify :session => session
+              rescue Errno::ECONNREFUSED
+                @log.error "PushGateway seems to be done, please start it.", session
+              end
+            end
+          end
 
+
+          sched,value = @config.daemon_metrics_scheduling.flatten
           @log.item "Initializing Splash metrics notifications."
           @server.send sched,value do
             begin

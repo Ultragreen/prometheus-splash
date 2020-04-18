@@ -35,6 +35,8 @@
     :logmon_scheduling:
       :every: 20s
     :metrics_scheduling:
+      :every: 15s
+    :procmon_scheduling:
       :every: 20s
     :process_name: "Splash : daemon."
     :paths:
@@ -108,3 +110,10 @@
       :pattern: ERROR
     - :log: /tmp/test2
       :pattern: ERROR
+
+
+### configuration of monitored processes
+  :processes:
+    - :process: cron
+      :patterns:
+        - cron

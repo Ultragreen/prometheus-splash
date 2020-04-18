@@ -11,8 +11,10 @@ module Splash
 
     # default scheduling criteria for log monitoring
     DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
-    # default scheduling criteria for log metrics notifications
-    DAEMON_METRICS_SCHEDULING={ :every => '20s'}
+    # default scheduling criteria for  metrics notifications
+    DAEMON_METRICS_SCHEDULING={ :every => '15s'}
+    # default scheduling criteria for process monitoring
+    DAEMON_PROCMON_SCHEDULING={ :every => '20s'}
 
     # the display name of daemon in proc info (ps/top)
     DAEMON_PROCESS_NAME="Splash : daemon."

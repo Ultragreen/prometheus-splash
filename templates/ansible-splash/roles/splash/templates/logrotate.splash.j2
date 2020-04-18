@@ -1,0 +1,33 @@
+/var/log/splash.log {
+	daily
+	rotate 7
+  size 100M
+	compress
+	delaycompress
+	missingok
+	notifempty
+	create 644 root root
+}
+
+
+/var/run/splash/traces/stderr.txt {
+	daily
+	rotate 7
+  size 100M
+	compress
+	delaycompress
+	missingok
+	notifempty
+	create 644 root root
+}
+
+/var/run/splash/traces/stdout.txt {
+	daily
+	rotate 7
+  size 100M
+	compress
+	delaycompress
+	missingok
+	notifempty
+	create 644 root root
+}

@@ -1,0 +1,4 @@
+---
+- name: restart Splashd
+  service: name=splashd state=restarted
+  become: yes

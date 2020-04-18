@@ -26,4 +26,27 @@
     owner: root
     group: root
     mode: 0644
-  #notify: restart Splash
+  notify: restart Splash
+
+- name: SPLASH Check if Systemd service installed
+  stat:
+    path: /etc/systemd/system/splashd.service
+  register: stat_splash_result
+
+- name: SPLASH Install systemd service
+  shell: splash conf service
+  when: not stat_splash_result.stat.exists
+
+- name: SPLASH Splashd running
+  service:
+    name: splashd
+    state: started
+    enabled: yes
+
+- name:  SPLASH LogRotate template
+  template:
+    src: logrotate.splash.j2
+    dest: /etc/logrotate.d/splash
+    owner: root
+    group: root
+    mode: 0644

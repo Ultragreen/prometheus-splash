@@ -112,3 +112,9 @@
 * Ansible Splash role logrotate copytruncate for splash logs
 * Prometheus Registry mismatch=> cumulative metrics on each groups #42
 * logger Dual level conservation #43
+
+## V 0.5.2 2020/04/18
+
+### FIX
+
+* dual logger daemon shutdown foreground error

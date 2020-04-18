@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = [Splash::Constants::EMAIL]
   spec.description   = %q{Prometheus Logs and Batchs supervision over PushGateway and commands orchestration}
   spec.summary       = %q{Supervision with Prometheus of Logs and Asynchronous tasks orchestration for Services or Hosts }
-  spec.homepage      = "http://www.ultragreen.net"
+  spec.homepage      = "https://github.com/Ultragreen/prometheus-splash"
   spec.license       = Splash::Constants::LICENSE
   spec.require_paths << 'bin'
   spec.bindir = 'bin'

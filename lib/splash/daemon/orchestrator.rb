@@ -12,6 +12,8 @@ module Splash
         include Splash::Transports
         include Splash::Daemon::Orchestrator::Grammar
         include Splash::Loggers
+        include Splash::Logs
+        include Splash::Commands
 
         def initialize(options = {})
           @log = get_logger
@@ -83,7 +85,7 @@ module Splash
         end
 
         def execute(options)
-          command =  Splash::CommandWrapper::new(options[:command])
+          command =  CommandWrapper::new(options[:command])
           if options[:ack] then
             command.ack
           else

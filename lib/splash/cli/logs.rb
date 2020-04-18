@@ -4,12 +4,13 @@ module CLISplash
   class Logs < Thor
     include Splash::Config
     include Splash::Exiter
+    include Splash::Logs
 
 
     desc "analyse", "analyze logs in config"
     def analyse
       log  = get_logger
-      results = Splash::LogScanner::new
+      results = LogScanner::new
       res = results.analyse
       log.info "SPlash Configured logs status :"
       full_status = true
@@ -42,7 +43,7 @@ module CLISplash
     def monitor
       log = get_logger
       log.level = :fatal if options[:quiet]
-      result = Splash::LogScanner::new
+      result = LogScanner::new
       result.analyse
       splash_exit result.notify
 

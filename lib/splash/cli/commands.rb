@@ -9,6 +9,7 @@ module CLISplash
     include Splash::Transports
     include Splash::Templates
     include Splash::Loggers
+    include Splash::Commands
 
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
@@ -60,7 +61,7 @@ module CLISplash
           res[:more] = "Remote command : :execute_command Scheduled"
           splash_exit res
         else
-          command =  Splash::CommandWrapper::new(name)
+          command =  CommandWrapper::new(name)
           if options[:ack] then
             splash_exit command.ack
           end

@@ -80,3 +80,4 @@
 * log horodating with PID #35
 * quiet mode + no-colors and no-emoji #5
 * correlation id in log for daemon #15
+* systemd Splashd service installation #32

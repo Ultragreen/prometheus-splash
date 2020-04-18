@@ -5,9 +5,9 @@ module Splash
       include Splash::Constants
       include Splash::Helpers
       include Splash::Config
-      include Splash::Orchestrator
       include Splash::Exiter
       include Splash::Loggers
+      include Splash::Daemon::Orchestrator
 
       def startdaemon(options = {})
         config = get_config
@@ -43,7 +43,7 @@ module Splash
               :foreground => options[:foreground]
             }
 
-          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  ObjectSpace.each_object(Splash::Orchestrator::Scheduler).first.shutdown } end
+          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  ObjectSpace.each_object(Splash::Daemon::Orchestrator::Scheduler).first.shutdown } end
           res = daemonize daemon_config do
               Scheduler::new options
           end

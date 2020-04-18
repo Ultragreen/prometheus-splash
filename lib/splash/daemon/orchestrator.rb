@@ -1,17 +1,16 @@
 # coding: utf-8
 Dir[File.dirname(__FILE__) + '/orchestrator/*.rb'].each {|file| require file  }
 
-
-
 module Splash
-  module Orchestrator
+  module Daemon
+    module Orchestrator
 
-    class Scheduler
+      class Scheduler
         include Splash::Constants
         include Splash::Helpers
         include Splash::Config
         include Splash::Transports
-        include Splash::Orchestrator::Grammar
+        include Splash::Daemon::Orchestrator::Grammar
         include Splash::Loggers
 
         def initialize(options = {})
@@ -69,17 +68,17 @@ module Splash
 
         private
         def init_commands_scheduling
-            config = get_config.commands
-            commands = config.select{|key,value| value.include? :schedule}.keys
-            commands.each do |command|
-              sched,value = config[command][:schedule].flatten
-              @log.arrow "Scheduling command #{command.to_s}"
-              @server.send sched,value do
-                session  = get_session
-                @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
-                execute command: command.to_s, session: session
-              end
+          config = get_config.commands
+          commands = config.select{|key,value| value.include? :schedule}.keys
+          commands.each do |command|
+            sched,value = config[command][:schedule].flatten
+            @log.arrow "Scheduling command #{command.to_s}"
+            @server.send sched,value do
+              session  = get_session
+              @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
+              execute command: command.to_s, session: session
             end
+          end
 
         end
 
@@ -94,7 +93,6 @@ module Splash
 
       end
 
-
     end
-
   end
+end

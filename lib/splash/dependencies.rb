@@ -48,8 +48,8 @@ module Splash
 
     require 'splash/commands'
     require 'splash/logs'
-    require 'splash/orchestrator'
     require 'splash/daemon'
+
 
   end
 end

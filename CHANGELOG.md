@@ -118,3 +118,10 @@
 ### FIX
 
 * dual logger daemon shutdown foreground error
+
+## V 0.5.3 2020/04/18
+
+### FEATURE
+
+* processes monitoring #23
+ 

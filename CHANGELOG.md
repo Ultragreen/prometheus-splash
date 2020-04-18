@@ -88,3 +88,14 @@
 ### FEATURES
 
 * flush backend arg in config #41
+* adding global --debug flag
+
+### DOC
+
+* default value of mon scheduling 20s => 1m in ansible splash.yml
+
+
+### FIX
+
+* Ansible Splash role handler error
+* Ansible Splash role logrotate copytruncate for splash logs

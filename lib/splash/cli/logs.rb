@@ -67,7 +67,7 @@ module CLISplash
     Show configured logs monitoring\n
     with --detail, show logs monitor details
     LONGDESC
-    option :detail, :type => :boolean
+    option :detail, :type => :boolean,  :aliases => "-D"
     def list
       log = get_logger
       log.info "Splash configured log monitoring :"

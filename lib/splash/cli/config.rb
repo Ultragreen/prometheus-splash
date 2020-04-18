@@ -13,7 +13,7 @@ module CLISplash
     Setup installation fo Splash\n
     with --preserve, preserve from reinstallation of the config
     LONGDESC
-    option :preserve, :type => :boolean
+    option :preserve, :type => :boolean,  :aliases => "-P"
     def setup
       acase = run_as_root :setupsplash, options
       splash_exit acase

@@ -8,7 +8,7 @@ module CLISplash
     include Splash::Loggers
 
 
-    option :foreground, :type => :boolean
+    option :foreground, :type => :boolean,  :aliases => "-F"
     option :purge, :type => :boolean, default: true
     option :scheduling, :type => :boolean, default: true
     long_desc <<-LONGDESC

@@ -21,10 +21,10 @@ module CLISplash
     with --hostname, execute on an other Splash daemon node
     LONGDESC
     option :trace, :type => :boolean, :default => true
-    option :ack, :type => :boolean, negate: false
+    option :ack, :type => :boolean, negate: false,  :aliases => "-a"
     option :notify, :type => :boolean, :default => true
     option :callback, :type => :boolean, :default => true
-    option :hostname, :type => :string
+    option :hostname, :type => :string,  :aliases => "-H"
     def execute(name)
       log = get_logger
       log.level = :fatal if options[:quiet]
@@ -83,7 +83,7 @@ module CLISplash
     WARNING : scheduling by CLI are not percisted, so use it only for specifics cases.\n
     NOTES : Scheduling, force trace, notifying and callback.
     LONGDESC
-    option :hostname, :type => :string, :default => Socket.gethostname
+    option :hostname, :type => :string, :default => Socket.gethostname,  :aliases => "-H"
     option :at, :type => :string
     option :in, :type => :string
     def schedule(name)
@@ -121,7 +121,7 @@ module CLISplash
     Show commands sequence tree\n
     with --hostname, ask other Splash daemon via transport\n
     LONGDESC
-    option :hostname, :type => :string
+    option :hostname, :type => :string,  :aliases => "-H"
     def treeview(command)
       depht = 0
       log  = get_logger
@@ -169,8 +169,8 @@ module CLISplash
     with --detail, show command details\n
     with --hostname, ask other Splash daemon via transport\n
     LONGDESC
-    option :detail, :type => :boolean
-    option :hostname, :type => :string
+    option :detail, :type => :boolean,  :aliases => "-D"
+    option :hostname, :type => :string,  :aliases => "-H"
     def list
       log = get_logger
       list = {}
@@ -218,7 +218,7 @@ module CLISplash
     Show specific configured command COMMAND\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
     LONGDESC
-    option :hostname, :type => :string
+    option :hostname, :type => :string,  :aliases => "-H"
     def show(command)
       log = get_logger
       list = {}
@@ -264,7 +264,7 @@ module CLISplash
     Show last running result for specific configured command COMMAND\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
     LONGDESC
-    option :hostname, :type => :string
+    option :hostname, :type => :string,  :aliases => "-H"
     def lastrun(command)
       log = get_logger
       backend = get_backend :execution_trace
@@ -307,10 +307,10 @@ module CLISplash
     with --detail, get major informations of each reports\n
     --all and --hostname are exclusives
     LONGDESC
-    option :pattern, :type => :string
-    option :hostname, :type => :string
-    option :all, :type => :boolean, :negate => false
-    option :detail, :type => :boolean
+    option :pattern, :type => :string, :aliases => "-p"
+    option :hostname, :type => :string,  :aliases => "-H"
+    option :all, :type => :boolean, :negate => false,  :aliases => "-A"
+    option :detail, :type => :boolean,  :aliases => "-D"
     def getreportlist
       log = get_logger
       options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'

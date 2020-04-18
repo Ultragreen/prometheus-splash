@@ -85,6 +85,10 @@
 
 ## V 0.5.1 2020/04/17
 
+### CHANGES
+
+* short Alias for commands without --no-[xxxx] #38
+
 ### FEATURES
 
 * flush backend arg in config #41

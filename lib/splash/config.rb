@@ -22,6 +22,7 @@ module Splash
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_logmon_scheduling] = (config_from_file[:daemon][:logmon_scheduling])? config_from_file[:daemon][:logmon_scheduling] : DAEMON_LOGMON_SCHEDULING
         self[:daemon_metrics_scheduling] = (config_from_file[:daemon][:metrics_scheduling])? config_from_file[:daemon][:metrics_scheduling] : DAEMON_METRICS_SCHEDULING
+        self[:daemon_procmon_scheduling] = (config_from_file[:daemon][:procmon_scheduling])? config_from_file[:daemon][:procmon_scheduling] : DAEMON_PROCMON_SCHEDULING
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST
         self[:execution_template_path] = (config_from_file[:templates][:execution][:path])? config_from_file[:templates][:execution][:path] : EXECUTION_TEMPLATE
         self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : DAEMON_PID_PATH
@@ -34,6 +35,7 @@ module Splash
         self[:backends] = {} ; self[:backends].merge! BACKENDS_STRUCT ; self[:backends].merge! config_from_file[:backends] if config_from_file[:backends]
         self[:loggers] = {} ; self[:loggers].merge! LOGGERS_STRUCT ; self[:loggers].merge! config_from_file[:loggers] if config_from_file[:loggers]
 
+        self[:processes] = (config_from_file[:processes])? config_from_file[:processes] : {}
         self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
         self[:commands] = (config_from_file[:commands])? config_from_file[:commands] : {}
 
@@ -57,6 +59,10 @@ module Splash
         return self[:daemon_logmon_scheduling]
       end
 
+      def daemon_procmon_scheduling
+        return self[:daemon_procmon_scheduling]
+      end
+
       def daemon_metrics_scheduling
         return self[:daemon_metrics_scheduling]
       end
@@ -73,6 +79,10 @@ module Splash
 
       def commands
         return self[:commands]
+      end
+
+      def processes
+        return self[:processes]
       end
 
       def author

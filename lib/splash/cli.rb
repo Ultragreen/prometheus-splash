@@ -24,14 +24,19 @@ class CLI < Thor
 
 
   include CLISplash
-  desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision"
+  desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision & orchestration"
   subcommand "commands", Commands
   desc "logs SUBCOMMAND ...ARGS", "Managing Files/Logs supervision"
   subcommand "logs", Logs
-  desc "daemon SUBCOMMAND ...ARGS", "Logs monitor daemon contoller"
+  desc "processes SUBCOMMAND ...ARGS", "Managing processes supervision"
+  subcommand "processes", Processes
+  desc "daemon SUBCOMMAND ...ARGS", "Splash daemon contoller"
   subcommand "daemon", CLIController
-  desc "config SUBCOMMAND ...ARGS", "config tools for Splash"
+  desc "config SUBCOMMAND ...ARGS", "Config tools for Splash"
   subcommand "config", Config
   desc "documentation SUBCOMMAND ...ARGS", "Documentation for Splash"
   subcommand "documentation", Documentation
+
+
+
 end

@@ -17,7 +17,8 @@ module Splash
     # @param [Hash] options
     # @option options [String] :pattern un motif de regexp
     # @option options [Array] :patterns Un tableau de motif de regexp
-    # @return [String] le PID
+    # @option options [Bool] :full renvoie tout les details si True
+    # @return [String|Array] le PID or tout les détails
     def get_processes(options = {})
       patterns = []
       patterns  = options[:patterns] if options[:patterns]
@@ -26,7 +27,11 @@ module Splash
       patterns.each do |item|
         res = res.find_processes item
       end
-      return res.pick_attr('PID')
+      if options[:full] then
+        return res
+      else
+        return res.pick_attr('PID')
+      end
     end
 
 

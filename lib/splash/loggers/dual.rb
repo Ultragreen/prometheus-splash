@@ -28,8 +28,12 @@ module Splash
         @log1.log options
         @log2.log options
       end
+      def level
+        @level
+      end
 
       def level=(level)
+        @level = level
         @log1.level=level
         @log2.level=level
       end

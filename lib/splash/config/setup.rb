@@ -1,13 +1,18 @@
-
 # coding: utf-8
 
-
+# Base Splash module
 module Splash
+
+  # moudle for Configuration utilities
   module ConfigUtilities
     include Splash::Constants
     include Splash::Helpers
+
+
     # Setup action method for installing Splash
-    # @return [Integer] an errorcode value
+    # @param [Hash] options
+    # @option options [Symbol] :preserve flag to preserve config file during setup
+    # @return [Hash] An Exiter case hash (:splash_setup_success or :splash_setup_error)
     def setupsplash(options = {})
       conf_in_path = search_file_in_gem "prometheus-splash", "config/splash.yml"
       full_res = 0

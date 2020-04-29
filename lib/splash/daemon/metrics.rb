@@ -7,9 +7,7 @@ module Splash
       include Splash::Loggers
 
       @@manager=nil
-      # factory of Configuration Class instance
-      # @param [String] config_file the path of the YAML Config file
-      # @return [SPlash::Config::Configuration]
+      
       def get_metrics_manager
         return @@manager ||= Manager::new
       end

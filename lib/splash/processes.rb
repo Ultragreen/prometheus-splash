@@ -1,12 +1,19 @@
+# coding: utf-8
+
+# base Splash Module
 module Splash
+
+  # Processes namespace
   module Processes
+
+    # Processes scanner and notifier
     class ProcessScanner
       include Splash::Constants
       include Splash::Config
 
 
-      # LogScanner Constructor
-      # return [LogScanner]
+      # ProcessScanner Constructor : initialize prometheus metrics
+      # @return [Splash::Processes::ProcessScanner]
       def initialize
         @processes_target = get_config.processes
         @config = get_config
@@ -21,7 +28,8 @@ module Splash
       end
 
 
-      # start log analyse for log target in config
+      # start process analyse for process target in config
+      # @return [Hash] Exiter case :quiet_exit
       def analyse
         @processes_target.each do |record|
           list =  get_processes patterns: record[:patterns], full: true
@@ -39,11 +47,15 @@ module Splash
       end
 
       # pseudo-accessor on @processes_target
+      # @return [Hash] the processes structure
       def output
         return @processes_target
       end
 
       # start notification on prometheus for metrics
+      # @param [Hash] options
+      # @option options [String] :session a session number for log daemon
+      # @return [Hash] Exiter case :quiet_exit
       def notify(options = {})
         log = get_logger
         unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then

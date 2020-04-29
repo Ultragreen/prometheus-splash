@@ -1,7 +1,10 @@
 # coding: utf-8
 Dir[File.dirname(__FILE__) + '/config/*.rb'].each {|file| require file  }
 
+# base Splash Module
 module Splash
+
+  # Config namespace
   module Config
     include Splash::Helpers
     include Splash::Constants
@@ -12,6 +15,7 @@ module Splash
     class Configuration < Hash
       include Splash::Constants
 
+      # constructor : read config file and map against Constants
       def initialize(config_file=CONFIG_FILE)
         config_from_file = readconf config_file
         self[:version] = VERSION
@@ -43,79 +47,126 @@ module Splash
 
       # @!group accessors on configurations Items
 
+      # getter for loggers Hash Config sample
+      # @return [Hash]
       def loggers
         return self[:loggers]
       end
 
+      # getter for backends Hash Config sample
+      # @return [Hash]
       def backends
         return self[:backends]
       end
 
+      # getter for transports Hash Config sample
+      # @return [Hash]
       def transports
         return self[:transports]
       end
 
+      # getter for daemon_logmon_scheduling Hash Config sample
+      # @return [Hash]
       def daemon_logmon_scheduling
         return self[:daemon_logmon_scheduling]
       end
 
+      # getter for daemon_procmon_scheduling Hash Config sample
+      # @return [Hash]
       def daemon_procmon_scheduling
         return self[:daemon_procmon_scheduling]
       end
 
+      # getter for daemon_metrics_scheduling Hash Config sample
+      # @return [Hash]
       def daemon_metrics_scheduling
         return self[:daemon_metrics_scheduling]
       end
 
+      # getter for execution_template_path Hash Config sample
+      # @return [String]
       def execution_template_path
         return self[:execution_template_path]
       end
+
+      # getter for execution_template_tokens Hash Config sample
+      # @return [Array]
       def execution_template_tokens
         return self[:execution_template_tokens]
       end
+
+      # getter for logs Hash Config sample
+      # @return [Hash]
       def logs
         return self[:logs]
       end
 
+      # getter for commands Hash Config sample
+      # @return [Hash]
       def commands
         return self[:commands]
       end
 
+      # getter for processes Hash Config sample
+      # @return [Hash]
       def processes
         return self[:processes]
       end
 
+
+      # getter for author Config sample
+      # @return [String]
       def author
         return self[:author]
       end
 
+      # getter for copyright Config sample
+      # @return [String]
       def copyright
         return self[:copyright]
       end
 
+      # getter for version Config sample
+      # @return [String]
       def version
         return self[:version]
       end
 
+
+
+
+      # getter for daemon_process_name Config sample
+      # @return [String]
       def daemon_process_name
         return self[:daemon_process_name]
       end
 
+      # getter for prometheus_pushgateway_host Config sample
+      # @return [String]
       def prometheus_pushgateway_host
         return self[:prometheus_pushgateway_host]
       end
+
+      # getter for prometheus_pushgateway_port Config sample
+      # @return [String]
       def prometheus_pushgateway_port
         return self[:prometheus_pushgateway_port]
       end
 
+      # getter for full_pid_path Config sample
+      # @return [String]
       def full_pid_path
         return "#{self[:pid_path]}/#{self[:pid_file]}"
       end
 
+      # getter for full_stdout_trace_path Config sample
+      # @return [String]
       def full_stdout_trace_path
         return "#{self[:trace_path]}/#{self[:stdout_trace]}"
       end
 
+      # getter for full_stderr_trace_path Config sample
+      # @return [String]
       def full_stderr_trace_path
         return "#{self[:trace_path]}/#{self[:stderr_trace]}"
       end
@@ -123,6 +174,10 @@ module Splash
       # @!endgroup
 
       private
+
+      # read config file
+      # @param [String] file default from CONFIG_FILE
+      # @return [Hash] The config global Hash from YAML
       def readconf(file = CONFIG_FILE)
         return YAML.load_file(file)[:splash]
       end
@@ -133,6 +188,7 @@ module Splash
 
 
     @@config=nil
+
     # factory of Configuration Class instance
     # @param [String] config_file the path of the YAML Config file
     # @return [SPlash::Config::Configuration]

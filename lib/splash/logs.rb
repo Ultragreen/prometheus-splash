@@ -1,13 +1,19 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # Logs namespace
   module Logs
+
+    # Log scanner and notifier
     class LogScanner
       include Splash::Constants
       include Splash::Config
 
 
-      # LogScanner Constructor
-      # return [LogScanner]
+      # LogScanner Constructor : initialize prometheus metrics
+      # return [Splash::Logs::LogScanner]
       def initialize
         @logs_target = get_config.logs
         @config = get_config
@@ -22,6 +28,7 @@ module Splash
 
 
       # start log analyse for log target in config
+      # @return [Hash] Exiter case :quiet_exit
       def analyse
         @logs_target.each do |record|
           record[:count]=0 if record[:count].nil?
@@ -38,11 +45,15 @@ module Splash
       end
 
       # pseudo-accessor on @logs_target
+      # @return [Hash] the logs structure
       def output
         return @logs_target
       end
 
       # start notification on prometheus for metric logerrors, logmissing; loglines
+      # @param [Hash] options
+      # @option options [String] :session a session number for log daemon
+      # @return [Hash] Exiter case :quiet_exit
       def notify(options = {})
         log = get_logger
         unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then

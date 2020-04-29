@@ -1,12 +1,19 @@
 # coding: utf-8
+
+# base Splash Module
 module Splash
+
+  # Templates namespace
   module Templates
 
     # KISS template Engine
     class Template
 
+      # getter of the list of token
       attr_reader :list_token
+      # getter of the template file
       attr_reader :template_file
+      # getter of the flat content of the template
       attr_reader :content
 
       # constructor : generate the pseudo accessor for template Class from token list
@@ -72,8 +79,11 @@ module Splash
 
     end
 
+    # Exception for an invalid Token list
     class InvalidTokenList < Exception; end
+    # Exception for an malformed token
     class NotAToken < Exception; end
+    # Exception for an invalid template file
     class NoTemplateFile < Exception; end
 
   end

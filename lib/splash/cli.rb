@@ -1,12 +1,15 @@
 # coding: utf-8
 Dir[File.dirname(__FILE__) + '/cli/*.rb'].each {|file| require file  }
 
+# The CLI Command structure for Thor
 class CLI < Thor
+
+  # callback for managing ARGV errors
   def self.exit_on_failure?
     true
   end
 
-
+  # Constructor override to manage debug, colors and emoji options for logger
   def initialize(*args)
     super
     log = get_logger

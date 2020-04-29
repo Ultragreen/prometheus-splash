@@ -1,6 +1,12 @@
 # coding: utf-8
+
+# base Splash module / namespace
 module Splash
+
+  # Constants namespace
   module Constants
+
+    # Current splash version
     VERSION = "0.5.3"
 
     # the path to th config file, not overridable by config
@@ -55,6 +61,7 @@ module Splash
                           :active => :rabbitmq,
                           :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
 
+    # loggers default settings
     LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual],
                        :default => :cli,
                        :level => :info,

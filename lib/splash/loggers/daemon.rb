@@ -1,12 +1,17 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # Splash Loggers module
   module Loggers
 
-
+    # Daemon specific logger
     class Daemon < Splash::Loggers::LoggerTemplate
 
 
-
+      # contructor, open log file
+      # @return [Splash::Loggers::Daemon]
       def initialize
         self.level = get_config.loggers[:level]
         @log_file = get_config.loggers[:daemon][:file]
@@ -14,7 +19,12 @@ module Splash
         @stream.sync = true
       end
 
-
+      # log wrapper
+      # @param [Hash] options
+      # @option options [Symbol] :level defined in Splash::Loggers::LEVEL or Splash::Loggers::ALIAS
+      # @option options [String] :message
+      # @option options [String] :session a session number
+      # write formatted string to log file
       def log(options)
         pid = Process.pid.to_s
         date = DateTime.now.to_s
@@ -28,6 +38,7 @@ module Splash
         end
       end
 
+      # close log file descriptor
       def close
         @stream.close
       end

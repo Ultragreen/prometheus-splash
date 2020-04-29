@@ -63,12 +63,14 @@ Install with gem command :
 As root or with rvmsudo, if you use RVM.
 
     # splash config setup              
-    Splash -> setup :
+    Splash -> setup : 
     * Installing Configuration file : /etc/splash.yml : [OK]
-    * Installing template file : /etc/splash_execution_report.tpl : [OK]
-    * Creating/Checking pid file path : /var/lib/splash : [OK]
-    * Creating/Checking trace file path : /var/lib/splash : [OK]
-    Splash config successfully done.
+    👍 Splash Initialisation
+    👍 Installing template file : /etc/splash_execution_report.tpl
+    👍 Creating/Checking pid file path : /var/run/splash
+    👍 Creating/Checking trace file path : /var/run/spla
+    
+*NOTE : you can just type 'splash' withou any arguments, for the first setup because, Splash come with an automatic recovery mode, when configuration file is missing, run at the very beginnning of his the execution*     
 
 *WARNING : if you have already configured Splash, running this command without --preserve flag, RESET the Splash Configuration.*
 

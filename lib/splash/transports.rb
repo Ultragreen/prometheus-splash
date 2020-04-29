@@ -1,9 +1,16 @@
 # coding: utf-8
 
+# base Splash module
 module Splash
+
+  # Splash Transports namespace
   module Transports
     include Splash::Config
 
+
+    # factory for Splash::Transports::Rabbitmq::Subscriber
+    # @param [Hash] options
+    # @return [Splash::Transports::Rabbitmq::Subscriber|Hash] Subscriber or Exiter case :configuration_error
     def get_default_subscriber(options)
       config = get_config.transports
       transport = config[:active]
@@ -20,6 +27,8 @@ module Splash
       end
     end
 
+    # factory for Splash::Transports::Rabbitmq::Client
+    # @return [Splash::Transports::Rabbitmq::Client|Hash] Client or Exiter case :configuration_error
     def get_default_client
       config = get_config.transports
       transport = config[:active]

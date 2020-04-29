@@ -1,6 +1,12 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # global daemon module
   module Daemon
+
+    # Daemon Controller Module
     module Controller
       include Splash::Constants
       include Splash::Helpers
@@ -9,6 +15,12 @@ module Splash
       include Splash::Loggers
       include Splash::Daemon::Orchestrator
 
+      # Start the Splash Daemon
+      # @param [Hash] options
+      # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
+      # @option options [Symbol] :foreground run daemon in foreground
+      # @option options [Symbol] :purge clean input queue for daemon on configured transport
+      # @return [Hash] Exiter Case (:quiet_exit, :already_exist, :unknown_error or other)
       def startdaemon(options = {})
         config = get_config
         log = get_logger
@@ -61,6 +73,10 @@ module Splash
         end
       end
 
+      # Stop the Splash Daemon
+      # @param [Hash] options
+      # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
+      # @return [Hash] Exiter Case (:quiet_exit, :not_found, other)
       def stopdaemon(options = {})
           config = get_config
           log = get_logger
@@ -80,6 +96,9 @@ module Splash
           return acase
       end
 
+      # Status of the Splash Daemon, display status
+      # @param [Hash] options ignored
+      # @return [Hash] Exiter Case (:status_ko, :status_ok)
       def statusdaemon(options = {})
         log = get_logger
         config = get_config

@@ -1,12 +1,17 @@
 # coding: utf-8
+
+# Base Splash module
 module Splash
+
+  # moudle for Configuration utilities
   module ConfigUtilities
     include Splash::Constants
 
 
 
     # Sanitycheck action method for testing installation of Splash
-    # @return [Integer] an errorcode value
+    # @param [Hash] options
+    # @return [Hash] An Exiter case hash (:splash_sanitycheck_success or :splash_sanitycheck_error)
     def checkconfig(options ={})
       self.extend Splash::Loggers
       log = get_logger

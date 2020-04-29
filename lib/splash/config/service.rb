@@ -1,11 +1,18 @@
 # coding: utf-8
 
-
+# Base Splash module
 module Splash
+
+  # moudle for Configuration utilities
   module ConfigUtilities
     include Splash::Constants
     include Splash::Helpers
 
+
+    # clean backend configured
+    # @param [Hash] options
+    # @option options [Symbol] :name the name of the backend (:redis, :file)
+    # @return [Hash] An Exiter case hash (:quiet_exit or :configuration_error)
     def addservice(options = {})
       local_service_file = search_file_in_gem "prometheus-splash", "templates/splashd.service"
       config = get_config

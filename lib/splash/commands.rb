@@ -1,6 +1,12 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # Splash Commands module/namespace
   module Commands
+
+    # command execution wrapper
     class CommandWrapper
       include Splash::Templates
       include Splash::Config
@@ -16,6 +22,8 @@ module Splash
       @@registry.register(@@metric_exitcode)
       @@registry.register(@@metric_time)
 
+      # Constructor
+      # @param [String] name the name of the command
       def initialize(name)
         @config  = get_config
         @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
@@ -25,11 +33,16 @@ module Splash
         end
       end
 
+      # wrapper for ack command ( return 0 to prometheus via notify)
       def ack
         get_logger.info "Sending ack for command : '#{@name}'"
         notify(0,0)
       end
 
+      # send metrics to Prometheus PushGateway
+      # @param [String] value numeric.to_s
+      # @param [String] time execution time numeric.to_s
+      # @return [Hash] Exiter case :quiet_exit
       def notify(value,time)
         unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
@@ -41,7 +54,15 @@ module Splash
         return { :case => :quiet_exit}
       end
 
-
+      # execute commands or sequence via callbacks, remote or not, notify prometheus, templatize report to backends
+      # the big cheese
+      # @param [Hash] options
+      # @option options [String] :session a number of session in case of Daemon Logger
+      # @option options [String] :hostname for remote execution (can't be use with commands with delegate_to)
+      # @option options [Boolean] :notify to activate prometheus notifications
+      # @option options [Boolean] :trace to activate execution report
+      # @option options [Boolean] :callback to activate sequence and callbacks executions
+      # @return [Hash] Exiter case
       def call_and_notify(options)
         log = get_logger
         session = (options[:session])? options[:session] : get_session

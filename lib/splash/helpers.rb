@@ -1,24 +1,30 @@
-# @option  options [String] :stdout_trace the path of the file where to redirect STDOUT
 # coding: utf-8
+
+# base Splash Module
 module Splash
+
+  # Helpers namespace
   module Helpers
 
 
-
+    # return the 'root' name
+    # @return [String] name
     def user_root
       return Etc.getpwuid(0).name
     end
 
+    # return the 'root' group name : root or wheel
+    # @return [String] name
     def group_root
       return Etc.getgrgid(0).name
     end
 
-    # facilité pour récupérer les PID depuis une regexp
+    # facility for retreiving PID from process query
     # @param [Hash] options
-    # @option options [String] :pattern un motif de regexp
-    # @option options [Array] :patterns Un tableau de motif de regexp
-    # @option options [Bool] :full renvoie tout les details si True
-    # @return [String|Array] le PID or tout les détails
+    # @option options [String] :pattern a regexp to search
+    # @option options [Array] :patterns an array of regexp to search
+    # @option options [Bool] :full flag to retrieve all process data not only PID
+    # @return [String|Array] PID or data structure
     def get_processes(options = {})
       patterns = []
       patterns  = options[:patterns] if options[:patterns]
@@ -35,7 +41,7 @@ module Splash
     end
 
 
-    # facilities to find a file in gem path
+    # facility to find a file in gem path
     # @param [String] _gem a Gem name
     # @param [String] _file a file relative path in the gem
     # @return [String] the path of the file, if found.
@@ -67,8 +73,8 @@ module Splash
 
 
 
-    # facilité pour vérifier si le process actif est root
-    # @return [Bool] vrai ou faux
+    # facility to verifyingif the active process run as root
+    # @return [Bool] status
     def is_root?
       case (Process.uid)
       when 0
@@ -78,9 +84,9 @@ module Splash
       end
     end
 
-    # facilité pour s'assurer qu'on execute une méthode avec les droits root
+    # wrapping execution if process run as root
     # @param [Symbol] method a method name th wrap
-    # @return [void] le retour de la méthode wrappée
+    # @return [void] return of wrapped method
     def run_as_root(method, options = {})
       unless is_root?
         return {:case => :not_root, :more => "subcommands : #{method.to_s}"}
@@ -188,15 +194,15 @@ module Splash
       return 0
     end
 
-    # @!group facilités sur le système de fichier
+    # @!group facilities for file system commands
 
-    # facilité d'installation de fichier
+    # facility for file installation
     # @param [Hash] options
-    # @option options [String] :source le chemin source du fichier
-    # @option options [String] :target le chemin cible du fichier
-    # @option options [String] :mode les droits du fichier du type Octal "XXX"
-    # @option options [String] :owner le owner du fichier
-    # @option options [String] :group le groupe du fichier
+    # @option options [String] :source file source path
+    # @option options [String] :target file target path
+    # @option options [String] :mode String for OCTAL rights like "644"
+    # @option options [String] :owner file owner for target
+    # @option options [String] :group  file group for target
     def install_file(options = {})
       #begin
         FileUtils::copy options[:source], options[:target] #unless File::exist? options[:target]
@@ -208,12 +214,12 @@ module Splash
       #end
     end
 
-    # facilité de création de répertoire
+    # facility for folder creation
     # @param [Hash] options
-    # @option options [String] :path le répertoire à créer (relatif ou absolut)
-    # @option options [String] :mode les droits du fichier du type Octal "XXX"
-    # @option options [String] :owner le owner du fichier
-    # @option options [String] :group le groupe du fichier
+    # @option options [String] :path folder path (relative or absolute)
+    # @option options [String] :mode String for OCTAL rights like "644"
+    # @option options [String] :owner file owner for folder
+    # @option options [String] :group  file group for folder
     def make_folder(options = {})
       begin
         FileUtils::mkdir_p options[:path] unless File::exist? options[:path]
@@ -225,10 +231,10 @@ module Splash
       end
     end
 
-    # facilité de liaison symbolique  de fichier
+    # facility for Symbolic link
     # @param [Hash] options
-    # @option options [String] :source le chemin source du fichier
-    # @option options [String] :link le chemin du lien symbolique
+    # @option options [String] :source path of the file
+    # @option options [String] :link path of the symlink
     def make_link(options = {})
       begin
         FileUtils::rm options[:link] if (File::symlink? options[:link] and not File::exist? options[:link])
@@ -241,15 +247,15 @@ module Splash
     # @!endgroup
 
 
-    #@!group  Vérifiers de l'application
+    #@!group  Verifiers for application : FS and TCP/IP services
 
-    # verifier d'existence d'un repertoire
+    # check folder
     # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :path le répertoire (relatif ou absolut) obligatoire
-    # @option options [String] :mode droit du  répertoire optionnel
-    # @option options [String] :owner owner du répertoire optionnel
-    # @option options [String] :group groupe du répertoire optionnel
+    # @option options [String] :path folder path (relative or absolute)
+    # @option options [String] :mode String for OCTAL rights like "644", optionnal
+    # @option options [String] :owner file owner for folder, optionnal
+    # @option options [String] :group  file group for folder, optionnal
     def verify_folder(options ={})
       res = Array::new
       return  [:inexistant] unless File.directory?(options[:name])
@@ -267,21 +273,21 @@ module Splash
       return res
     end
 
-    # verifier d'existence d'un lien
-    # @return [Bool] vrai ou faux
+    # check symlink
+    # @return [Boolean]
     # @param [Hash] options
-    # @option options [String] :name path du lien
+    # @option options [String] :name path of the link
     def verify_link(options ={})
       return File.file?(options[:name])
     end
 
-    # verifier d'existence d'un fichier
+    # check file
     # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :name path du fichier obligatoire
-    # @option options [String] :mode droit du fichier optionnel
-    # @option options [String] :owner owner du fichier optionnel
-    # @option options [String] :group groupe du fichier optionnel
+    # @option options [String] :name path of file
+    # @option options [String] :mode String for OCTAL rights like "644", optionnal
+    # @option options [String] :owner file owner for file, optionnal
+    # @option options [String] :group  file group for file, optionnal
     def verify_file(options ={})
       res = Array::new
       return  [:inexistant] unless File.file?(options[:name])
@@ -299,11 +305,11 @@ module Splash
       return res
     end
 
-    # verifier de l'ecoute d'un service sur un host et port donné en TCP
-    # @return [Bool] vrai ou faux
+    # TCP/IP service checker
+    # @return [Bool] status
     # @param [Hash] options
-    # @option options [String] :host le nom d'hote
-    # @option options [String] :port le port TCP
+    # @option options [String] :host hostname
+    # @option options [String] :port TCP port
     def verify_service(options ={})
       begin
         Timeout::timeout(1) do

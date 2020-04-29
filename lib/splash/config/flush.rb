@@ -1,8 +1,16 @@
+# coding: utf-8
+
+# Base Splash module
 module Splash
+
+  # moudle for Configuration utilities
   module ConfigUtilities
     include Splash::Constants
 
-
+    # clean backend action method 
+    # @param [Hash] options
+    # @option options [Symbol] :name the name of the backend (:redis, :file)
+    # @return [Hash] An Exiter case hash (:quiet_exit or :configuration_error)
     def flush_backend(options ={})
       config = get_config
       self.extend Splash::Backends

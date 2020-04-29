@@ -1,5 +1,9 @@
 # coding: utf-8
+
+# base Splash namespace
 module Splash
+
+  # Exiter namespace
   module Exiter
     include Splash::Loggers
     EXIT_MAP= {
@@ -35,6 +39,10 @@ module Splash
 
     }
 
+    # exiter wrapper
+    # @param [Hash] options
+    # @option options [Symbol] :case an exit case
+    # @option options [String] :more a complementary string to display
     def splash_exit(options = {})
       log = get_logger
       mess = ""

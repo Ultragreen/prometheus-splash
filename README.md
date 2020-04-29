@@ -65,10 +65,12 @@ As root or with rvmsudo, if you use RVM.
     # splash config setup              
     Splash -> setup :
     * Installing Configuration file : /etc/splash.yml : [OK]
-    * Installing template file : /etc/splash_execution_report.tpl : [OK]
-    * Creating/Checking pid file path : /var/lib/splash : [OK]
-    * Creating/Checking trace file path : /var/lib/splash : [OK]
-    Splash config successfully done.
+    👍 Splash Initialisation
+    👍 Installing template file : /etc/splash_execution_report.tpl
+    👍 Creating/Checking pid file path : /var/run/splash
+    👍 Creating/Checking trace file path : /var/run/spla
+
+*NOTE : you can just type 'splash' withou any arguments, for the first setup because, Splash come with an automatic recovery mode, when configuration file is missing, run at the very beginnning of his the execution*     
 
 *WARNING : if you have already configured Splash, running this command without --preserve flag, RESET the Splash Configuration.*
 
@@ -652,74 +654,70 @@ TODO
 
  defined in the lib/splash/constants.rb
 
-```ruby
-
-# the only one non-overridable by the configuration
-CONFIG_FILE = "/etc/splash.yml"
 
 
-TRACE_PATH="/var/run/splash"
+    # the only one non-overridable by the configuration
+    CONFIG_FILE = "/etc/splash.yml"
 
-DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
-DAEMON_PROCESS_NAME="Splash : daemon."
-DAEMON_PID_PATH="/var/run"
-DAEMON_PID_FILE="splash.pid"
-DAEMON_STDOUT_TRACE="stdout.txt"
-DAEMON_STDERR_TRACE="stderr.txt"
 
-AUTHOR="Romain GEORGES"
-EMAIL = "gems@ultragreen.net"
-COPYRIGHT="Ultragreen (c) 2020"
-LICENSE="BSD-2-Clause"
+    TRACE_PATH="/var/run/splash"
 
-PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
-PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+    DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
+    DAEMON_PROCESS_NAME="Splash : daemon."
+    DAEMON_PID_PATH="/var/run"
+    DAEMON_PID_FILE="splash.pid"
+    DAEMON_STDOUT_TRACE="stdout.txt"
+    DAEMON_STDERR_TRACE="stderr.txt"
 
-EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
-EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+    AUTHOR="Romain GEORGES"
+    EMAIL = "gems@ultragreen.net"
+    COPYRIGHT="Ultragreen (c) 2020"
+    LICENSE="BSD-2-Clause"
 
-BACKENDS_STRUCT = { :list => [:file,:redis],
+    PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
+    PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+
+    EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
+    EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+
+    BACKENDS_STRUCT = { :list => [:file,:redis],
                     :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
-TRANSPORTS_STRUCT = { :list => [:rabbitmq],
+    TRANSPORTS_STRUCT = { :list => [:rabbitmq],
                     :active => :rabbitmq,
                     :rabbitmq => { :url => 'amqp://localhost/'} }
 
-```
-
 
 #### Splash CLI return code significations
-```ruby
-EXIT_MAP= {
-
-   # context execution
-   :not_root => {:message => "This operation need to be run as root (use sudo or rvmsudo)", :code => 10},
-   :options_incompatibility => {:message => "Options incompatibility", :code => 40},
-   :service_dependence_missing => {:message => "Splash Service dependence missing", :code => 60},
-
-   # config
-   :specific_config_required => {:message => "Specific configuration required", :code => 30},
-   :splash_setup_error => {:message => "Splash Setup terminated unsuccessfully", :code => 25},
-   :splash_setup_success => {:message => "Splash Setup terminated successfully", :code => 0},
-   :splash_sanitycheck_error => {:message => "Splash Sanitycheck terminated unsuccessfully", :code => 20},
-   :splash_sanitycheck_success => {:message => "Splash Sanitycheck terminated successfully", :code => 0},
-   :configuration_error => {:message => "Splash Configuration Error", :code => 50},
 
 
-   # global
-   :quiet_exit => {:code => 0},
+    # context execution
+    :not_root => {:message => "This operation need to be run as root (use sudo or rvmsudo)", :code => 10},
+    :options_incompatibility => {:message => "Options incompatibility", :code => 40},
+    :service_dependence_missing => {:message => "Splash Service dependence missing", :code => 60},
 
-   # events
-   :interrupt => {:message => "Splash user operation interrupted", :code => 33},
+    # config
+    :specific_config_required => {:message => "Specific configuration required", :code => 30},
+    :splash_setup_error => {:message => "Splash Setup terminated unsuccessfully", :code => 25},
+    :splash_setup_success => {:message => "Splash Setup terminated successfully", :code => 0},
+    :splash_sanitycheck_error => {:message => "Splash Sanitycheck terminated unsuccessfully", :code => 20},
+    :splash_sanitycheck_success => {:message => "Splash Sanitycheck terminated successfully", :code => 0},
+    :configuration_error => {:message => "Splash Configuration Error", :code => 50},
 
-   # request
-   :not_found => {:message => "Object not found", :code => 44},
-   :already_exist => {:message => "Object already exist", :code => 48},
 
-   # daemon
-   :status_ok => {:message => "Status OK", :code => 0},
-   :status_ko => {:message => "Status KO", :code => 31}
-```
-}
+    # global
+    :quiet_exit => {:code => 0},
+
+    # events
+    :interrupt => {:message => "Splash user operation interrupted", :code => 33},
+
+    # request
+    :not_found => {:message => "Object not found", :code => 44},
+    :already_exist => {:message => "Object already exist", :code => 48},
+
+    # daemon
+    :status_ok => {:message => "Status OK", :code => 0},
+    :status_ko => {:message => "Status KO", :code => 31}
+
 
 ### In the Futur ?
 

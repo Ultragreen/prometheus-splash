@@ -1,10 +1,16 @@
 # coding: utf-8
 Dir[File.dirname(__FILE__) + '/orchestrator/*.rb'].each {|file| require file  }
 
+# base Splash module
 module Splash
+
+  # global daemon module
   module Daemon
+
+    # orchestrator specific module
     module Orchestrator
 
+      # Splash Scheduler object
       class Scheduler
         include Splash::Constants
         include Splash::Helpers
@@ -16,7 +22,12 @@ module Splash
         include Splash::Processes
         include Splash::Commands
 
-
+        # Constructor prepare the Scheduler
+        # commands Schedules
+        # logs monitorings
+        # process monitorings
+        # @param [Hash] options
+        # @option options [Symbol] :scheduling activate commands scheduling
         def initialize(options = {})
           @log = get_logger
           self.extend Splash::Daemon::Metrics
@@ -103,6 +114,8 @@ module Splash
           end
         end
 
+        # Stop the Splash daemon gracefully
+        # @return [hash] Exiter Case :quiet_exit
         def terminate
           @log.info "Splash daemon shutdown"
           @server.shutdown
@@ -111,6 +124,7 @@ module Splash
         end
 
         private
+        # prepare commands Scheduling
         def init_commands_scheduling
           config = get_config.commands
           commands = config.select{|key,value| value.include? :schedule}.keys
@@ -126,10 +140,14 @@ module Splash
 
         end
 
+        # execute_command verb : execute command specified in payload
+        # @param [Hash] options
+        # @option options [Symbol] :command the name of the command
+        # @option options [Symbol] :ack ack flag to inhibit execution and send ack to Prometheus (0)
+        # @return [Hash] Exiter case
         def execute(options)
           command =  CommandWrapper::new(options[:command])
-          if options[:ack] then
-            command.ack
+          if options[:ack] then 
           else
             @metric_manager.inc_execution
             return command.call_and_notify trace: true, notify: true, callback: true, session: options[:session]

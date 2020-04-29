@@ -1,5 +1,12 @@
+# coding: utf-8
+
+# base Splash module
 module Splash
+
+  # global daemon module
   module Daemon
+
+    # Metrics management modulefor Splash daemon
     module Metrics
       include Splash::Constants
       include Splash::Helpers
@@ -7,20 +14,24 @@ module Splash
       include Splash::Loggers
 
       @@manager=nil
-      # factory of Configuration Class instance
-      # @param [String] config_file the path of the YAML Config file
-      # @return [SPlash::Config::Configuration]
+
+      # metrics manager factory
+      # @return [Splash::Daemon::Metrics::Manager]
       def get_metrics_manager
         return @@manager ||= Manager::new
       end
 
-
+      # Metrics Manager (collect and sending to Prometheus)
       class Manager
 
+        # metric : commands executions count during Splash daemon uptime
         attr_reader :execution_count
+        # metric : logs monitoring count during Splash daemon uptime
         attr_reader :monitoring_logs_count
+        # metric : processes monitoring count during Splash daemon uptime
         attr_reader :monitoring_processes_count
 
+        # Constructor prepare prometheus-client, defined metrics and init attributes
         def initialize
           @config = get_config
           @starttime = Time.now
@@ -40,24 +51,28 @@ module Splash
           @registry.register(@metric_processes_monitoring)
         end
 
-
+        # virtual accessor uptime
         def uptime
           return Time.now - @starttime
         end
 
+        # increment metric : execution_count
         def inc_execution
           @execution_count += 1
         end
 
-
+        # increment metric : monitoring_logs_count
         def inc_logs_monitoring
           @monitoring_logs_count += 1
         end
 
+        # increment metric : monitoring_processes_count
         def inc_processes_monitoring
           @monitoring_processes_count += 1
         end
 
+        # Send metrics to Prometheus PushGateway
+        # @return [Hash] Exiter case ( :service_dependence_missing , :quiet_exit)
         def notify
           log = get_logger
           session  = get_session

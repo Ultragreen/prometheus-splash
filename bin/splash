@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 
+# major include
 require 'splash/dependencies'
 require 'splash/cli'
 
@@ -13,6 +14,7 @@ include Splash::Exiter
 include Splash::Loggers
 include Splash::Config
 
+# auto setup
 unless verify_file(name: CONFIG_FILE, mode: "644", owner: user_root, group: group_root).empty? then
   puts 'Splash need reconfiguration : Auto setup launch'
 
@@ -26,4 +28,5 @@ unless verify_file(name: CONFIG_FILE, mode: "644", owner: user_root, group: grou
   end
 end
 
+# running Thor
 CLI.start(ARGV)

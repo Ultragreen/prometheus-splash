@@ -1,11 +1,17 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # Splash Loggers module
   module Loggers
 
+    # Cli specific logger
     class Cli < Splash::Loggers::LoggerTemplate
 
       include Splash::Config
 
+      # mapping of UTf-8 emoji for log levels or alias
       EMOJI =  { :unknown => "\u{1F4A5}",
                  :fatal => "\u{26D4}",
                  :error => "\u{1F6AB}",
@@ -22,6 +28,7 @@ module Splash
                  :success => "\u{1F4AA}",
                  :debug => "\u{1F41B}"}
 
+      # mapping of colors for log levels or alias
       COLORS = { :unknown => :red,
                  :fatal => :red,
                  :error => :red,
@@ -39,7 +46,11 @@ module Splash
                  :debug => :magenta}
 
 
-
+      # log wrapper
+      # @param [Hash] options
+      # @option options [Symbol] :level defined in Splash::Loggers::LEVEL or Splash::Loggers::ALIAS
+      # @option options [String] :message
+      # display formatted string to STDOUT
       def log(options)
         level = (ALIAS.keys.include? options[:level])?  ALIAS[options[:level]] : options[:level]
         if @active_levels.include? level then
@@ -59,14 +70,20 @@ module Splash
         end
       end
 
+      # setter in configuration for emoji display
+      # @param [Boolean] status
       def emoji=(status)
         get_config.loggers[:cli][:emoji] = status
       end
 
+      # setter in configuration for color display
+      # @param [Boolean] status
       def color=(status)
         get_config.loggers[:cli][:color] = status
       end
 
+      # check if unicode must be used with term ENV
+      # @return [Boolean]
       def check_unicode_term
         return false unless ENV.include? "TERM"
         if ENV.values_at("LC_ALL","LC_CTYPE","LANG").compact.first.include?("UTF-8") and ENV.values_at('TERM').first.include? "xterm" then
@@ -77,8 +94,6 @@ module Splash
       end
 
     end
-
-    class BadLevel < Exception; end
 
   end
 end

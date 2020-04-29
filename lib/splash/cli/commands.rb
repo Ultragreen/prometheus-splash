@@ -1,7 +1,9 @@
 # coding: utf-8
+
+# module for all Thor subcommands
 module CLISplash
 
-
+  # Thor inherited class for commands management
   class Commands < Thor
     include Splash::Config
     include Splash::Backends
@@ -11,6 +13,8 @@ module CLISplash
     include Splash::Loggers
     include Splash::Commands
 
+
+    # Thor method : execution of command
     desc "execute NAME", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
     execute command or sequence or ack result\n
@@ -74,6 +78,7 @@ module CLISplash
     end
 
 
+    # Thor method : scheduling commands
     desc "schedule NAME", "Schedule excution of command on Splash daemon"
     long_desc <<-LONGDESC
     Schedule excution of command on Splash daemon\n
@@ -116,7 +121,7 @@ module CLISplash
 
     end
 
-
+    # Thor method : getting a treeview of sequence of commands
     desc "treeview", "Show commands sequence tree"
     long_desc <<-LONGDESC
     Show commands sequence tree\n
@@ -164,6 +169,7 @@ module CLISplash
     end
 
 
+    # Thor method : getting the list of avaible commands in splash config
     desc "list", "Show configured commands"
     long_desc <<-LONGDESC
     Show configured commands\n
@@ -213,7 +219,7 @@ module CLISplash
       splash_exit case: :quiet_exit
     end
 
-
+    # Thor method: getting informations about a specific splash configuration defined command
     desc "show COMMAND", "Show specific configured command COMMAND"
     long_desc <<-LONGDESC
     Show specific configured command COMMAND\n
@@ -259,7 +265,7 @@ module CLISplash
       end
     end
 
-
+    # Thor method : getting information on the last execution of a command
     desc "lastrun COMMAND", "Show last running result for specific configured command COMMAND"
     long_desc <<-LONGDESC
     Show last running result for specific configured command COMMAND\n
@@ -299,6 +305,7 @@ module CLISplash
       end
     end
 
+    # Thor method : getting the list of avaibles executions reports
     desc "getreportlist", "list all executions report results "
     long_desc <<-LONGDESC
     list all executions report results\n

@@ -1,12 +1,15 @@
 # coding: utf-8
+
+# module for all Thor subcommands
 module CLISplash
 
+  # Thor inherited class for documentation management
   class Logs < Thor
     include Splash::Config
     include Splash::Exiter
     include Splash::Logs
 
-
+    # Thor method : running Splash configured logs monitors analyse
     desc "analyse", "analyze logs defined in Splash config"
     def analyse
       log  = get_logger
@@ -39,6 +42,8 @@ module CLISplash
       splash_exit case: :quiet_exit
     end
 
+
+    # Thor method : running Splash configured logs monitors analyse and sending to Prometheus Pushgateway
     desc "monitor", "monitor logs defined in Splash config"
     def monitor
       log = get_logger
@@ -49,6 +54,7 @@ module CLISplash
 
     end
 
+    # Thor method : display a specific Splash configured log monitor
     desc "show LOG", "show Splash configured log monitoring for LOG"
     def show(logrecord)
       log = get_logger
@@ -63,6 +69,7 @@ module CLISplash
       end
     end
 
+    # Thor method : display the full list of Splash configured log monitors
     desc "list", "List all Splash configured logs monitoring"
     long_desc <<-LONGDESC
     Show configured logs monitoring\n

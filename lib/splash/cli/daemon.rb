@@ -1,6 +1,9 @@
 # coding: utf-8
+
+# module for all Thor subcommands
 module CLISplash
 
+  # Thor inherited class for splashd daemon management
   class CLIController < Thor
     include Splash::Daemon::Controller
     include Splash::Transports
@@ -8,6 +11,7 @@ module CLISplash
     include Splash::Loggers
 
 
+    # Thor method : starting Splashd
     option :foreground, :type => :boolean,  :aliases => "-F"
     option :purge, :type => :boolean, default: true
     option :scheduling, :type => :boolean, default: true
@@ -23,7 +27,7 @@ module CLISplash
       splash_exit acase
     end
 
-
+    # Thor method : purge transport input queue of Splashd daemon
     desc "purge", "Purge Transport Input queue of Daemon"
     def purge
       log = get_logger
@@ -39,18 +43,21 @@ module CLISplash
       end
     end
 
+    # Thor method : stopping Splashd
     desc "stop", "Stopping Splash Daemon"
     def stop
       acase = run_as_root :stopdaemon
       splash_exit acase
     end
 
+    # Thor method : getting execution status of Splashd
     desc "status", "Splash Daemon status"
     def status
       acase = run_as_root :statusdaemon
       splash_exit acase
     end
 
+    # Thor method : sending ping verb over transport in the input queue of Splashd
     desc "ping HOSTNAME", "send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
     def ping(hostname=Socket.gethostname)
       log = get_logger

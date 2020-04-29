@@ -1,11 +1,14 @@
 # coding: utf-8
+
+# module for all Thor subcommands
 module CLISplash
 
+  # Thor inherited class for splashd daemon management
   class Documentation < Thor
     include Splash::Config
     include Splash::Exiter
 
-
+    # Thor method : display the readme file Typicallly formatted in Markdown
     desc "readme", "Display README file"
     option :formatted, :type => :boolean, :default => true
     def readme

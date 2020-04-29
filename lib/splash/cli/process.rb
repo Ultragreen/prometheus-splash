@@ -1,10 +1,15 @@
+# coding: utf-8
+
+# module for all Thor subcommands
 module CLISplash
 
+  # Thor inherited class for Processes management
   class Processes < Thor
     include Splash::Config
     include Splash::Exiter
     include Splash::Processes
 
+    # Thor method : unning Splash configured processes monitors analyse
     desc "analyse", "analyze processes defined in Splash config"
     def analyse
       log  = get_logger
@@ -40,6 +45,8 @@ module CLISplash
       splash_exit case: :quiet_exit
     end
 
+
+    # Thor method : running Splash configured processes monitors analyse and sending to Prometheus Pushgateway
     desc "monitor", "monitor processes defined in Splash config"
     def monitor
       log = get_logger
@@ -49,6 +56,7 @@ module CLISplash
       splash_exit result.notify
     end
 
+    # Thor method : display a specific Splash configured process monitor
     desc "show PROCESS", "show Splash configured process record for PROCESS"
     def show(record)
       log = get_logger
@@ -66,6 +74,7 @@ module CLISplash
       end
     end
 
+    # Thor method : display the full list of Splash configured processes monitors
     desc "list", "List all Splash configured process records"
     long_desc <<-LONGDESC
     List all Splash configured processes record\n

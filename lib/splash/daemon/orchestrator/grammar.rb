@@ -1,34 +1,54 @@
 # coding: utf-8
+
+# base Splash module
 module Splash
+
+  # global daemon module
   module Daemon
+
+    # orchestrator specific module
     module Orchestrator
+
+      # Orchestrator grammar method defiition  module
       module Grammar
 
         include Splash::Config
         include Splash::Loggers
 
-
+        # list of known verbs for Splash orchestrator
         VERBS=[:ping,:list_commands,:execute_command,:ack_command, :shutdown]
 
-
-        def shutdown
+        # shutdown verb : stop the Splash daemon gracefully
+        # @param [Hash] content message content Hash Structure, ignored
+        # @return [Hash] Exiter Case :quiet_exit
+        def shutdown(content)
           terminate
         end
 
+        # ping verb : return pong to hostname precise in payload
+        # @param [Hash] content message content Hash Structure, include  mandatory payload[:hostname]
+        # @return [String] the pong
         def ping(content)
           return "Pong : #{content[:payload][:hostname]} !"
         end
 
-
+        # list_commands verb : return the list of specified commands in local Splash
+        # @param [Hash] content message content Hash Structure, ignored
+        # @return [Hash] structure of commands
         def list_commands(content)
           return get_config.commands
         end
 
+        # ack_command verb : send ack to Prometheus, for command specified in payload
+        # @param [Hash] content message content Hash Structure, include  mandatory payload[:name]
+        # @return [Hash] Exiter case
         def ack_command(content)
           return execute command: content[:payload][:name], ack: true
         end
 
-
+        # execute_command verb : execute command specified in payload
+        # @param [Hash] content message content Hash Structure, include  mandatory payload[:name]
+        # @return [Hash] Exiter case
         def execute_command(content)
           payload = content[:payload]
           unless get_config.commands.include? payload[:name].to_sym

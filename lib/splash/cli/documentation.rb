@@ -3,7 +3,7 @@
 # module for all Thor subcommands
 module CLISplash
 
-  # Thor inherited class for splashd daemon management
+  # Thor inherited class for documentation management
   class Documentation < Thor
     include Splash::Config
     include Splash::Exiter

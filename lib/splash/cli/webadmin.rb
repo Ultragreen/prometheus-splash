@@ -21,8 +21,8 @@ module CLISplash
 
     # Thor method : getting execution status of Splashd
     desc "start", "Splash Daemon status"
-    def status
-      require 'api/main'
+    def start
+      require 'splash/webadmin/main'
     end
 
   end

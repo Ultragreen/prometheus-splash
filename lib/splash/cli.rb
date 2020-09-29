@@ -40,7 +40,7 @@ class CLI < Thor
   desc "documentation SUBCOMMAND ...ARGS", "Documentation for Splash"
   subcommand "documentation", Documentation
   desc "webadmin SUBCOMMAND ...ARGS", "Splash Webadmin daemon controller"
-  subcommand "documentation", WebAdmin
+  subcommand "webadmin", WebAdmin
 
 
 end

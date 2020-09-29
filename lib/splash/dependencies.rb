@@ -27,6 +27,7 @@ module Splash
       require 'colorize'
       require "redis"
       require 'ps-ruby'
+      require 'sinatra'
 
     rescue Gem::GemNotFoundException
       $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."
@@ -49,7 +50,7 @@ module Splash
     require 'splash/commands'
     require 'splash/logs'
     require 'splash/processes'
-    
+
     require 'splash/daemon'
 
 

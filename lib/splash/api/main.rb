@@ -1,14 +1,6 @@
-require 'sinatra'
-require 'dependencies'
 
 
-$-w = nil
 
-include Splash::Dependencies
-include Splash::Helpers
-include Splash::Exiter
-include Splash::Loggers
-include Splash::Config
 
 set :server, 'thin'
 set :port, 9234

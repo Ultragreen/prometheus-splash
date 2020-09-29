@@ -106,9 +106,11 @@
 
 ### configuration of monitored logs
   :logs:
-    - :log: /tmp/test
+    - :label: :log_app_1
+      :log: /tmp/test
       :pattern: ERROR
-    - :log: /tmp/test2
+    - :label: :log_app_2
+      :log: /tmp/test2
       :pattern: ERROR
 
 

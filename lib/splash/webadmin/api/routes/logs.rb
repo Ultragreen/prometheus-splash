@@ -16,7 +16,7 @@ WebAdminApp.get '/api/logs/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
   log.call "api : logs, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
-  logs_recordset = get_config.logs.select{|item| item[:logs] == params[:name] }
+  logs_recordset = get_config.logs.select{|item| item[:label] == params[:name].to_sym }
   unless logs_recordset.empty? then
     record = logs_recordset.first
     obj = splash_return case: :quiet_exit

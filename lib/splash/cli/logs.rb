@@ -19,14 +19,14 @@ module CLISplash
       full_status = true
       results.output.each do |result|
         if result[:status] == :clean then
-          log.ok "Log : #{result[:log]} : no errors"
+          log.ok "Log : #{result[:log]} with label : #{result[:label]} : no errors"
           log.item "Detected pattern : #{result[:pattern]}"
           log.item "Nb lines = #{result[:lines]}"
         elsif result[:status] == :missing then
-          log.ko "Log : #{result[:log]} : missing !"
+          log.ko "Log : #{result[:log]} with label : #{result[:label]} : missing !"
           log.item "Detected pattern : #{result[:pattern]}"
         else
-          log.ko "Log : #{result[:log]} : #{result[:count]} errors"
+          log.ko "Log : #{result[:log]} with label : #{result[:label]} : #{result[:count]} errors"
           log.item "Detected pattern : #{result[:pattern]}"
           log.item "Nb lines = #{result[:lines]}"
         end
@@ -58,11 +58,12 @@ module CLISplash
     desc "show LOG", "show Splash configured log monitoring for LOG"
     def show(logrecord)
       log = get_logger
-      log_record_set = get_config.logs.select{|item| item[:log] == logrecord }
+      log_record_set = get_config.logs.select{|item| item[:log] == logrecord or item[:label] == logrecord.to_sym}
       unless log_record_set.empty? then
         record = log_record_set.first
         log.info "Splash log monitor : #{record[:log]}"
         log.item "pattern : /#{record[:pattern]}/"
+        log.item "label : #{record[:label]}"
         splash_exit case: :quiet_exit
       else
         splash_exit case: :not_found, :more => "log not configured"
@@ -82,7 +83,7 @@ module CLISplash
       log_record_set = get_config.logs
       log.ko 'No configured commands found' if log_record_set.empty?
       log_record_set.each do |record|
-        log.item "log monitor : #{record[:log]}"
+        log.item "log monitor : #{record[:log]} label : #{record[:label]}"
         if options[:detail] then
           log.arrow "pattern : /#{record[:pattern]}/"
         end

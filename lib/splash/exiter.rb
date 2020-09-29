@@ -61,8 +61,9 @@ module Splash
     def splash_return(options = {})
 
       data = EXIT_MAP[options[:case]]
+      data[:status] = (data[:code]>0)? :failure : :success
       data[:more] = options[:more] if options[:more]
-      return data 
+      return data
     end
 
   end

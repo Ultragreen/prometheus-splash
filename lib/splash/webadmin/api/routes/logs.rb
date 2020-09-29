@@ -2,49 +2,49 @@
 
 
 
-WebAdminApp.get '/api/process/list.?:format?' do
+WebAdminApp.get '/api/logs/list.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : GET, route : list, format : #{format}"
-  process_recordset = get_config.processes
-  obj =  splash_return case: :quiet_exit, :more => "Processes list"
-  obj[:data] = process_recordset
+  log.call "api : logs, verb : GET, route : list, format : #{format}"
+  logs_recordset = get_config.logs
+  obj =  splash_return case: :quiet_exit, :more => "logses list"
+  obj[:data] = logs_recordset
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
   end
 
-WebAdminApp.get '/api/process/show/:name.?:format?' do
+WebAdminApp.get '/api/logs/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
-  process_recordset = get_config.processes.select{|item| item[:process] == params[:name] }
-  unless process_recordset.empty? then
-    record = process_recordset.first
+  log.call "api : logs, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
+  logs_recordset = get_config.logs.select{|item| item[:logs] == params[:name] }
+  unless logs_recordset.empty? then
+    record = logs_recordset.first
     obj = splash_return case: :quiet_exit
     obj[:data] = record
   else
-    obj = splash_return case: :not_found, :more => "Process not configured"
+    obj = splash_return case: :not_found, :more => "logs not configured"
   end
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
-WebAdminApp.post '/api/process/analyse.?:format?' do
+WebAdminApp.post '/api/logs/analyse.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : POST, route : analyse, format : #{format}"
-  results = Splash::Processes::ProcessScanner::new
+  log.call "api : logs, verb : POST, route : analyse, format : #{format}"
+  results = Splash::Logs::LogScanner::new
   results.analyse
   res = results.output
-  obj =  splash_return case: :quiet_exit, :more => "Process analyse report"
+  obj =  splash_return case: :quiet_exit, :more => "logs analyse report"
   obj[:data] = res
   status 201
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
-WebAdminApp.post '/api/process/monitor.?:format?' do
+WebAdminApp.post '/api/logs/monitor.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : POST, route : monitor, format : #{format}"
-  results = Splash::Processes::ProcessScanner::new
+  log.call "api : logs, verb : POST, route : monitor, format : #{format}"
+  results = Splash::Logs::LogScanner::new
   results.analyse
   res = splash_return results.notify
   if res[:status] == :failure then

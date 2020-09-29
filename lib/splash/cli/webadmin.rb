@@ -7,6 +7,7 @@ module CLISplash
   class WebAdmin < Thor
     include Splash::Config
     include Splash::Exiter
+    include Splash::Helpers
 
 
     # Thor method : stopping Splash Webadmin
@@ -15,14 +16,18 @@ module CLISplash
     end
 
     # Thor method : getting execution status of Splashd
-    desc "status", "Splash Daemon status"
+    desc "status", "Splash WebAdmin Daemon status"
     def status
     end
 
     # Thor method : getting execution status of Splashd
-    desc "start", "Splash Daemon status"
+    desc "start", "Splash WebAdmin Daemon status"
     def start
-      require 'splash/webadmin/main'
+      unless is_root?
+        splash_exit :case => :not_root, :more => "WebAdmin need to be run as root"
+      else
+        require 'splash/webadmin/main'
+      end
     end
 
   end

@@ -15,7 +15,7 @@ module Splash
       # LogScanner Constructor : initialize prometheus metrics
       # return [Splash::Logs::LogScanner]
       def initialize
-        @logs_target = get_config.logs
+        @logs_target = Marshal.load(Marshal.dump(get_config.logs)
         @config = get_config
         @registry = Prometheus::Client::Registry::new
         @metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])

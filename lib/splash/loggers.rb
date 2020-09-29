@@ -14,7 +14,7 @@ module Splash
     # @param [Hash] options
     # @option options [Symbol] :logger the name of the logger actually in [:cli, :daemon, :dual]
     # @option options [Boolean] :force to force new instance creation (Logger is class variable)
-    # @return [SPlash::Loggers::<type>] type is Cli, Dual, Daemon
+    # @return [SPlash::Loggers::<type>] type is Cli, Dual, Daemon, Web
     def get_logger(options = {})
       logger = (get_config.loggers[:list].include? options[:logger])? options[:logger].to_s : get_config.loggers[:default].to_s
       aclass = "Splash::Loggers::#{logger.capitalize}"

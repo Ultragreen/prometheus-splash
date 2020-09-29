@@ -19,6 +19,6 @@ class WebAdminApp < Sinatra::Base
 end
 
 require 'splash/webadmin/api/routes/init'
-log = get_logger logger: :web
-log.info "Starting Splash WebAdmin" 
+log = get_logger logger: :web, force: true
+log.info "Starting Splash WebAdmin"
 WebAdminApp.run!

@@ -33,13 +33,14 @@ class CLI < Thor
   subcommand "logs", Logs
   desc "processes SUBCOMMAND ...ARGS", "Managing processes supervision"
   subcommand "processes", Processes
-  desc "daemon SUBCOMMAND ...ARGS", "Splash daemon contoller"
+  desc "daemon SUBCOMMAND ...ARGS", "Splash daemon controller"
   subcommand "daemon", CLIController
   desc "config SUBCOMMAND ...ARGS", "Config tools for Splash"
   subcommand "config", Config
   desc "documentation SUBCOMMAND ...ARGS", "Documentation for Splash"
   subcommand "documentation", Documentation
-
+  desc "webadmin SUBCOMMAND ...ARGS", "Splash Webadmin daemon controller"
+  subcommand "documentation", WebAdmin
 
 
 end

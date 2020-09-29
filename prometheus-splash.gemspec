@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'tty-markdown','~> 0.6.0'
   spec.add_runtime_dependency 'tty-pager','~> 0.12.1'
   spec.add_runtime_dependency 'colorize','~> 0.8.1'
+  spec.add_runtime_dependency 'sinatra','~> 2.1.0'
   spec.add_development_dependency 'rake', '~> 13.0.1'
   spec.add_development_dependency 'rspec', '~> 3.9.0'
   spec.add_development_dependency 'yard', '~> 0.9.24'

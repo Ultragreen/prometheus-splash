@@ -15,7 +15,7 @@ module Splash
       # ProcessScanner Constructor : initialize prometheus metrics
       # @return [Splash::Processes::ProcessScanner]
       def initialize
-        @processes_target = get_config.processes
+        @processes_target = Marshal.load(Marshal.dump(get_config.processes))
         @config = get_config
         @registry = Prometheus::Client::Registry::new
         @metric_status = Prometheus::Client::Gauge.new(:process_status, docstring: 'SPLASH metric process status', labels: [:process ])

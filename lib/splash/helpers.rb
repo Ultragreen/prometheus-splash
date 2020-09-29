@@ -328,6 +328,24 @@ module Splash
     #!@endgroup
 
 
+    def format_response(data, format)
+      response = case format
+                 when 'application/json' then data.to_json
+                 when 'text/x-yaml' then data.to_yaml
+                 else data.to_json
+                 end
+      return response
+    end
+
+    def format_by_extensions(extension)
+      result = {
+        'json' => 'application/json',
+        'yaml' => 'text/x-yaml',
+        'yml' => 'text/x-yaml'
+      }
+       return result[extension]
+    end
+
 
   end
 end

@@ -62,10 +62,11 @@ module Splash
                           :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
 
     # loggers default settings
-    LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual],
+    LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual, :web],
                        :default => :cli,
                        :level => :info,
                        :daemon => {:file => '/var/log/splash.log'},
+                       :web => {:file => '/var/log/splash_web.log'},
                        :cli => {:color => true, :emoji => true }  }
 
   end

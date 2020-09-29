@@ -43,7 +43,7 @@ module Splash
 
     LEVELS = [:debug, :warn, :info, :result, :fatal, :unknown]
     ALIAS = {:flat => :info, :item => :info, :ok => :info, :ko => :info, :trigger => :info,
-      :schedule => :info, :arrow => :info, :send => :info,
+      :schedule => :info, :arrow => :info, :send => :info, :call => :info,
       :receive => :info, :error => :result, :success => :result }
 
       # class template for loggers

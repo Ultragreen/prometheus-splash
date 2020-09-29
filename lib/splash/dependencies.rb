@@ -12,6 +12,7 @@ module Splash
     require 'fileutils'
     require 'etc'
     require 'forwardable'
+    require 'json'
 
 
 
@@ -29,6 +30,7 @@ module Splash
       require 'ps-ruby'
       require 'sinatra/base'
       require 'thin'
+
 
     rescue Gem::GemNotFoundException
       $stderr.puts "Loadind error, it's like you try to run Splash, with a lake of dependencies."

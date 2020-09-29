@@ -58,7 +58,12 @@ module Splash
       end
     end
 
+    def splash_return(options = {})
 
+      data = EXIT_MAP[options[:case]]
+      data[:more] = options[:more] if options[:more]
+      return data 
+    end
 
   end
 end

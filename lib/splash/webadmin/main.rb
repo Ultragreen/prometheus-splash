@@ -1,8 +1,5 @@
 
 
-
-
-
 class WebAdminApp < Sinatra::Base
 
   set :server, 'thin'
@@ -10,19 +7,18 @@ class WebAdminApp < Sinatra::Base
   set :bind, '127.0.0.1'
 
   include Splash::Config
+  include Splash::Helpers
   include Splash::Exiter
-  include Splash::Processes
+  include Splash::Loggers
 
-  require 'splash/webadmin/routes/init'
 
   get '/' do
     'SPLASH Admin'
   end
 
-  get '/api' do
-      'SPLASH API'
-  end
-
 end
 
+require 'splash/webadmin/api/routes/init'
+log = get_logger logger: :web
+log.info "Starting Splash WebAdmin" 
 WebAdminApp.run!

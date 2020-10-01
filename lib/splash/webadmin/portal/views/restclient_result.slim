@@ -1,0 +1,26 @@
+p HTTP Method : #{@method} / <b>URL</b> : #{@url}
+h3 Result :
+- unless @result == false
+  table.uk_table
+    tr
+      td
+        i.uk-icon-dollar
+        | &nbsp;<b>Return code :</b>
+      td = @result.code
+    tr
+      td
+        i.uk-icon-file-o
+        | &nbsp;<b>Body :</b>
+      td = @result.to_str
+    tr
+      td
+        i.uk-icon-header
+        | &nbsp;<b>Headers :</b>
+      td
+        ul
+          - @result.headers.each do |hkey,value|
+            li <i><b>#{hkey}:</b> &nbsp; &nbsp; #{value}</i>
+
+- else
+  div.uk-alert.uk-alert-danger
+    | Can't excute this request

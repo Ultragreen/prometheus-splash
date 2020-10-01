@@ -30,6 +30,8 @@ module Splash
       require 'ps-ruby'
       require 'sinatra/base'
       require 'thin'
+      require 'slim'
+      require 'rest-client'
 
 
     rescue Gem::GemNotFoundException

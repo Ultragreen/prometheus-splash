@@ -9,6 +9,7 @@ WebAdminApp.get '/api/process/list.?:format?' do
   process_recordset = get_config.processes
   obj =  splash_return case: :quiet_exit, :more => "Processes list"
   obj[:data] = process_recordset
+  content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
   end
 
@@ -24,6 +25,7 @@ WebAdminApp.get '/api/process/show/:name.?:format?' do
   else
     obj = splash_return case: :not_found, :more => "Process not configured"
   end
+  content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
@@ -37,6 +39,7 @@ WebAdminApp.post '/api/process/analyse.?:format?' do
   obj =  splash_return case: :quiet_exit, :more => "Process analyse report"
   obj[:data] = res
   status 201
+  content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
@@ -52,5 +55,6 @@ WebAdminApp.post '/api/process/monitor.?:format?' do
   else
     status 201
   end
+  content_type format
   format_response(res, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end

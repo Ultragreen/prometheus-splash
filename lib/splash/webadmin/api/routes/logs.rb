@@ -9,6 +9,7 @@ WebAdminApp.get '/api/logs/list.?:format?' do
   logs_recordset = get_config.logs
   obj =  splash_return case: :quiet_exit, :more => "logses list"
   obj[:data] = logs_recordset
+  content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
   end
 
@@ -37,6 +38,7 @@ WebAdminApp.post '/api/logs/analyse.?:format?' do
   obj =  splash_return case: :quiet_exit, :more => "logs analyse report"
   obj[:data] = res
   status 201
+  content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
@@ -52,5 +54,6 @@ WebAdminApp.post '/api/logs/monitor.?:format?' do
   else
     status 201
   end
+  content_type format
   format_response(res, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end

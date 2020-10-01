@@ -1,0 +1,44 @@
+h2 REST Client
+
+div.uk-grid
+  div.uk-width-1-1
+    div.uk-panel.uk-panel-box
+      h3.uk-panel-title
+        i.uk-icon-question-circle
+         |  &nbsp;&nbsp;Request
+      form.uk-form#query action="/restclient/query" method="POST"
+        fieldset(data-uk-margin)
+          div.uk-grid
+            div.uk-width-2-10
+              | Method	  
+              select#method name="method"
+                option GET
+                option POST
+                option DELETE
+                option PUT
+            div.uk-width-6-10
+              input#url.uk-width-1-1 type="text" placeholder="url" name="url"
+            div.uk-width-1-10
+              input.uk-button.uk-button-primary type="submit" value="Send" 
+
+div.uk-placeholder
+  div.uk-width-1-1
+    div.uk-panel.uk-panel-box
+      h3.uk-panel-title
+        i.uk-icon-share-square
+          |  &nbsp;&nbsp;Response
+	  div#result.uk-width-1-1
+
+javascript:
+  $('#query').submit(function() { 
+    console.log($(this).serialize());
+    $.ajax({ 
+      data: $(this).serialize(), 
+      type: $(this).attr('method'),
+      url: $(this).attr('action'), 
+      success: function(response) { 
+        $('#result').html(response); 
+      }
+    });
+    return false; 
+  });

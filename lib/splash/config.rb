@@ -196,7 +196,12 @@ module Splash
       return @@config ||= Configuration::new(config_file)
     end
 
-
+    # reset of Configuration Class instance
+    # @param [String] config_file the path of the YAML Config file
+    # @return [SPlash::Config::Configuration]
+    def rehash_config(config_file=CONFIG_FILE)
+      return @@config = Configuration::new(config_file)
+    end
 
 
   end

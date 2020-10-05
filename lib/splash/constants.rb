@@ -69,5 +69,8 @@ module Splash
                        :web => {:file => '/var/log/splash_web.log'},
                        :cli => {:color => true, :emoji => true }  }
 
+    WEBADMIN_IP = "127.0.0.1"
+    WEBADMIN_PORT = "9234"
+
   end
 end

@@ -27,6 +27,12 @@ module Splash
         self[:daemon_logmon_scheduling] = (config_from_file[:daemon][:logmon_scheduling])? config_from_file[:daemon][:logmon_scheduling] : DAEMON_LOGMON_SCHEDULING
         self[:daemon_metrics_scheduling] = (config_from_file[:daemon][:metrics_scheduling])? config_from_file[:daemon][:metrics_scheduling] : DAEMON_METRICS_SCHEDULING
         self[:daemon_procmon_scheduling] = (config_from_file[:daemon][:procmon_scheduling])? config_from_file[:daemon][:procmon_scheduling] : DAEMON_PROCMON_SCHEDULING
+
+
+        self[:webadmin_port] = (config_from_file[:webadmin][:port])? config_from_file[:webadmin][:port] : WEBADMIN_PORT
+        self[:webadmin_ip] = (config_from_file[:webadmin][:ip])? config_from_file[:webadmin][:ip] : WEBADMIN_IP
+
+
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST
         self[:execution_template_path] = (config_from_file[:templates][:execution][:path])? config_from_file[:templates][:execution][:path] : EXECUTION_TEMPLATE
         self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : DAEMON_PID_PATH
@@ -46,6 +52,12 @@ module Splash
       end
 
       # @!group accessors on configurations Items
+
+      # getter for full Config Hash
+      # @return [Hash]
+      def full
+        return self
+      end
 
       # getter for loggers Hash Config sample
       # @return [Hash]
@@ -94,6 +106,20 @@ module Splash
       def execution_template_tokens
         return self[:execution_template_tokens]
       end
+
+
+      # getter for webadmin_port Hash Config sample
+      # @return [Array]
+      def webadmin_port
+        return self[:webadmin_port]
+      end
+
+      # getter for webadmin_ip Hash Config sample
+      # @return [Array]
+      def webadmin_ip
+        return self[:webadmin_ip]
+      end
+
 
       # getter for logs Hash Config sample
       # @return [Hash]

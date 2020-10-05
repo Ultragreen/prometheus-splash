@@ -1,2 +1,78 @@
 h1 This is Splash
-p Choose a activity in the main menu 
+p Choose a activity in the main menu
+
+
+div.uk-grid
+  div.uk-width-medium-1-2
+    div.uk-panel.uk-panel-box
+      span.uk-text-large.uk-text-bold Global Configuration
+      br
+      br
+      span.uk-text-bold <i>Logger and display</i> :
+      ul
+        li <b>Level:</b> #{@data[:loggers][:level]}
+        li <b>Daemon log filename:</b> #{@data[:loggers][:daemon][:file]}
+        li <b>Web log filename:</b> #{@data[:loggers][:web][:file]}
+        li <b>Emoji in CLI:</b> #{@data[:loggers][:cli][:emoji]}
+        li <b>Color in CLI:</b> #{@data[:loggers][:cli][:color]}
+      span.uk-text-bold <i>Templates</i> :
+      ul
+        li <b>Execution Report Template file:</b> #{@data[:execution_template_path]}
+
+  div.uk-width-medium-1-2
+    div.uk-panel.uk-panel-box
+      span.uk-text-large.uk-text-bold Transport and Backend
+      br
+      br
+      span.uk-text-bold <i>Backend</i> :
+      ul
+        li <b>Backend type:</b> #{@data[:backends][:stores][:execution_trace][:type]}
+        - if @data[:backends][:stores][:execution_trace][:type] == :file
+          li <b>Path:</b> #{@data[:backends][:stores][:execution_trace][:path]}
+        - else
+          li  <b>Host:</b> #{@data[:backends][:stores][:execution_trace][:host]}
+          li  <b>Port:</b> #{@data[:backends][:stores][:execution_trace][:port]}
+          li  <b>base:</b> #{@data[:backends][:stores][:execution_trace][:base]}
+          - unless @data[:backends][:stores][:execution_trace][:auth].nil?
+            li  <b>Authentification:</b> Active (see config file)
+      span.uk-text-bold <i>Transport</i> :
+      ul
+        li <b>Transport:</b> #{@data[:transports][:active]}
+        - if @data[:transports][:active] == :rabbitmq
+          li <b>Host:</b> #{@data[:transports][:rabbitmq][:host]}
+          li <b>Port:</b> #{@data[:transports][:rabbitmq][:port]}
+          li <b>Vhost:</b> #{@data[:transports][:rabbitmq][:vhost]}
+          - unless @data[:transports][:rabbitmq][:user].nil?
+            li  <b>Authentification:</b> Active (see config file)
+
+div.uk-grid
+  div.uk-width-medium-1-2
+    div.uk-panel.uk-panel-box
+      span.uk-text-large.uk-text-bold Daemon
+      br
+      ul
+        li <b>Logs monitoring scheduling: </b> #{@data[:daemon_logmon_scheduling]}
+        li <b>Processes monitoring scheduling: </b> #{@data[:daemon_process_scheduling]}
+        li <b>Splash metrics monitoring scheduling: </b> #{@data[:daemon_metrics_scheduling]}
+        li <b>Splash daemon process name: </b> #{@data[:daemon_process_name]}
+        li <b>Splash daemon PID file path: </b> #{@data[:pid_path]}
+        li <b>Splash daemon PID file : </b> #{@data[:pid_file]}
+        li <b>Splash daemon trace path: </b> #{@data[:trace_path]}
+        li <b>Splash daemon trace STDOUT file: </b> #{@data[:stdout_trace]}
+        li <b>Splash daemon trace STDERR: </b> #{@data[:stderr_trace]}
+
+
+  div.uk-width-medium-1-2
+    div.uk-panel.uk-panel-box
+      span.uk-text-large.uk-text-bold Web UI
+      br
+      br
+      span.uk-text-bold <i>Webadmin</i> :
+      ul
+        li <b>IP:</b> #{@data[:webadmin_ip]}
+        li <b>Port:</b> #{@data[:webadmin_port]}
+
+      span.uk-text-bold <i>Prometheus PushGateway</i> :
+      ul
+        li <b>Host:</b> #{@data[:prometheus_pushgateway_host]}
+        li <b>Port:</b> #{@data[:prometheus_pushgateway_port]}

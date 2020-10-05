@@ -50,6 +50,9 @@
     :pushgateway:
       :host: "localhost"
       :port: 9091
+  :webadmin:
+    :port: 9234
+    :ip: 127.0.0.1
 
 
 ### configuration of commands and scheduling

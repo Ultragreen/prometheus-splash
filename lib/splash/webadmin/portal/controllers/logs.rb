@@ -1,4 +1,4 @@
-WebAdminApp.get '/' do
+WebAdminApp.get '/logs' do
   get_menu 1
   url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/logs/list.yml"
   @raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)

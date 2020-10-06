@@ -1,10 +1,32 @@
 h2 Logs configured in Splash
 
-
-div.uk-grid
-  div.uk-width-medium-1-1
-    div.uk-panel.uk-panel-box
-      span.uk-text-large.uk-text-bold List of Logs Monitoring
-      br
-      ul
-        li 
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    span.uk-text-large.uk-text-bold List of Logs Monitoring
+    br
+    table.uk-table.uk-table-hover.uk-table-striped
+      thead
+        tr
+          th Log record label
+          th Definition
+          th Status
+        tbody
+          - @data.each do |log|
+            tr
+              td <b>Label</b> : #{log[:label]}
+              td
+                ul
+                  li <b>File</b> : #{log[:log]}
+                  li <b>Pattern</b> : #{log[:pattern]}
+              td
+                - if @result[log[:label]][:status] == :missing
+                  div.uk-badge.uk-badge-warning missing
+                - if @result[log[:label]][:status] == :clean
+                  div.uk-badge.uk-badge-success success
+                  ul
+                    li <b>Lines count</b> : #{@result[log[:label]][:lines]}
+                - if @result[log[:label]][:status] == :matched
+                  div.uk-badge.uk-badge-danger matched
+                  ul
+                    li <b>Lines count</b> : #{@result[log[:label]][:lines]}
+                    li <b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>

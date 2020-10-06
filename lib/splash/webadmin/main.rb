@@ -14,7 +14,9 @@ class WebAdminApp < Sinatra::Base
   set :public_folder, 'lib/splash/webadmin/portal/public'
   set :views, "lib/splash/webadmin/portal/views"
 
-
+  before do
+    rehash_config
+  end
 
 
 

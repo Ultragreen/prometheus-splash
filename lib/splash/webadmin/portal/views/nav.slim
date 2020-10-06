@@ -1,5 +1,5 @@
 nav.uk-navbar.uk-navbar-attached(data-uk-sticky)
-  a.uk-navbar-brand.uk-hidden-small href="/" Home
+  a.uk-navbar-brand.uk-hidden-small href="/" <i class="uk-icon-home"></i> Home
   ul.uk-navbar-nav.uk-hidden-small
     - for item in @menu
       li class=( (item == @current_item)? "uk-active" : "uk-inactive")

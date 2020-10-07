@@ -9,7 +9,7 @@ SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestra
 * Web : http://www.ultragreen.net
 * Github : https://github.com/Ultragreen/prometheus-splash
 * Rubygems : https://rubygems.org/gems/prometheus-splash
-* DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.3.0
+* DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.6.0
 
 Prometheus Logs and Batchs supervision over PushGateway
 
@@ -123,7 +123,7 @@ For file/folders if problems is detected, it could be such as :
 run :
 
     $ splash config version
-    Splash version : 0.0.3, Author : Romain GEORGES <gems@ultragreen.net>
+    Splash version : 0.6.0, Author : Romain GEORGES <gems@ultragreen.net>
     Ultragreen (c) 2020 BSD-2-Clause
 
 

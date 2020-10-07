@@ -4,8 +4,7 @@ Dir[File.dirname(__FILE__) + '/helpers/*.rb'].each {|file| require file  unless 
 Slim::Engine.set_options pretty: true
 
 def get_menu(current)
-  @menu = ['Logs','Processes','Commands','RestCLIENT']
-  @menu.push 'Proxy' if get_config.webadmin_proxy == true
+  @menu = ['Logs','Processes','Commands','RestCLIENT','Proxy/Links']
   @current_item = nil
   @current_item = @menu[current] unless current == -1
 end

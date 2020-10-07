@@ -330,9 +330,9 @@ module Splash
 
     def format_response(data, format)
       response = case format
-                 when 'application/json' then data.to_json
+                 when 'application/json' then JSON.pretty_generate(data)
                  when 'text/x-yaml' then data.to_yaml
-                 else data.to_json
+                 else JSON.pretty_generate(data)
                  end
       return response
     end

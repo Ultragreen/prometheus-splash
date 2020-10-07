@@ -21,6 +21,10 @@ module Splash
         self[:version] = VERSION
         self[:author] = "#{AUTHOR} <#{EMAIL}>"
         self[:copyright] = "#{COPYRIGHT} #{LICENSE}"
+
+        self[:prometheus_url] = (config_from_file[:prometheus][:url])? config_from_file[:prometheus][:url] : PROMETHEUS_URL
+
+        self[:prometheus_pushgateway_path] = (config_from_file[:prometheus][:pushgateway][:path])? config_from_file[:prometheus][:pushgateway][:path] : PROMETHEUS_PUSHGATEWAY_PATH
         self[:prometheus_pushgateway_host] = (config_from_file[:prometheus][:pushgateway][:host])? config_from_file[:prometheus][:pushgateway][:host] : PROMETHEUS_PUSHGATEWAY_HOST
         self[:prometheus_pushgateway_port] = (config_from_file[:prometheus][:pushgateway][:port])? config_from_file[:prometheus][:pushgateway][:port] : PROMETHEUS_PUSHGATEWAY_PORT
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
@@ -31,6 +35,7 @@ module Splash
 
         self[:webadmin_port] = (config_from_file[:webadmin][:port])? config_from_file[:webadmin][:port] : WEBADMIN_PORT
         self[:webadmin_ip] = (config_from_file[:webadmin][:ip])? config_from_file[:webadmin][:ip] : WEBADMIN_IP
+        self[:webadmin_proxy] = (config_from_file[:webadmin][:proxy])? config_from_file[:webadmin][:proxy] : WEBADMIN_PROXY
 
 
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST
@@ -109,17 +114,22 @@ module Splash
 
 
       # getter for webadmin_port Hash Config sample
-      # @return [Array]
+      # @return [Fixnum]
       def webadmin_port
         return self[:webadmin_port]
       end
 
       # getter for webadmin_ip Hash Config sample
-      # @return [Array]
+      # @return [String]
       def webadmin_ip
         return self[:webadmin_ip]
       end
 
+     # getter for webadmin_proxy Hash Config sample
+     # @return [TrueClass|FalseClass]
+     def webadmin_proxy
+       return self[:webadmin_proxy]
+     end
 
       # getter for logs Hash Config sample
       # @return [Hash]
@@ -177,6 +187,18 @@ module Splash
       # @return [String]
       def prometheus_pushgateway_port
         return self[:prometheus_pushgateway_port]
+      end
+
+      # getter for prometheus_pushgateway_path Config sample
+      # @return [String]
+      def prometheus_pushgateway_path
+        return self[:prometheus_pushgateway_path]
+      end
+
+      # getter for prometheus_url Config sample
+      # @return [String]
+      def prometheus_url
+        return self[:prometheus_url]
       end
 
       # getter for full_pid_path Config sample

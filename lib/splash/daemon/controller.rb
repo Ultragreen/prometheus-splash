@@ -56,7 +56,7 @@ module Splash
               :foreground => options[:foreground]
             }
 
-          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  ObjectSpace.each_object(Splash::Daemon::Orchestrator::Scheduler).first.shutdown } end
+          ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  ObjectSpace.each_object(Splash::Daemon::Orchestrator::Scheduler).first.terminate } end
           res = daemonize daemon_config do
               Scheduler::new options
           end

@@ -26,7 +26,7 @@ module Splash
       # @param [String] name the name of the command
       def initialize(name)
         @config  = get_config
-        @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
+        @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}/#{@config.prometheus_pushgateway_path}"
         @name = name
         unless @config.commands.keys.include? @name.to_sym then
           splash_exit case: :not_found, more: "command #{@name} is not defined in configuration"

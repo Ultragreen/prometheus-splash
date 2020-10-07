@@ -70,7 +70,7 @@ module Splash
           @metric_lines.set(lines, labels: { log: item[:log] })
         end
         hostname = Socket.gethostname
-        url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}"
+        url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}/#{@config.prometheus_pushgateway_path}"
         Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
         log.ok "Sending to Prometheus PushGateway done.", session
         return {:case => :quiet_exit }

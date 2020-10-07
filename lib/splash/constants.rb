@@ -46,6 +46,11 @@ module Splash
     PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
     # the default prometheus pushgateway port
     PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+    # the default prometheus pushgateway port
+    PROMETHEUS_PUSHGATEWAY_PATH = ''
+
+    # the default prometheus URL
+    PROMETHEUS_URL = "http://localhost:9090"
 
     # the default path fo execution report template
     EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
@@ -71,6 +76,7 @@ module Splash
 
     WEBADMIN_IP = "127.0.0.1"
     WEBADMIN_PORT = "9234"
+    WEBADMIN_PROXY = false
 
   end
 end

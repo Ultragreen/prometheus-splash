@@ -1,45 +1,23 @@
-require 'net/http'
-
-$request_settings = { host: "http://localhost:9091"] }
 
 
-
-# methods
-def api_request(type, path, query_string, body, new_headers)
-  uri = URI::HTTP.build(
-    $request_settings.merge(
-      path: path,
-      query: query_string,
-    )
-  )
-  req = Net::HTTP.const_get(type).new(uri, new_headers)
-  req.body = body.read
-  Net::HTTP.new(uri.hostname, uri.port).start {|http| http.request(req) }
+WebAdminApp.use Rack::ReverseProxy do
+  config = get_config
+  url = "http://#{config.prometheus_pushgateway_host}:#{config.prometheus_pushgateway_port}/#{config.prometheus_pushgateway_path}"
+  reverse_proxy /^\/pushgateway\/?(.*)$/, url
+  reverse_proxy_options preserve_host: true
 end
 
-def all_headers(response)
-  header_list = {}
-  response.header.each_capitalized do |k,v|
-    header_list[k] =v unless k == "Transfer-Encoding"
-  end
-  header_list
+
+WebAdminApp.use Rack::ReverseProxy do
+  reverse_proxy /^\/prometheus\/?(.*)$/, get_config.prometheus_url
+  reverse_proxy_options preserve_host: true
 end
 
-def incomming_headers(request)
-  request.env.map { |header, value|  [header[5..-1].split("_").map(&:capitalize).join('-'), value] if header.start_with?("HTTP_") }.compact.to_h
-end
+WebAdminApp.get '/proxy' do
+  get_menu 4
 
-# wildcard routing
-%w(get post put patch delete).each do |verb|
-  WebAdminApp.send(verb, /.*/) do
-    content_type $headers["Content-Type"]
-    start_request = Thread.new {
-      api_request(verb.capitalize, request.path_info, request.query_string, request.body, incomming_headers(request))
-    }
-
-    response = start_request.value
-    status response.code
-    headers all_headers(response)
-    response.body
-  end
+  config = get_config
+  @pushgateway_url = "http://#{config.prometheus_pushgateway_host}:#{config.prometheus_pushgateway_port}/#{config.prometheus_pushgateway_path}"
+  @prometheus_url = "http://#{config.prometheus_url}"
+  slim :proxy, :format => :html
 end

@@ -32,6 +32,7 @@ module Splash
       require 'thin'
       require 'slim'
       require 'rest-client'
+      require 'rack/reverse_proxy'
 
 
     rescue Gem::GemNotFoundException

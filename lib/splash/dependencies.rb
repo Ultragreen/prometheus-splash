@@ -32,6 +32,7 @@ module Splash
       require 'thin'
       require 'slim'
       require 'rest-client'
+      require 'kramdown'
       require 'rack/reverse_proxy'
 
 

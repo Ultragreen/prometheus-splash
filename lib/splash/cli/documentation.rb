@@ -17,7 +17,7 @@ module CLISplash
       if options[:formatted] then
         content = TTY::Markdown.parse_file(filename)
       else
-        conten = File::readlines(filename).join
+        content = File::readlines(filename).join
       end
       pager = TTY::Pager.new
       pager.page(content)

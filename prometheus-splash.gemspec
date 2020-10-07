@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'thin','~> 1.7.2'
   spec.add_runtime_dependency 'rest-client','~> 2.1.0'
   spec.add_runtime_dependency 'slim','~> 4.1.0'
+  spec.add_runtime_dependency 'kramdown','~> 1.16.2'
   spec.add_runtime_dependency 'rack-reverse-proxy','~> 0.12.0'
   spec.add_development_dependency 'rake', '~> 13.0.1'
   spec.add_development_dependency 'rspec', '~> 3.9.0'

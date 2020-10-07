@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require 'splash/webadmin/main'
+
 
 # base Splash module
 module Splash
@@ -20,15 +20,14 @@ module Splash
       # Start the Splash Daemon
       # @param [Hash] options
       # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
-      # @option options [Symbol] :foreground run daemon in foreground
       # @return [Hash] Exiter Case (:quiet_exit, :already_exist, :unknown_error or other)
       def startdaemon(options = {})
+        require 'splash/webadmin/main'
         config = get_config
+        log = get_logger
+        log.level = :fatal if options[:quiet]
         realpid = get_processes pattern: get_config.webadmin_process_name
-        foreground  = get_processes patterns: [ "splash", "foreground" ]
-        unless foreground.empty? or options[:foreground] then
-          return {:case => :already_exist, :more => "Splash WebAdmin Process already launched on foreground "}
-        end
+
 
         unless File::exist? config.full_pid_path then
           unless realpid.empty? then
@@ -38,8 +37,7 @@ module Splash
           daemon_config = {:description => config.webadmin_process_name,
               :pid_file => config.webadmin_full_pid_path,
               :stdout_trace => config.webadmin_full_stdout_trace_path,
-              :stderr_trace => config.webadmin_full_stderr_trace_path,
-              :foreground => options[:foreground]
+              :stderr_trace => config.webadmin_full_stderr_trace_path
             }
 
           ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  WebAdminApp.quit! } end
@@ -50,7 +48,7 @@ module Splash
           end
           sleep 1
           if res == 0 then
-            pid = `cat #{config.full_pid_path}`.to_i
+            pid = `cat #{config.webadmin_full_pid_path}`.to_i
             log.ok "Splash WebAdmin Started, with PID : #{pid}"
             return {:case => :quiet_exit, :more => "Splash WebAdmin successfully loaded."}
           else

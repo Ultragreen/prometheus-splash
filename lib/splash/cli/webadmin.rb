@@ -5,6 +5,7 @@ module CLISplash
 
   # Thor inherited class for Processes management
   class WebAdmin < Thor
+    include Splash::WebAdmin::Controller
     include Splash::Config
     include Splash::Exiter
     include Splash::Helpers
@@ -13,32 +14,31 @@ module CLISplash
     # Thor method : stopping Splash Webadmin
     desc "stop", "Stopping Splash Webadmin Daemon"
     def stop
+      acase = run_as_root :stopdaemon, options
+      splash_exit acase
     end
 
     # Thor method : getting execution status of Splashd
     desc "status", "Splash WebAdmin Daemon status"
     def status
+      acase = run_as_root :statusdaemon, options
+      splash_exit acase
     end
 
 
 
-  
+
 
 
 
     # Thor method : getting execution status of Splash WebAdmin
-    option :foreground, :type => :boolean,  :aliases => "-F"
     long_desc <<-LONGDESC
     Starting Splash Daemon\n
-    With --foreground, run Splash WebAdmin in foreground\n
     LONGDESC
     desc "start", "Splash WebAdmin Daemon status"
     def start
-      unless is_root?
-        splash_exit :case => :not_root, :more => "WebAdmin need to be run as root"
-      else
-        require 'splash/webadmin/main'
-      end
+      acase = run_as_root :startdaemon
+      splash_exit acase
     end
 
   end

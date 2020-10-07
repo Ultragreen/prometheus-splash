@@ -36,6 +36,10 @@ module Splash
         self[:webadmin_port] = (config_from_file[:webadmin][:port])? config_from_file[:webadmin][:port] : WEBADMIN_PORT
         self[:webadmin_ip] = (config_from_file[:webadmin][:ip])? config_from_file[:webadmin][:ip] : WEBADMIN_IP
         self[:webadmin_proxy] = (config_from_file[:webadmin][:proxy])? config_from_file[:webadmin][:proxy] : WEBADMIN_PROXY
+        self[:webadmin_process_name] = (config_from_file[:webadmin][:process_name])? config_from_file[:webadmin][:process_name] : WEBADMIN_PROCESS_NAME
+        self[:webadmin_pid_file] = (config_from_file[:webadmin][:files][:pid_file])? config_from_file[:webadmin][:files][:pid_file] : WEBADMIN_PID_FILE
+        self[:webadmin_stdout_trace] = (config_from_file[:webadmin][:files][:stdout_trace])? config_from_file[:webadmin][:files][:stdout_trace] : WEBADMIN_STDOUT_TRACE
+        self[:webadmin_stderr_trace] = (config_from_file[:webadmin][:files][:stderr_trace])? config_from_file[:webadmin][:files][:stderr_trace] : WEBADMIN_STDERR_TRACE
 
 
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST
@@ -125,11 +129,38 @@ module Splash
         return self[:webadmin_ip]
       end
 
-     # getter for webadmin_proxy Hash Config sample
-     # @return [TrueClass|FalseClass]
-     def webadmin_proxy
-       return self[:webadmin_proxy]
-     end
+      # getter for webadmin_proxy Hash Config sample
+      # @return [TrueClass|FalseClass]
+      def webadmin_proxy
+        return self[:webadmin_proxy]
+      end
+
+      # getter for webadmin_process_name Config sample
+      # @return [String]
+      def webadmin_process_name
+        return self[:webadmin_process_name]
+      end
+
+      # getter for webadmin_full_pid_path Config sample
+      # @return [String]
+      def webadmin_full_pid_path
+        return "#{self[:pid_path]}/#{self[:webadmin_pid_file]}"
+      end
+
+      # getter for webadmin_full_stdout_trace_path Config sample
+      # @return [String]
+      def webadmin_full_stdout_trace_path
+        return "#{self[:trace_path]}/#{self[:webadmin_stdout_trace]}"
+      end
+
+      # getter for webadmin_full_stderr_trace_path Config sample
+      # @return [String]
+      def webadmin_full_stderr_trace_path
+        return "#{self[:trace_path]}/#{self[:webadmin_stderr_trace]}"
+      end
+
+
+
 
       # getter for logs Hash Config sample
       # @return [Hash]

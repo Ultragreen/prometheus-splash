@@ -56,6 +56,11 @@
     :port: 9234
     :ip: 127.0.0.1
     :proxy: false
+    :process_name: "Splash : WebAdmin."
+    :files:
+      :stdout_trace: stdout_webadmin.txt
+      :stderr_trace: stderr_webadmin.txt
+      :pid_file: splash_webadmin.pid
 
 
 ### configuration of commands and scheduling

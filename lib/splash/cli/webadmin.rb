@@ -20,7 +20,18 @@ module CLISplash
     def status
     end
 
-    # Thor method : getting execution status of Splashd
+
+
+  
+
+
+
+    # Thor method : getting execution status of Splash WebAdmin
+    option :foreground, :type => :boolean,  :aliases => "-F"
+    long_desc <<-LONGDESC
+    Starting Splash Daemon\n
+    With --foreground, run Splash WebAdmin in foreground\n
+    LONGDESC
     desc "start", "Splash WebAdmin Daemon status"
     def start
       unless is_root?

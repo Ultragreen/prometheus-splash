@@ -58,6 +58,7 @@ module Splash
     require 'splash/processes'
 
     require 'splash/daemon'
+    require 'splash/webadmin'
 
 
   end

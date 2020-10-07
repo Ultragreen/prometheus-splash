@@ -24,6 +24,3 @@ end
 
 require 'splash/webadmin/portal/init'
 require 'splash/webadmin/api/routes/init'
-log = get_logger logger: :web, force: true
-log.info "Starting Splash WebAdmin"
-WebAdminApp.run!

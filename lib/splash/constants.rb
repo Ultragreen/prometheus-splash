@@ -77,6 +77,17 @@ module Splash
     WEBADMIN_IP = "127.0.0.1"
     WEBADMIN_PORT = "9234"
     WEBADMIN_PROXY = false
+    # the display name of daemon in proc info (ps/top)
+    WEBADMIN_PROCESS_NAME="Splash : WebAdmin."
+    # the default pid file path
+    WEBADMIN_PID_PATH="/var/run"
+    # the default pid file name
+    WEBADMIN_PID_FILE="splash.pid"
+    # the default sdtout trace file
+    WEBADMIN_STDOUT_TRACE="stdout.txt"
+    # the default sdterr trace file
+    WEBADMIN_STDERR_TRACE="stderr.txt"
+
 
   end
 end

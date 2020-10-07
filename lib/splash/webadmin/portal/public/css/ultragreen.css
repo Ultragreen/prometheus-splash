@@ -1,4 +1,25 @@
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-top:    1px solid  lightgrey;
+  height: 7em;
+}
+
+
+
+.wrapper {
+    overflow-y:scroll;
+    height: 70%;
+}
+
 html {
+  height:100%;
+  overflow:hidden;
   font: normal 14px / 20px "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -8,6 +29,8 @@ html {
   background-image: radial-gradient(100% 100% at center, #ffffff, #ffffff);
 }
 body {
+  height:100%;
+  overflow:hidden;
   margin: 0;
 }
 a {

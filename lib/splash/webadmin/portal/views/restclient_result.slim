@@ -1,22 +1,25 @@
-p HTTP Method : #{@method} / <b>URL</b> : #{@url}
+di &nbsp;
+ul.uk-list
+  li <b>HTTP Method</b> : #{@method}
+  li <b>URL</b> : #{@url}
 h3 Result :
 - unless @result == false
   table.uk_table
     tr
-      td
+      td.uk-width-2-10
         i.uk-icon-dollar
         | &nbsp;<b>Return code :</b>
-      td = @result.code
+      td.uk-width-8-10 = @result.code
     tr
-      td
+      td.uk-width-2-10
         i.uk-icon-file-o
         | &nbsp;<b>Body :</b>
-      td = @result.to_str
+      td.uk-width-8-10 = @result.to_str
     tr
-      td
+      td.uk-width-2-10
         i.uk-icon-header
         | &nbsp;<b>Headers :</b>
-      td
+      td.uk-width-8-10
         ul
           - @result.headers.each do |hkey,value|
             li <i><b>#{hkey}:</b> &nbsp; &nbsp; #{value}</i>

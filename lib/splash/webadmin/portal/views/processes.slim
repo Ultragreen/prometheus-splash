@@ -2,7 +2,7 @@ h2 Processes configured in Splash
 
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
-    span.uk-text-large.uk-text-bold List of Processes Monitored
+    span.uk-text-large.uk-text-bold List of processes monitored
     br
     table.uk-table.uk-table-hover.uk-table-striped
       thead
@@ -17,7 +17,7 @@ div.uk-width-medium-1-1
               td
                 span.uk-text-bold Patterns
                 ul
-                  - process[:patterns].each |pattern|
+                  - process[:patterns].each do |pattern|
                     li= pattern
               td
                 - if @result[process[:process]][:status] == :inexistant

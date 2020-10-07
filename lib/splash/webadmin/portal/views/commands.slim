@@ -1,0 +1,20 @@
+h2 Commands configured in Splash
+
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    span.uk-text-large.uk-text-bold List of commands availables
+    br
+    table.uk-table.uk-table-hover.uk-table-striped
+      thead
+        tr
+          th Command
+          th Definition
+          th Status
+        tbody
+          - @data.each do |command|
+            tr
+              td <b>Label</b> : #{command[:name]}
+              td
+
+              td
+                

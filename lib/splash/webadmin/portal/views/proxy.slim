@@ -1,7 +1,13 @@
-h2 Proxy for Prometheus components
-
-ul.uk-list
-  li
-    a href="#{@prometheus_url}" Prometheus
-  li
-    a href="#{@pushgateway_url}" Prometheus PushGateway
+- if @proxy
+  h2 Proxies for Prometheus components
+- else
+  h2 Links for Prometheus components
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    ul.uk-list
+      li
+        i.uk-icon-hand-o-right
+        a href="#{@prometheus_url}" &nbsp;Prometheus
+      li
+        i.uk-icon-hand-o-right
+        a href="#{@pushgateway_url}" &nbsp;Prometheus PushGateway

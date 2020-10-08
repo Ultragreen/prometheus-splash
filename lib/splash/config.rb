@@ -57,6 +57,7 @@ module Splash
         self[:processes] = (config_from_file[:processes])? config_from_file[:processes] : {}
         self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
         self[:commands] = (config_from_file[:commands])? config_from_file[:commands] : {}
+        self[:sequences] = (config_from_file[:sequences])? config_from_file[:sequences] : {}
 
       end
 
@@ -180,6 +181,11 @@ module Splash
         return self[:processes]
       end
 
+      # getter for sequences Hash Config sample
+      # @return [Hash]
+      def sequences
+        return self[:sequences]
+      end
 
       # getter for author Config sample
       # @return [String]

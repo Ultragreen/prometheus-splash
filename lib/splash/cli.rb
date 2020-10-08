@@ -29,6 +29,8 @@ class CLI < Thor
   include CLISplash
   desc "commands SUBCOMMAND ...ARGS", "Managing commands/batchs supervision & orchestration"
   subcommand "commands", Commands
+  desc "sequences SUBCOMMAND ...ARGS", "Managing Sequences of commands"
+  subcommand "sequences", Sequences
   desc "logs SUBCOMMAND ...ARGS", "Managing Files/Logs supervision"
   subcommand "logs", Logs
   desc "processes SUBCOMMAND ...ARGS", "Managing processes supervision"

@@ -29,7 +29,7 @@ module Splash
         realpid = get_processes pattern: get_config.webadmin_process_name
 
 
-        unless File::exist? config.full_pid_path then
+        unless File::exist? config.webadmin_full_pid_path then
           unless realpid.empty? then
             return {:case => :already_exist, :more => "Splash WebAdmin Process already launched "}
           end

@@ -55,6 +55,8 @@ module Splash
 
 
     require 'splash/commands'
+    require 'splash/sequences'
+
     require 'splash/logs'
     require 'splash/processes'
 

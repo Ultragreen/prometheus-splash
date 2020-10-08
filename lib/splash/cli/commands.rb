@@ -133,7 +133,7 @@ module CLISplash
       log  = get_logger
       if options[:hostname] then
         options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
-        log.info "Remote Splash scheduling command on #{options[:hostname]}:"
+        log.info "Remote Splash treeview command on #{options[:hostname]}:"
         log.info "ctrl+c for interrupt"
         begin
           transport = get_default_client
@@ -169,7 +169,7 @@ module CLISplash
     end
 
 
-    # Thor method : getting the list of avaible commands in splash config
+    # Thor method : getting the list of available commands in splash config
     desc "list", "Show configured commands"
     long_desc <<-LONGDESC
     Show configured commands\n

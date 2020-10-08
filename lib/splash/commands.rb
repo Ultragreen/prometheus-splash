@@ -84,6 +84,8 @@ module Splash
               log.receive "return with exitcode #{exit_code}", session
 
             end
+          rescue Interrupt
+            splash_exit case: :interrupt, more: "Remote command exection"
           end
         else
           log.info "Executing command : '#{@name}' ", session

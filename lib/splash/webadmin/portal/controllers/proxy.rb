@@ -24,7 +24,7 @@ WebAdminApp.get '/proxy/links' do
   else
     @proxy = false
     @pushgateway_url = "http://#{config.prometheus_pushgateway_host}:#{config.prometheus_pushgateway_port}/#{config.prometheus_pushgateway_path}"
-    @prometheus_url = "http://#{config.prometheus_url}"
+    @prometheus_url = "#{config.prometheus_url}"
   end
   slim :proxy, :format => :html
 end

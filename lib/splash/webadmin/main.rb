@@ -11,8 +11,8 @@ class WebAdminApp < Sinatra::Base
   set :port, get_config.webadmin_port
   set :bind, get_config.webadmin_ip
   set :static, :enable
-  set :public_folder, 'lib/splash/webadmin/portal/public'
-  set :views, "lib/splash/webadmin/portal/views"
+  set :public_folder, search_file_in_gem("prometheus-splash", 'lib/splash/webadmin/portal/public')
+  set :views, search_file_in_gem("prometheus-splash", "lib/splash/webadmin/portal/views")
 
   before do
     rehash_config

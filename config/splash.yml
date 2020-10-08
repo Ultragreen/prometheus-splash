@@ -51,7 +51,7 @@
       :host: "localhost"
       :port: 9091
       :path: ''
-    :url: "http://localhost:9090/"
+    :url: 'http://localhost:9090/'
   :webadmin:
     :port: 9234
     :ip: 127.0.0.1
@@ -125,8 +125,19 @@
       :pattern: ERROR
 
 
-### configuration of monitored processes
-  :processes:
-    - :process: cron
-      :patterns:
-        - cron
+###
+## configuration of executions sequences
+  :sequences:
+    :sample_remote_sequence:
+      :step1:
+        :command: :echo2
+        :on_host: omicron
+      :step2:
+        :command: :echo3
+    :sample_local_sequence:
+      :continue: false
+      :step1:
+        :command: :echo2
+      :step2:
+        :command: :echo3
+###

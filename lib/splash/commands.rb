@@ -26,7 +26,7 @@ module Splash
       # @param [String] name the name of the command
       def initialize(name)
         @config  = get_config
-        @url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}/#{@config.prometheus_pushgateway_path}"
+        @url = @config.prometheus_pushgateway_url
         @name = name
         unless @config.commands.keys.include? @name.to_sym then
           splash_exit case: :not_found, more: "command #{@name} is not defined in configuration"
@@ -44,7 +44,7 @@ module Splash
       # @param [String] time execution time numeric.to_s
       # @return [Hash] Exiter case :quiet_exit
       def notify(value,time)
-        unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
+        unless verify_service url: @config.prometheus_pushgateway_url then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
         end
         @@metric_exitcode.set(value)
@@ -138,7 +138,6 @@ module Splash
             log.item "Without Prometheus notification", session
           end
         end
-
         if options[:callback] then
           on_failure = (@config.commands[@name.to_sym][:on_failure])? @config.commands[@name.to_sym][:on_failure] : false
           on_success = (@config.commands[@name.to_sym][:on_success])? @config.commands[@name.to_sym][:on_success] : false

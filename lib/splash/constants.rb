@@ -13,6 +13,8 @@ module Splash
     CONFIG_FILE = "/etc/splash.yml"
     # the default execution trace_path if backend file
     TRACE_PATH="/var/run/splash"
+    # the default pid file path
+    PID_PATH="/var/run"
 
 
     # default scheduling criteria for log monitoring
@@ -24,8 +26,6 @@ module Splash
 
     # the display name of daemon in proc info (ps/top)
     DAEMON_PROCESS_NAME="Splash : daemon."
-    # the default pid file path
-    DAEMON_PID_PATH="/var/run"
     # the default pid file name
     DAEMON_PID_FILE="splash.pid"
     # the default sdtout trace file
@@ -42,15 +42,11 @@ module Splash
     # type of licence
     LICENSE="BSD-2-Clause"
 
-    # the default prometheus pushgateway host
-    PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
-    # the default prometheus pushgateway port
-    PROMETHEUS_PUSHGATEWAY_PORT = "9091"
-    # the default prometheus pushgateway port
-    PROMETHEUS_PUSHGATEWAY_PATH = ''
+    # the default prometheus pushgateway URL
+    PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9090/'
 
     # the default prometheus URL
-    PROMETHEUS_URL = "http://localhost:9090"
+    PROMETHEUS_URL = "http://localhost:9090/"
 
     # the default path fo execution report template
     EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"

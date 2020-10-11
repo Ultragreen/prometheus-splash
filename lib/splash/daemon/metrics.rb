@@ -76,7 +76,7 @@ module Splash
         def notify
           log = get_logger
           session  = get_session
-          unless verify_service host: @config.prometheus_pushgateway_host ,port: @config.prometheus_pushgateway_port then
+          unless verify_service url: @config.prometheus_pushgateway_url then
             return  { :case => :service_dependence_missing, :more => "Prometheus Notification not send." }
           end
 
@@ -87,7 +87,7 @@ module Splash
           @metric_processes_monitoring.set monitoring_processes_count
 
           hostname = Socket.gethostname
-          url = "http://#{@config.prometheus_pushgateway_host}:#{@config.prometheus_pushgateway_port}/#{@config.prometheus_pushgateway_path}"
+          url = @config.prometheus_pushgateway_url
           Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
           log.debug "Sending to Prometheus PushGateway done.", session
           return {:case => :quiet_exit }

@@ -1,9 +1,7 @@
 
 
 WebAdminApp.use Rack::ReverseProxy do
-  config = get_config
-  url = "http://#{config.prometheus_pushgateway_host}:#{config.prometheus_pushgateway_port}/#{config.prometheus_pushgateway_path}"
-  reverse_proxy /^\/pushgateway\/?(.*)$/, url
+  reverse_proxy /^\/pushgateway\/?(.*)$/, get_config.prometheus_pushgateway_url
   reverse_proxy_options preserve_host: true
 end
 
@@ -23,7 +21,7 @@ WebAdminApp.get '/proxy/links' do
     @prometheus_url = "http://#{config.webadmin_ip}:#{config.webadmin_port}/prometheus"
   else
     @proxy = false
-    @pushgateway_url = "http://#{config.prometheus_pushgateway_host}:#{config.prometheus_pushgateway_port}/#{config.prometheus_pushgateway_path}"
+    @pushgateway_url = "#{config.prometheus_pushgateway_url}"
     @prometheus_url = "#{config.prometheus_url}"
   end
   slim :proxy, :format => :html

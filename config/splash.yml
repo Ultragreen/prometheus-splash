@@ -47,10 +47,7 @@
       :stderr_trace: stderr.txt
       :pid_file: splash.pid
   :prometheus:
-    :pushgateway:
-      :host: "localhost"
-      :port: 9091
-      :path: ''
+    :pushgateway: 'http://localhost:9091/'
     :url: 'http://localhost:9090/'
   :webadmin:
     :port: 9234
@@ -63,7 +60,7 @@
       :pid_file: splash_webadmin.pid
 
 
-### configuration of commands and scheduling
+### Sample configuration of commands and scheduling
   :commands:
     :id_root:
       :desc: run id command on root
@@ -115,7 +112,7 @@
       :on_success: :echo3
 
 
-### configuration of monitored logs
+### Sample configuration of monitored logs
   :logs:
     - :label: :log_app_1
       :log: /tmp/test
@@ -124,20 +121,58 @@
       :log: /tmp/test2
       :pattern: ERROR
 
+### configuration of monitored processes
+  :processes:
+    - :process: cron
+      :patterns:
+        - cron
+
 
 ###
-## configuration of executions sequences
+## Sample configuration of executions sequences
   :sequences:
     :sample_remote_sequence:
-      :step1:
-        :command: :echo2
-        :on_host: omicron
-      :step2:
-        :command: :echo3
+      :definition:
+        - :step: execute echo2 on omicron
+          :command: :echo2
+          :on_host: omicron
+        - :step: run locally echo3
+          :command: :echo3
+          :trace: false
     :sample_local_sequence:
-      :continue: false
-      :step1:
-        :command: :echo2
-      :step2:
-        :command: :echo3
+      :definition:
+        - :step: run locally pwd without callback
+          :command: :pwd
+          :callback: false
+        - :step: run locally echo3 without Prometheus notifications
+          :command: :echo3
+          :notify: false
+    :sample_local_failed_sequence:
+      :options:
+        :continue: false
+      :definition:
+        - :step: run false_test locally without callback
+          :command: :false_test
+          :callback: false
+        - :step: considere this as inefective
+          :command: :echo3
+    :sample_local_full_sequence:
+      :options:
+        :continue: true
+      :definition:
+        - :step: run false_test locally without callback
+          :command: :false_test
+          :callback: false
+          :trace: false
+        - :step: considere this as inefective
+          :command: :pwd
+    :sample_scheduled_sequence:
+      :schedule:
+        :every: 1m
+      :options:
+        :continue: true
+      :definition:
+        - :step: exec echo3
+          :command: :echo3
+
 ###

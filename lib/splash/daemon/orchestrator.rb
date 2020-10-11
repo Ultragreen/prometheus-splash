@@ -21,6 +21,7 @@ module Splash
         include Splash::Logs
         include Splash::Processes
         include Splash::Commands
+        include Splash::Sequences
 
         # Constructor prepare the Scheduler
         # commands Schedules
@@ -42,6 +43,7 @@ module Splash
           if options[:scheduling] then
             @log.item "Initializing commands Scheduling."
             init_commands_scheduling
+            init_sequences_scheduling
           end
 
           if @config.logs.empty? then
@@ -140,6 +142,25 @@ module Splash
 
         end
 
+
+        # prepare sequences Scheduling
+        def init_sequences_scheduling
+          config = get_config.sequences
+          sequences = config.select{|key,value| value.include? :schedule}.keys
+          sequences.each do |sequence|
+            sched,value = config[sequence][:schedule].flatten
+            @log.arrow "Scheduling sequence #{sequence.to_s}"
+            @server.send sched,value do
+              session  = get_session
+              @log.trigger "Executing Scheduled sequence #{sequence.to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
+              run_seq name: sequence.to_s, session: session
+            end
+          end
+
+        end
+
+
+
         # execute_command verb : execute command specified in payload
         # @param [Hash] options
         # @option options [Symbol] :command the name of the command
@@ -147,7 +168,7 @@ module Splash
         # @return [Hash] Exiter case
         def execute(options)
           command =  CommandWrapper::new(options[:command])
-          if options[:ack] then 
+          if options[:ack] then
           else
             @metric_manager.inc_execution
             return command.call_and_notify trace: true, notify: true, callback: true, session: options[:session]

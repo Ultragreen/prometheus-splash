@@ -23,10 +23,8 @@ module Splash
         self[:copyright] = "#{COPYRIGHT} #{LICENSE}"
 
         self[:prometheus_url] = (config_from_file[:prometheus][:url])? config_from_file[:prometheus][:url] : PROMETHEUS_URL
+        self[:prometheus_pushgateway_url] = (config_from_file[:prometheus][:pushgateway])? config_from_file[:prometheus][:pushgateway] : PROMETHEUS_PUSHGATEWAY_URL
 
-        self[:prometheus_pushgateway_path] = (config_from_file[:prometheus][:pushgateway][:path])? config_from_file[:prometheus][:pushgateway][:path] : PROMETHEUS_PUSHGATEWAY_PATH
-        self[:prometheus_pushgateway_host] = (config_from_file[:prometheus][:pushgateway][:host])? config_from_file[:prometheus][:pushgateway][:host] : PROMETHEUS_PUSHGATEWAY_HOST
-        self[:prometheus_pushgateway_port] = (config_from_file[:prometheus][:pushgateway][:port])? config_from_file[:prometheus][:pushgateway][:port] : PROMETHEUS_PUSHGATEWAY_PORT
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_logmon_scheduling] = (config_from_file[:daemon][:logmon_scheduling])? config_from_file[:daemon][:logmon_scheduling] : DAEMON_LOGMON_SCHEDULING
         self[:daemon_metrics_scheduling] = (config_from_file[:daemon][:metrics_scheduling])? config_from_file[:daemon][:metrics_scheduling] : DAEMON_METRICS_SCHEDULING
@@ -42,10 +40,12 @@ module Splash
         self[:webadmin_stderr_trace] = (config_from_file[:webadmin][:files][:stderr_trace])? config_from_file[:webadmin][:files][:stderr_trace] : WEBADMIN_STDERR_TRACE
 
 
+        self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
+        self[:trace_path] = (config_from_file[:daemon][:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
+
+
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST
         self[:execution_template_path] = (config_from_file[:templates][:execution][:path])? config_from_file[:templates][:execution][:path] : EXECUTION_TEMPLATE
-        self[:pid_path] = (config_from_file[:daemon][:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : DAEMON_PID_PATH
-        self[:trace_path] = (config_from_file[:daemon][:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
         self[:pid_file] = (config_from_file[:daemon][:files][:pid_file])? config_from_file[:daemon][:files][:pid_file] : DAEMON_PID_FILE
         self[:stdout_trace] = (config_from_file[:daemon][:files][:stdout_trace])? config_from_file[:daemon][:files][:stdout_trace] : DAEMON_STDOUT_TRACE
         self[:stderr_trace] = (config_from_file[:daemon][:files][:stderr_trace])? config_from_file[:daemon][:files][:stderr_trace] : DAEMON_STDERR_TRACE
@@ -208,28 +208,11 @@ module Splash
 
 
 
-      # getter for daemon_process_name Config sample
-      # @return [String]
-      def daemon_process_name
-        return self[:daemon_process_name]
-      end
 
-      # getter for prometheus_pushgateway_host Config sample
+      # getter for prometheus_pushgateway_url Config sample
       # @return [String]
-      def prometheus_pushgateway_host
-        return self[:prometheus_pushgateway_host]
-      end
-
-      # getter for prometheus_pushgateway_port Config sample
-      # @return [String]
-      def prometheus_pushgateway_port
-        return self[:prometheus_pushgateway_port]
-      end
-
-      # getter for prometheus_pushgateway_path Config sample
-      # @return [String]
-      def prometheus_pushgateway_path
-        return self[:prometheus_pushgateway_path]
+      def prometheus_pushgateway_url
+        return self[:prometheus_pushgateway_url]
       end
 
       # getter for prometheus_url Config sample
@@ -238,21 +221,29 @@ module Splash
         return self[:prometheus_url]
       end
 
-      # getter for full_pid_path Config sample
+
+      # getter for daemon_process_name Config sample
       # @return [String]
-      def full_pid_path
+      def daemon_process_name
+        return self[:daemon_process_name]
+      end
+
+
+      # getter for daemon_full_pid_path Config sample
+      # @return [String]
+      def daemon_full_pid_path
         return "#{self[:pid_path]}/#{self[:pid_file]}"
       end
 
-      # getter for full_stdout_trace_path Config sample
+      # getter for daemon_full_stdout_trace_path Config sample
       # @return [String]
-      def full_stdout_trace_path
+      def daemon_full_stdout_trace_path
         return "#{self[:trace_path]}/#{self[:stdout_trace]}"
       end
 
-      # getter for full_stderr_trace_path Config sample
+      # getter for daemon_full_stderr_trace_path Config sample
       # @return [String]
-      def full_stderr_trace_path
+      def daemon_full_stderr_trace_path
         return "#{self[:trace_path]}/#{self[:stderr_trace]}"
       end
 

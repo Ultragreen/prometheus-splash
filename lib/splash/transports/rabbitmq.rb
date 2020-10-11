@@ -100,7 +100,6 @@ module Splash
           condition = ConditionVariable.new
           get_default_subscriber(queue: queue).subscribe do |delivery_info, properties, payload|
             res = YAML::load(payload)
-
             lock.synchronize { condition.signal }
           end
           get_logger.send "Verb : #{order[:verb].to_s} to queue : #{order[:queue]}."

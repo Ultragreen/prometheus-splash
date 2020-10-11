@@ -13,6 +13,7 @@ module Splash
     require 'etc'
     require 'forwardable'
     require 'json'
+    require 'uri'
 
 
 

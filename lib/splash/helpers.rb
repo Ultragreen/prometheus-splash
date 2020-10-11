@@ -310,11 +310,20 @@ module Splash
     # @param [Hash] options
     # @option options [String] :host hostname
     # @option options [String] :port TCP port
+    # @option options [String] :url full URL, priority on :host and :port
     def verify_service(options ={})
       begin
+        if options[:url] then
+          uri = URI.parse(options[:url])
+          host = uri.host
+          port = uri.port
+        else
+          host = options[:host]
+          port = options[:port]
+        end
         Timeout::timeout(1) do
           begin
-            s = TCPSocket.new(options[:host], options[:port])
+            s = TCPSocket.new(host, port)
             s.close
             return true
           rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH

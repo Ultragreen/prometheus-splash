@@ -50,7 +50,7 @@ module Splash
       end
 
       target = "Prometheus PushGateway Service running"
-      if verify_service host: config.prometheus_pushgateway_host ,port: config.prometheus_pushgateway_port then
+      if verify_service url: config.prometheus_pushgateway_url then
         log.ok target
       else
         log.ko target

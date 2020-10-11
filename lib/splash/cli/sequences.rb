@@ -19,8 +19,38 @@ module CLISplash
     LONGDESC
     desc "execute", "Execute a sequence"
     def execute(sequence)
-      options[:sequence] = sequence
+      options[:name] = sequence
       acase = run_as_root :run_seq, options
+      splash_exit acase
+    end
+
+
+    # Thor method : show sequence
+    long_desc <<-LONGDESC
+    Show a commands Sequence\n
+    LONGDESC
+    desc "show", "Show a sequence"
+    def show(sequence)
+      options = {}
+      log = get_logger
+      options[:name] = sequence
+      acase = run_as_root :show_seq, options
+      unless acase[:data].nil? then
+        dseq = acase[:data]
+        log.item sequence
+        unless dseq[:options].nil? then
+          log.arrow "Options : "
+          log.flat  "    * continue on failure : #{dseq[:options][:continue]}" unless dseq[:options][:continue].nil?
+        end
+        log.arrow "Definition :"
+        dseq[:definition].each do |step|
+          log.flat "    * Step name : #{step[:step]}"
+          log.flat "      => Splash Command to execute : #{step[:command]}"
+          log.flat "      => Execute remote on host : #{step[:on_host]}" unless step[:on_host].nil?
+          log.flat "      => Follow Callback : #{step[:callback]}" unless step[:callback].nil?
+          log.flat "      => Prometheus notification : #{step[:notification]}" unless step[:notification].nil?
+        end
+      end
       splash_exit acase
     end
 
@@ -34,6 +64,28 @@ module CLISplash
     option :detail, :type => :boolean,  :aliases => "-D"
     def list
       acase = run_as_root :list_seq, options
+      log = get_logger
+      unless acase[:data].nil?
+        log.info "Splash configured sequences"
+        acase[:data].keys.each do |seq|
+          log.item seq
+          if options[:detail] then
+            dseq = acase[:data][seq]
+            unless dseq[:options].nil? then
+              log.arrow "Options : "
+              log.flat  "    * continue on failure : #{dseq[:options][:continue]}" unless dseq[:options][:continue].nil?
+            end
+            log.arrow "Definition :"
+            dseq[:definition].each do |step|
+              log.flat "    * Step name : #{step[:step]}"
+              log.flat "      => Splash Command to execute : #{step[:command]}"
+              log.flat "      => Execute remote on host : #{step[:on_host]}" unless step[:on_host].nil?
+              log.flat "      => Follow Callback : #{step[:callback]}" unless step[:callback].nil?
+              log.flat "      => Prometheus notification : #{step[:notification]}" unless step[:notification].nil?
+            end
+          end
+        end
+      end
       splash_exit acase
     end
 

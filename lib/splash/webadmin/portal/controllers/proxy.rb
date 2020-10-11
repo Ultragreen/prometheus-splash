@@ -12,7 +12,7 @@ WebAdminApp.use Rack::ReverseProxy do
 end
 
 WebAdminApp.get '/proxy/links' do
-  get_menu 4
+  get_menu 5
 
   config = get_config
   if config.webadmin_proxy == true then

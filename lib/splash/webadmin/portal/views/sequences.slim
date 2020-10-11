@@ -1,0 +1,28 @@
+h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Sequences configured in Splash
+
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    span.uk-text-large.uk-text-bold List of sequences availables
+    br
+
+    div.uk-accordion(data-uk-accordion)
+      - @data.each do |sequence,content|
+        h3.uk-accordion-title <b>Name</b> : #{sequence}
+        div.uk-accordion-content
+          table.uk-table.uk-table-hover.uk-table-striped
+            thead
+              tr
+                th Options
+                th Definition
+                th Actions
+            tbody
+              tr
+                td
+                  dl.uk-description-list-horizontal
+
+                    - if content[:options]
+                      - if content[:options][continue]
+                        dt <i class="uk-icon-check-square-o"></i>&nbsp;Continue exection on error :
+                        dd #{content[:options][continue]}
+                td
+                td

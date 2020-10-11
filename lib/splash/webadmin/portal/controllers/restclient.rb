@@ -1,5 +1,5 @@
 WebAdminApp.get '/restclient' do
-  get_menu 3
+  get_menu 4
   slim :restclient,  :format => :html
 end
 

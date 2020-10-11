@@ -24,6 +24,7 @@ module Splash
 
         self[:prometheus_url] = (config_from_file[:prometheus][:url])? config_from_file[:prometheus][:url] : PROMETHEUS_URL
         self[:prometheus_pushgateway_url] = (config_from_file[:prometheus][:pushgateway])? config_from_file[:prometheus][:pushgateway] : PROMETHEUS_PUSHGATEWAY_URL
+        self[:prometheus_alertmanager_url] = (config_from_file[:prometheus][:alertmanager])? config_from_file[:prometheus][:alertmanager] : PROMETHEUS_ALERTMANAGER_URL
 
         self[:daemon_process_name] = (config_from_file[:daemon][:process_name])? config_from_file[:daemon][:process_name] : DAEMON_PROCESS_NAME
         self[:daemon_logmon_scheduling] = (config_from_file[:daemon][:logmon_scheduling])? config_from_file[:daemon][:logmon_scheduling] : DAEMON_LOGMON_SCHEDULING
@@ -214,6 +215,13 @@ module Splash
       def prometheus_pushgateway_url
         return self[:prometheus_pushgateway_url]
       end
+
+      # getter for prometheus_alertmanager_url Config sample
+      # @return [String]
+      def prometheus_alertmanager_url
+        return self[:prometheus_alertmanager_url]
+      end
+
 
       # getter for prometheus_url Config sample
       # @return [String]

@@ -43,7 +43,10 @@ module Splash
     LICENSE="BSD-2-Clause"
 
     # the default prometheus pushgateway URL
-    PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9090/'
+    PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9091/'
+
+    # the default prometheus Alertmanager URL
+    PROMETHEUS_ALERTMANAGER_URL = 'http://localhost:9092/'
 
     # the default prometheus URL
     PROMETHEUS_URL = "http://localhost:9090/"

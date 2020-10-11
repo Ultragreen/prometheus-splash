@@ -104,6 +104,8 @@ module CLISplash
     def schedule(sequence)
       options[:sequence] = sequence
       acase = run_as_root :schedule_seq, options
+      log = get_logger
+      log.info "Feature in development"
       splash_exit acase
     end
 

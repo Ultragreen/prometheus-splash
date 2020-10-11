@@ -21,8 +21,30 @@ div.uk-width-medium-1-1
                   dl.uk-description-list-horizontal
 
                     - if content[:options]
-                      - if content[:options][continue]
-                        dt <i class="uk-icon-check-square-o"></i>&nbsp;Continue exection on error :
-                        dd #{content[:options][continue]}
+                      - if content[:options][:continue]
+                        ul
+                          li <i class="uk-icon-check-square-o"></i>&nbsp;<b>Continue execution on error</b> : #{content[:options][:continue]}
+                    - if content[:schedule]
+                      ul
+                        li <i class="uk-icon-calendar"></i>&nbsp;<b>Scheduling</b> :
+                          <ul>
+                            <li> <b><i>Type</b></i> : #{content[:schedule].keys.first}</li>
+                            <li> <b><i>Value</b></i> : #{content[:schedule].values.first}</li>
+                          </ul>
                 td
+                  dl.uk-description-list-horizontal
+                    - content[:definition].each_with_index do |step,i|
+                      dt <i class="uk-icon-check-square-o"></i>&nbsp;Step #{i+1} :
+                      dd #{step[:step]}
+                      ul
+                        li <i class="uk-icon-cog"></i>&nbsp;<b>Command</b> : #{step[:command]}
+                        - if step[:on_host]
+                          li <i class="uk-icon-chevron-circle-right"></i>&nbsp;<b>Remote execution target</b> : #{step[:on_host]}
+                        - if not step[:callback].nil?
+                          li <i class="uk-icon-share-square-o"></i>&nbsp;<b>Execute Callback</b> : #{step[:callback]}
+                        - if not step[:trace].nil?
+                          li <i class="uk-icon-pencil-square-o"></i>&nbsp;<b>Trace Execution</b> : #{step[:trace]}
+                        - if not step[:notify].nil?
+                          li <i class="uk-icon-external-link"></i>&nbsp;<b>Notify Execution in Prometheus</b> : #{step[:notify]}
+
                 td

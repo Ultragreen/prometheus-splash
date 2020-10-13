@@ -43,6 +43,7 @@ class CLI < Thor
   subcommand "documentation", Documentation
   desc "webadmin SUBCOMMAND ...ARGS", "Splash Webadmin daemon controller"
   subcommand "webadmin", WebAdmin
-
+  desc "transferts SUBCOMMAND ...ARGS", "Managing transferts"
+  subcommand "tranferts", Transferts
 
 end

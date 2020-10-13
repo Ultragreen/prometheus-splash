@@ -176,4 +176,28 @@
         - :step: exec echo3
           :command: :echo3
 
+### Transferts
+  :transferts:
+    :config:
+      :cache: /tmp/cache
+    :definitions:
+      - :name: tranfert_text
+        :desc: "List of text files"
+        :pattern: '*.txt'
+        :backup: true
+        :type: :push
+        :local:
+          :path: /tmp/transferts
+          :user: root
+        :remote:
+          :user: root
+          :host: localhost
+          :path: /tmp/
+        :post:
+          :remote_command: 'ls'
+
+
+
+
+
 ###

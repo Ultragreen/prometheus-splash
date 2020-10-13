@@ -17,8 +17,13 @@ module Splash
 
 
 
+
+
     # Rubygems
     begin
+      require 'net/ssh'
+      require 'net/scp'
+      require 'tty-prompt'
       require 'prometheus/client'
       require 'prometheus/client/push'
       require 'thor'
@@ -57,9 +62,9 @@ module Splash
 
     require 'splash/commands'
     require 'splash/sequences'
-
     require 'splash/logs'
     require 'splash/processes'
+    require 'splash/transferts'
 
     require 'splash/daemon'
     require 'splash/webadmin'

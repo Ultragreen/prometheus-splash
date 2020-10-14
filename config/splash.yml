@@ -51,9 +51,9 @@
       :stderr_trace: stderr.txt
       :pid_file: splash.pid
   :prometheus:
-    :pushgateway: 'http://localhost:9091/'
-    :url: 'http://localhost:9090/'
-    :alertmanager: 'http://localhost:9093/'
+    :pushgateway: 'http://localhost:9091'
+    :url: 'http://localhost:9090'
+    :alertmanager: 'http://localhost:9093'
   :webadmin:
     :port: 9234
     :ip: 127.0.0.1

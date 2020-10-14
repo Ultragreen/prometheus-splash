@@ -10,6 +10,43 @@ module Splash
     include Splash::Loggers
     include Splash::Helpers
 
+
+
+    class TxNotifier
+      @@registry = Prometheus::Client::Registry::new
+      @@metric_nbfiles = Prometheus::Client::Gauge.new(:txnbfiles, docstring: 'SPLASH metric transfer number of files')
+      @@metric_nbfiles_failed = Prometheus::Client::Gauge.new(:txnbfilesfailed, docstring: 'SPLASH metric transfer number of failed files')
+      @@metric_time = Prometheus::Client::Gauge.new(:txtime, docstring: 'SPLASH metric transfer execution time')
+      @@registry.register(@@metric_nbfiles)
+      @@registry.register(@@metric_nbfiles_failed)
+      @@registry.register(@@metric_time)
+
+      def initialize(options={})
+        @config = get_config
+        @url = @config.prometheus_pushgateway_url
+        @name = "tx_#{options[:name].to_s}"
+        @nbfiles = options[:nbfiles]
+        @nbfiles_failed = options[:nbfiles_failed]
+        @time = options[:time]
+      end
+
+      # send metrics to Prometheus PushGateway                                                                          
+      # @return [Bool] 
+      def notify
+	unless verify_service url: @url then
+          return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
+        end
+        @@metric_nbfiles.set(@nbfiles)
+        @@metric_nbfiles_failed.set(@nbfiles_failed)
+        @@metric_time.set(@time)
+        hostname = Socket.gethostname
+        return Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+      end
+      
+    end
+
+
+    
     class TxRecords
       include Splash::Backends
       def initialize(name)
@@ -160,6 +197,7 @@ module Splash
             FileUtils::unlink(f)
           end
         end
+
       rescue
         res = false
       end
@@ -173,6 +211,13 @@ module Splash
                        :count => count,
                        :wanted => list,
                        :done => done
+      count_failed = list.count - done.count
+      txmonitor = TxNotifier::new({name: record[:name], nbfiles: count,nbfiles_failed: count_failed, time: time})
+      if txmonitor.notify then
+        log.ok "Sending metrics to Prometheus Pushgateway"
+      else
+        log.ko "Failed to send metrics to Prometheus Pushgateway"
+      end
       return res 
     end
   end

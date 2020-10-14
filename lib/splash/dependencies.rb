@@ -23,7 +23,6 @@ module Splash
     begin
       require 'net/ssh'
       require 'net/scp'
-      require 'tty-prompt'
       require 'prometheus/client'
       require 'prometheus/client/push'
       require 'thor'

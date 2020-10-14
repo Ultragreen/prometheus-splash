@@ -23,6 +23,10 @@
 #        :port: 6379
 #        #:auth: "mykey"
 #        :base: 1
+      :transferts_trace:
+          :type: :file
+          :path: /var/run/splash/tranferts
+
   :transports:
     :active: :rabbitmq
     :rabbitmq:
@@ -178,23 +182,20 @@
 
 ### Transferts
   :transferts:
-    :config:
-      :cache: /tmp/cache
-    :definitions:
-      - :name: tranfert_text
-        :desc: "List of text files"
-        :pattern: '*.txt'
-        :backup: true
-        :type: :push
-        :local:
-          :path: /tmp/transferts
-          :user: root
-        :remote:
-          :user: root
-          :host: localhost
-          :path: /tmp/
-        :post:
-          :remote_command: 'ls'
+    - :name: :transfert_text
+      :desc: "List of text files"
+      :pattern: '*.txt'
+      :backup: true
+      :type: :push
+      :local:
+        :path: /tmp/transferts
+        :user: root
+      :remote:
+        :user: root
+        :host: localhost
+        :path: /tmp/
+      :post:
+        :remote_command: 'ls'
 
 
 

@@ -252,7 +252,7 @@ module Splash
     # check folder
     # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :path folder path (relative or absolute)
+    # @option options [String] :name folder path (relative or absolute)
     # @option options [String] :mode String for OCTAL rights like "644", optionnal
     # @option options [String] :owner file owner for folder, optionnal
     # @option options [String] :group  file group for folder, optionnal
@@ -335,7 +335,6 @@ module Splash
       end
     end
     #!@endgroup
-
 
     def format_response(data, format)
       response = case format

@@ -25,7 +25,7 @@
 #        :base: 1
       :transferts_trace:
           :type: :file
-          :path: /var/run/splash/tranferts
+          :path: /var/run/splash/transferts
 
   :transports:
     :active: :rabbitmq
@@ -187,6 +187,8 @@
       :pattern: '*.txt'
       :backup: true
       :type: :push
+      :retention:
+	:hours: 1
       :local:
         :path: /tmp/transferts
         :user: root

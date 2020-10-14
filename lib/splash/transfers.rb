@@ -17,6 +17,22 @@ module Splash
         @backend = get_backend :transferts_trace
       end
 
+      def purge(retention)
+        if retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
+        elsif retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:days].to_i
+        else
+          retention = TRANSFER_DEFAULT_RETENTION
+        end
+
+        data = get_all_records
+
+        data.delete_if { |item,value|
+          DateTime.parse(item) <= (adjusted_datetime) and value[:status] != :prepared} 
+        @backend.put key: @name, value: data.to_yaml
+      end
+      
       def add_record(record)
         data = get_all_records
         data[DateTime.now.to_s] = record
@@ -43,6 +59,7 @@ module Splash
       count=0
       get_config.transfers.each do |record|
         txrec =  TxRecords::new record[:name]
+        txrec.purge(record[:retention])
         log.item "Execute : #{record[:name]},  #{record[:desc]}"        
         case txrec.check_prepared
         when :prepared

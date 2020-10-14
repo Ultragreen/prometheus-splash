@@ -72,30 +72,27 @@ module CLISplash
     def list
       log = get_logger
       log.info "Splash configured transfert :"
-      tx_record_set = get_config.logs
+      tx_record_set = get_config.transferts
       log.ko 'No configured transferts found' if tx_record_set.empty?
       tx_record_set.each do |record|
         log.item "Transfert : #{record[:name]} Description : #{record[:desc]}"
         if options[:detail] then
-          log.item "Type : #{record[:type].to_s}"
-          log.item "Backup file after copy : #{record[:backup].to_s}"
-          log.item "Local spool"
-          log.arrow "Path : #{record[:local][:path]}"
-          log.arrow "User : #{record[:local][:user]}"
-          log.item "Remote spool"
-          log.arrow "Path : #{record[:remote][:path]}"
-          log.arrow "User : #{record[:remote][:user]}"
-          log.arrow "Host : #{record[:remote][:host]}"
-          log.item "Post execution"
-          log.arrow "Remote command : #{record[:post][:remote_command]}" unless record[:post][:remote_command].nil?
-          log.arrow "Local command : #{record[:post][:local_command]}" unless record[:post][:local_command].nil?
+          log.arrow "Type : #{record[:type].to_s}"
+          log.arrow "Backup file after copy : #{record[:backup].to_s}"
+          log.arrow "Local spool"
+          log.flat "   * Path : #{record[:local][:path]}"
+          log.flat "   * User : #{record[:local][:user]}"
+          log.arrow "Remote spool"
+          log.flat "   * Path : #{record[:remote][:path]}"
+          log.flat "   * User : #{record[:remote][:user]}"
+          log.flat "   * Host : #{record[:remote][:host]}"
+          log.arrow "Post execution"
+          log.flat "   * Remote command : #{record[:post][:remote_command]}" unless record[:post][:remote_command].nil?
+          log.flat "   * Local command : #{record[:post][:local_command]}" unless record[:post][:local_command].nil?
         end
       end
       splash_exit case: :quiet_exit
     end
-
-  end
-
 
   end
 

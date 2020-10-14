@@ -3,21 +3,21 @@
 # module for all Thor subcommands
 module CLISplash
 
-  # Thor inherited class for transferts management
-  class Transferts < Thor
-    include Splash::Transferts
+  # Thor inherited class for transfers management
+  class Transfers < Thor
+    include Splash::Transfers
     include Splash::Helpers
     include Splash::Exiter
     include Splash::Loggers
 
 
 
-    # Thor method : running tranferts prepare
+    # Thor method : running transfer prepare
     long_desc <<-LONGDESC
-    Prepare tranferts with RSA Public key\n
+    Prepare transfer with RSA Public key for NAME\n
     Warning : interactive command only (prompt for passwd)
     LONGDESC
-    desc "prepare", "Prepare tranferts with RSA Public key"
+    desc "prepare", "Prepare transfers with RSA Public key"
     def prepare(name)
       acase = run_as_root :prepare_tx, name
       splash_exit acase
@@ -25,24 +25,24 @@ module CLISplash
 
     # Thor method : Execute all tranferts
     long_desc <<-LONGDESC
-    Execute all tranferts\n
+    Execute all transfers\n
     Warning : interactive command only (prompt for passwd)
     LONGDESC
-    desc "full_execute", "Execute all tranferts"
+    desc "full_execute", "Execute all transfers"
     def full_execute
       acase = run_as_root :run_txs
       splash_exit acase
     end
 
 
-    # Thor method : display a specific Splash configured transfert
-    desc "show LOG", "show Splash configured transfert TRANSFERT"
-    def show(transfert)
+    # Thor method : display a specific Splash configured transfer
+    desc "show LOG", "show Splash configured transfer TRANSFER"
+    def show(transfer)
       log = get_logger
-      transfert_record_set = get_config.tansferts.select{|item| item[:name] == transfert.to_sym }
-      unless transfert_record_set.empty? then
-        record = transfert_record_set.first
-        log.info "Splash transfert : #{record[:name]}"
+      transfer_record_set = get_config.transfers.select{|item| item[:name] == transfer.to_sym }
+      unless transfer_record_set.empty? then
+        record = transfer_record_set.first
+        log.info "Splash transfer : #{record[:name]}"
         log.item "Description : /#{record[:desc]}/"
         log.item "Type : #{record[:type].to_s}"
         log.item "Backup file after copy : #{record[:backup].to_s}"
@@ -62,20 +62,20 @@ module CLISplash
       end
     end
 
-    # Thor method : display the full list of Splash configured transferts
-    desc "list", "List all Splash configured tranferts"
+    # Thor method : display the full list of Splash configured transfers
+    desc "list", "List all Splash configured transfers"
     long_desc <<-LONGDESC
-    Show configured tranferts\n
-    with --detail, show transferts details
+    Show configured transfers\n
+    with --detail, show transfers details
     LONGDESC
     option :detail, :type => :boolean,  :aliases => "-D"
     def list
       log = get_logger
-      log.info "Splash configured transfert :"
-      tx_record_set = get_config.transferts
-      log.ko 'No configured transferts found' if tx_record_set.empty?
+      log.info "Splash configured transfer :"
+      tx_record_set = get_config.transfers
+      log.ko 'No configured transfers found' if tx_record_set.empty?
       tx_record_set.each do |record|
-        log.item "Transfert : #{record[:name]} Description : #{record[:desc]}"
+        log.item "Transfer : #{record[:name]} Description : #{record[:desc]}"
         if options[:detail] then
           log.arrow "Type : #{record[:type].to_s}"
           log.arrow "Backup file after copy : #{record[:backup].to_s}"

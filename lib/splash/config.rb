@@ -59,7 +59,7 @@ module Splash
         self[:logs] = (config_from_file[:logs])? config_from_file[:logs] : {}
         self[:commands] = (config_from_file[:commands])? config_from_file[:commands] : {}
         self[:sequences] = (config_from_file[:sequences])? config_from_file[:sequences] : {}
-        self[:transferts] = (config_from_file[:transferts])? config_from_file[:transferts] : {}
+        self[:transfers] = (config_from_file[:transfers])? config_from_file[:transfers] : {}
 
       end
 
@@ -89,10 +89,10 @@ module Splash
         return self[:transports]
       end
 
-      # getter for transferts Hash Config sample
+      # getter for transfers Hash Config sample
       # @return [Hash]
-      def transferts
-        return self[:transferts]
+      def transfers
+        return self[:transfers]
       end
 
       # getter for daemon_logmon_scheduling Hash Config sample

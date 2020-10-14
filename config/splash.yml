@@ -180,9 +180,9 @@
         - :step: exec echo3
           :command: :echo3
 
-### Transferts
-  :transferts:
-    - :name: :transfert_text
+### Transfers
+  :transfers:
+    - :name: :transfer_text
       :desc: "List of text files"
       :pattern: '*.txt'
       :backup: true

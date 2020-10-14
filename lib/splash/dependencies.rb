@@ -63,7 +63,7 @@ module Splash
     require 'splash/sequences'
     require 'splash/logs'
     require 'splash/processes'
-    require 'splash/transferts'
+    require 'splash/transfers'
 
     require 'splash/daemon'
     require 'splash/webadmin'

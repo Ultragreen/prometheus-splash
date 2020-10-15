@@ -188,7 +188,7 @@
       :backup: true
       :type: :push
       :retention:
-	:hours: 1
+        :hours: 1
       :local:
         :path: /tmp/transferts
         :user: root

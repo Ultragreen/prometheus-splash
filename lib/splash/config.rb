@@ -44,8 +44,8 @@ module Splash
         self[:webadmin_stderr_trace] = (config_from_file[:webadmin][:files][:stderr_trace])? config_from_file[:webadmin][:files][:stderr_trace] : WEBADMIN_STDERR_TRACE
 
 
-        self[:pid_path] = (config_from_file[:paths][:pid_path])? config_from_file[:daemon][:paths][:pid_path] : PID_PATH
-        self[:trace_path] = (config_from_file[:paths][:trace_path])? config_from_file[:daemon][:paths][:trace_path] : TRACE_PATH
+        self[:pid_path] = (config_from_file[:paths][:pid_path])? config_from_file[:paths][:pid_path] : PID_PATH
+        self[:trace_path] = (config_from_file[:paths][:trace_path])? config_from_file[:paths][:trace_path] : TRACE_PATH
 
 
         self[:execution_template_tokens] = EXECUTION_TEMPLATE_TOKENS_LIST

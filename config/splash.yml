@@ -2,6 +2,9 @@
 :splash:
 
 ### Main Configuration
+  :paths:
+    :pid_path: /var/run/splash
+    :trace_path: /var/run/splash/traces
   :loggers:
     :level: :info
     :daemon:
@@ -43,9 +46,6 @@
     :procmon_scheduling:
       :every: 20s
     :process_name: "Splash : daemon."
-    :paths:
-      :pid_path: /var/run/splash
-      :trace_path: /var/run/splash/traces
     :files:
       :stdout_trace: stdout.txt
       :stderr_trace: stderr.txt

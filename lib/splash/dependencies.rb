@@ -39,6 +39,7 @@ module Splash
       require 'rest-client'
       require 'kramdown'
       require 'rack/reverse_proxy'
+      require 'tty-table'
 
 
     rescue Gem::GemNotFoundException

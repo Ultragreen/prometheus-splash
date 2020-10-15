@@ -30,8 +30,8 @@ module Splash
         @time = options[:time]
       end
 
-      # send metrics to Prometheus PushGateway                                                                          
-      # @return [Bool] 
+      # send metrics to Prometheus PushGateway
+      # @return [Bool]
       def notify
 	unless verify_service url: @url then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
@@ -42,15 +42,15 @@ module Splash
         hostname = Socket.gethostname
         return Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
       end
-      
+
     end
 
 
-    
+
     class TxRecords
       include Splash::Backends
       def initialize(name)
-        @name = name 
+        @name = name
         @backend = get_backend :transferts_trace
       end
 
@@ -66,10 +66,10 @@ module Splash
         data = get_all_records
 
         data.delete_if { |item,value|
-          DateTime.parse(item) <= (adjusted_datetime) and value[:status] != :prepared} 
+          DateTime.parse(item) <= (adjusted_datetime) and value[:status] != :prepared}
         @backend.put key: @name, value: data.to_yaml
       end
-      
+
       def add_record(record)
         data = get_all_records
         data[DateTime.now.to_s] = record
@@ -81,15 +81,15 @@ module Splash
       end
 
       def check_prepared
-        return :never_run_prepare unless @backend.exist?({key: @name}) 
+        return :never_run_prepare unless @backend.exist?({key: @name})
         return :never_prepare unless YAML::load(@backend.get({key: @name})).select {|item,value|
           value[:status] == :prepared
         }.count > 0
         return :prepared
       end
-      
+
     end
-    
+
     def run_txs(options = {})
       log = get_logger
       log.info 'Running Transfers'
@@ -97,7 +97,7 @@ module Splash
       get_config.transfers.each do |record|
         txrec =  TxRecords::new record[:name]
         txrec.purge(record[:retention])
-        log.item "Execute : #{record[:name]},  #{record[:desc]}"        
+        log.item "Execute : #{record[:name]},  #{record[:desc]}"
         case txrec.check_prepared
         when :prepared
           if record[:type] == :push then
@@ -112,22 +112,22 @@ module Splash
             log.ko "Transfer type unkown"
             count += 1
           end
-        when :never_prepare 
+        when :never_prepare
           log.ko "#{record[:name]} : Never prepared, ignored"
-          txrec.add_record :status => :never_prepare
+          txrec.add_record :status => :never_prepared
           count += 1
         when :never_run_prepare
           log.ko "#{record[:name]} : Never Executed and never prepared, ignored"
-          txrec.add_record :status => :never_prepare
+          txrec.add_record :status => :never_prepared
           count += 1
         end
       end
       return {:case => :error_exit, :more => "#{count} Transfer(s) failed"} if count > 0
       return {:case => :quiet_exit }
     end
-    
-    
-    
+
+
+
     def prepare_tx(name)
       log = get_logger
       record = get_config.transfers.select { |item| item[:name] == name.to_sym }.first
@@ -162,28 +162,28 @@ module Splash
         splash_exit case: :interrupt, more: "Remote command exection"
       end
     end
-    
-    
-    
+
+
+
     def save_data
-      
+
     end
-    
-    
-    
+
+
+
     def push(record)
       config = get_config
       log = get_logger
       txrec = TxRecords::new record[:name]
       start = Time.now
       res = true
-      count = 0 
+      count = 0
       done =[]
       start_date = DateTime.now.to_s
       list = Dir.glob("#{record[:local][:path]}/#{record[:pattern]}")
       count = list.count
       log.arrow "Transfering #{count} file(s)"
-      
+
       begin
         scp = Net::SCP.start(record[:remote][:host],record[:remote][:user])
         list.each do|f|
@@ -201,7 +201,7 @@ module Splash
       rescue
         res = false
       end
-      
+
       end_date = DateTime.now.to_s
       time = Time.now - start
       status = (res)? :success : :failure
@@ -218,7 +218,7 @@ module Splash
       else
         log.ko "Failed to send metrics to Prometheus Pushgateway"
       end
-      return res 
+      return res
     end
   end
 end

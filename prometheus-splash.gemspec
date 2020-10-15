@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'ps-ruby','~> 0.0.4'
   spec.add_runtime_dependency 'tty-markdown','~> 0.6.0'
   spec.add_runtime_dependency 'tty-pager','~> 0.12.0'
+  spec.add_runtime_dependency 'tty-table','~> 0.11.0'
   spec.add_runtime_dependency 'net-ssh','~> 6.1.0'
   spec.add_runtime_dependency 'net-scp','~> 3.0.0'
   spec.add_runtime_dependency 'colorize','~> 0.8.1'
@@ -43,6 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'roodi', '~> 5.0.0'
   spec.add_development_dependency 'code_statistics', '~> 0.2.13'
   spec.add_development_dependency 'yard-rspec', '~> 0.1'
-
+  spec.add_development_dependency 'bundler', '~> 2.1.4'
 
 end

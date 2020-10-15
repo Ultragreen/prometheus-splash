@@ -7,7 +7,7 @@ module Splash
   module Constants
 
     # Current splash version
-    VERSION = "0.7.0"
+    VERSION = "0.8.0"
 
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"
@@ -87,7 +87,7 @@ module Splash
     # the default sdterr trace file
     WEBADMIN_STDERR_TRACE="stderr.txt"
 
-    # default transfer retention for trace 
+    # default transfer retention for trace
     TRANSFER_DEFAULT_RETENTION=1
 
   end

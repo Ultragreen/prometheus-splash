@@ -78,9 +78,9 @@ module CLISplash
       end
     end
 
-    # Thor method : sending ping verb over transport in the input queue of Splashd
-    desc "get_jobs", "send a get_jobs verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
-    def ping(hostname=Socket.gethostname)
+    # Thor method : sending get_jobs verb over transport in the input queue of Splashd
+    desc "getjobs", "send a get_jobs verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    def getjobs(hostname=Socket.gethostname)
       log = get_logger
       log.info "ctrl+c for interrupt"
       begin

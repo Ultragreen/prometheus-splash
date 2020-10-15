@@ -74,7 +74,7 @@ module CLISplash
           splash_exit case: :quiet_exit
         end
       rescue Interrupt
-        splash_exit status: :error, case: :interrupt, more: "Ping Command"
+        splash_exit status: :error, case: :interrupt, more: "ping Command"
       end
     end
 
@@ -94,7 +94,7 @@ module CLISplash
           splash_exit case: :quiet_exit
         end
       rescue Interrupt
-        splash_exit status: :error, case: :interrupt, more: "Ping Command"
+        splash_exit status: :error, case: :interrupt, more: "getjobs Command"
       end
     end
 
@@ -114,7 +114,7 @@ module CLISplash
           splash_exit case: :quiet_exit
         end
       rescue Interrupt
-        splash_exit status: :error, case: :interrupt, more: "Ping Command"
+        splash_exit status: :error, case: :interrupt, more: "reset Command"
       end
     end
 

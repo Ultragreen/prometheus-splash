@@ -39,9 +39,10 @@ module Splash
           @server  = Rufus::Scheduler::new
           @server.extend SchedulerHooks
           @config = get_config
+          @scheduling = options[:scheduling]
 
           @log.info "Splash Orchestrator starting :"
-          if options[:scheduling] then
+          if @scheduling then
             @log.item "Initializing Sequences & commands Scheduling."
             init_commands_scheduling
             init_sequences_scheduling
@@ -191,7 +192,7 @@ module Splash
           @server.extend SchedulerHooks
           @config = rehash_config
           @log.info "Splash Orchestrator re-hashing :"
-          if options[:scheduling] then
+          if @scheduling then
             @log.item "Re-Initializing Sequences & commands Scheduling."
             init_commands_scheduling
             init_sequences_scheduling

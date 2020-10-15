@@ -98,6 +98,26 @@ module CLISplash
       end
     end
 
+    # Thor method : sending reset verb over transport in the input queue of Splashd
+    desc "getjobs", "send a reset verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    def reset(hostname=Socket.gethostname)
+      log = get_logger
+      log.info "ctrl+c for interrupt"
+      begin
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          log.receive transport.execute({ :verb => :reset,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{hostname}.input" })
+          splash_exit case: :quiet_exit
+        end
+      rescue Interrupt
+        splash_exit status: :error, case: :interrupt, more: "Ping Command"
+      end
+    end
+
   end
 
 end

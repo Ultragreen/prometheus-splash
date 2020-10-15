@@ -32,7 +32,8 @@ module Splash
         def initialize(options = {})
           @log = get_logger
           self.extend Splash::Daemon::Metrics
-          @metric_manager = get_metrics_manager
+          @session = get_session
+          @metric_manager = get_metrics_manager(@session)
           $stdout.sync = true
           $stderr.sync = true
           @server  = Rufus::Scheduler::new
@@ -138,13 +139,15 @@ module Splash
 
         #prepare metrics sheduling
         def init_metrics_scheduling
-        sched,value = @config.daemon_metrics_scheduling.flatten
-        @log.item "Initializing Splash metrics notifications."
-        @server.send sched,value do
-          begin
-            @metric_manager.notify
-          rescue Errno::ECONNREFUSED
-            @log.error "PushGateway seems to be done, please start it."
+          sched,value = @config.daemon_metrics_scheduling.flatten
+          @log.item "Initializing Splash metrics notifications."
+          @server.send sched,value do
+            begin
+              @log.trigger "Splash Metrics monitoring for Scheduling : #{sched.to_s} #{value.to_s}", @session
+              @metric_manager.notify
+            rescue Errno::ECONNREFUSED
+              @log.error "PushGateway seems to be done, please start it."
+            end
           end
         end
 
@@ -162,7 +165,6 @@ module Splash
               execute command: command.to_s, session: session
             end
           end
-
         end
 
 
@@ -179,14 +181,13 @@ module Splash
               run_seq name: sequence.to_s, session: session
             end
           end
-
         end
 
         # reset the orchestrator
         # @return [Hash] Exiter case
         def reset_orchestrator
           @server.shutdown
-          @server  = Rufus::Scheduler::new
+          @server = Rufus::Scheduler::new
           @server.extend SchedulerHooks
           @config = rehash_config
           @log.info "Splash Orchestrator re-hashing :"
@@ -195,9 +196,6 @@ module Splash
             init_commands_scheduling
             init_sequences_scheduling
           end
-
-
-
           init_logs_monitoring_scheduling
           init_process_monitoring_scheduling
           init_metrics_scheduling
@@ -217,9 +215,7 @@ module Splash
             return command.call_and_notify trace: true, notify: true, callback: true, session: options[:session]
           end
         end
-
       end
-
     end
   end
 end

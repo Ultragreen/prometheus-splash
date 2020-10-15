@@ -17,8 +17,8 @@ module Splash
 
       # metrics manager factory
       # @return [Splash::Daemon::Metrics::Manager]
-      def get_metrics_manager
-        return @@manager ||= Manager::new
+      def get_metrics_manager(session)
+        return @@manager ||= Manager::new(:session => session)
       end
 
       # Metrics Manager (collect and sending to Prometheus)
@@ -32,7 +32,8 @@ module Splash
         attr_reader :monitoring_processes_count
 
         # Constructor prepare prometheus-client, defined metrics and init attributes
-        def initialize
+        def initialize(options ={})
+          @session = options[:session]
           @config = get_config
           @starttime = Time.now
           @execution_count = 0
@@ -75,12 +76,11 @@ module Splash
         # @return [Hash] Exiter case ( :service_dependence_missing , :quiet_exit)
         def notify
           log = get_logger
-          session  = get_session
           unless verify_service url: @config.prometheus_pushgateway_url then
             return  { :case => :service_dependence_missing, :more => "Prometheus Notification not send." }
           end
 
-          log.debug "Sending Splash self metrics to PushGateway." , session
+          log.ok "Sending Splash self metrics to PushGateway." , @session
           @metric_uptime.set uptime
           @metric_execution.set execution_count
           @metric_logs_monitoring.set monitoring_logs_count
@@ -89,7 +89,7 @@ module Splash
           hostname = Socket.gethostname
           url = @config.prometheus_pushgateway_url
           Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
-          log.debug "Sending to Prometheus PushGateway done.", session
+          log.debug "Sending to Prometheus PushGateway done.", @session
           return {:case => :quiet_exit }
         end
 

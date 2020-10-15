@@ -16,7 +16,7 @@ module Splash
         include Splash::Loggers
 
         # list of known verbs for Splash orchestrator
-        VERBS=[:ping,:list_commands,:execute_command,:ack_command, :shutdown]
+        VERBS=[:ping,:list_commands,:execute_command,:ack_command, :shutdown, :get_jobs]
 
         # shutdown verb : stop the Splash daemon gracefully
         # @param [Hash] content message content Hash Structure, ignored
@@ -44,6 +44,14 @@ module Splash
         # @return [Hash] Exiter case
         def ack_command(content)
           return execute command: content[:payload][:name], ack: true
+        end
+
+
+        # get_jobs verb : return list of scheduled jobs for internal scheduler
+        # @param [Hash] content message content Hash Structure, ignored
+        # @return [String] YAML dataset
+        def get_jobs(content)
+          return @server.jobs.to_yaml
         end
 
         # execute_command verb : execute command specified in payload

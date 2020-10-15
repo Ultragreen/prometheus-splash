@@ -17,14 +17,14 @@ WebAdminApp.get '/daemon/:action' do
 
   case params[:action]
   when 'start'
-    startdaemon scheduling: true, purge: true
+    startdaemon scheduling: true, purge: false
     return 'start'
   when 'stop'
     stopdaemon
     return 'stop'
   when 'restart'
     stopdaemon
-    startdaemon scheduling: true, purge: true
+    startdaemon scheduling: true, purge: false
     return 'start'
   else
   end

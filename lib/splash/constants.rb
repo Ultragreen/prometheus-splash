@@ -87,8 +87,8 @@ module Splash
     # the default sdterr trace file
     WEBADMIN_STDERR_TRACE="stderr.txt"
 
-    # default transfer retention for trace
-    TRANSFER_DEFAULT_RETENTION=1
+    # default retention for trace
+    DEFAULT_RETENTION=1
 
   end
 end

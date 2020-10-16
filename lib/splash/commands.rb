@@ -73,16 +73,16 @@ module Splash
       # @param [String] value numeric.to_s
       # @param [String] time execution time numeric.to_s
       # @return [Hash] Exiter case :quiet_exit
-      def notify(value,time)
+      def notify(value,time, session)
         log = get_logger
         unless verify_service url: @config.prometheus_pushgateway_url then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
         end
         cmdmonitor = CmdNotifier::new({name: @name, exitcode: value, time: time})
         if cmdmonitor.notify then
-          log.ok "Sending metrics to Prometheus Pushgateway"
+          log.ok "Sending metrics to Prometheus Pushgateway",session
         else
-          log.ko "Failed to send metrics to Prometheus Pushgateway"
+          log.ko "Failed to send metrics to Prometheus Pushgateway",session
         end
         return { :case => :quiet_exit}
       end
@@ -162,7 +162,7 @@ module Splash
           log.ok "Command executed", session
           log.arrow "exitcode #{exit_code}", session
           if options[:notify] then
-            acase = notify(exit_code,time.to_i)
+            acase = notify(exit_code,time.to_i,session)
           else
             log.item "Without Prometheus notification", session
           end

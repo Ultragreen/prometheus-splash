@@ -51,7 +51,7 @@ module Splash
       include Splash::Backends
       def initialize(name)
         @name = name
-        @backend = get_backend :transferts_trace
+        @backend = get_backend :transfers_trace
       end
 
       def purge(retention)

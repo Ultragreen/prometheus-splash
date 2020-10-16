@@ -91,6 +91,43 @@ module CLISplash
       splash_exit case: :quiet_exit
     end
 
+
+    # Thor method : show logs monitoring history
+    long_desc <<-LONGDESC
+    show logs monitoring history for LABEL\n
+    LONGDESC
+    option :table, :type => :boolean,  :aliases => "-t"
+    desc "history LABEL", "show logs monitoring history"
+    def history(label)
+      log = get_logger
+      log.info "Log : #{label}"
+      config = get_config
+      if options[:table] then
+        table = TTY::Table.new do |t|
+          t << ["Start Date", "File","Status", "Nb errors", "Nb lines"]
+          t << ['','','','','']
+          LogsRecords::new(label).get_all_records.each do |record,value|
+
+            t << [record, value[:file], value[:status].to_s, value[:errors], value[:lines]]
+          end
+        end
+        if check_unicode_term  then
+          puts table.render(:unicode)
+        else
+          puts table.render(:ascii)
+        end
+
+      else
+        LogsRecords::new(label).get_all_records.each do |record,value|
+          log.item record
+          log.arrow "Status : #{value[:status].to_s}"
+          log.arrow "nb files : #{value[:errors]}"
+          log.arrow "nb lines : #{value[:lines]}"
+        end
+      end
+      splash_exit case: :quiet_exit
+    end
+
   end
 
 end

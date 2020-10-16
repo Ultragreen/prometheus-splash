@@ -16,10 +16,6 @@ module Splash
       @@registry.register(@@metric_missing)
       @@registry.register(@@metric_lines)
 
-
-
-
-
       def initialize(options={})
         @config = get_config
         @url = @config.prometheus_pushgateway_url
@@ -40,6 +36,41 @@ module Splash
         @@metric_lines.set(@lines, labels: { log: @name })
         hostname = Socket.gethostname
         return Prometheus::Client::Push.new("Splash", hostname, @url).add(@@registry)
+      end
+
+    end
+
+    class LogsRecords
+      include Splash::Backends
+      def initialize(name)
+        @name = name
+        @backend = get_backend :logs_trace
+      end
+
+      def purge(retention)
+        if retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
+        elsif retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:days].to_i
+        else
+          retention = DEFAULT_RETENTION
+        end
+
+        data = get_all_records
+
+        data.delete_if { |item,value|
+          DateTime.parse(item) <= (adjusted_datetime)}
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def add_record(record)
+        data = get_all_records
+        data[DateTime.now.to_s] = record
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def get_all_records
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : {}
       end
 
     end
@@ -96,15 +127,22 @@ module Splash
         session = (options[:session]) ? options[:session] : log.get_session
         log.info "Sending metrics to Prometheus Pushgateway", session
         @logs_target.each do |item|
-          missing = (item[:status] == :missing)? 1 : 0
-          errors = item[:count]
+          logsrec = LogsRecords::new item[:label]
+          errors = (item[:count])? item[:count] : 0
           lines = (item[:lines])? item[:lines] : 0
-          name = item[:log]
-          logsmonitor = LogsNotifier::new({name: name, missing: missing, errors: errors, lines: lines})
+          missing = (item[:status] = :missing)? 1 : 0
+          file = item[:log]
+          logsrec.purge(item[:retention])
+          logsrec.add_record :status => item[:status],
+                           :errors => errors,
+                           :lines => lines,
+                           :file => file
+
+          logsmonitor = LogsNotifier::new({name: item[:label], missing: missing, file: file, errors: errors, lines: lines})
           if logsmonitor.notify then
-            log.ok "Sending metrics for log #{name} to Prometheus Pushgateway"
+            log.ok "Sending metrics for log #{file} to Prometheus Pushgateway", session
           else
-            log.ko "Failed to send metrics for log #{name} to Prometheus Pushgateway"
+            log.ko "Failed to send metrics for log #{file} to Prometheus Pushgateway", session
           end
         end
         return {:case => :quiet_exit }

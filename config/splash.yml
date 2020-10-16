@@ -26,9 +26,12 @@
 #        :port: 6379
 #        #:auth: "mykey"
 #        :base: 1
-      :transferts_trace:
+      :transfers_trace:
           :type: :file
-          :path: /var/run/splash/transferts
+          :path: /var/run/splash/transfers
+      :logs_trace:
+          :type: :file
+          :path: /var/run/splash/logs
 
   :transports:
     :active: :rabbitmq
@@ -122,9 +125,13 @@
     - :label: :log_app_1
       :log: /tmp/test
       :pattern: ERROR
+      :retention:
+        :hours: 5
     - :label: :log_app_2
       :log: /tmp/test2
       :pattern: ERROR
+      :retention:
+        :hours: 5
 
 ### configuration of monitored processes
   :processes:

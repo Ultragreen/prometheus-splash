@@ -6,6 +6,46 @@ module Splash
   # Logs namespace
   module Logs
 
+    class LogsNotifier
+
+      @@registry = Prometheus::Client::Registry::new
+      @@metric_missing = Prometheus::Client::Gauge.new(:logmissing, docstring: 'SPLASH metric log missing', labels: [:log ])
+      @@metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])
+      @@metric_lines = Prometheus::Client::Gauge.new(:loglines, docstring: 'SPLASH metric log lines numbers', labels: [:log ])
+      @@registry.register(@@metric_count)
+      @@registry.register(@@metric_missing)
+      @@registry.register(@@metric_lines)
+
+
+
+
+
+      def initialize(options={})
+        @config = get_config
+        @url = @config.prometheus_pushgateway_url
+        @name = options[:name]
+        @missing = options[:missing]
+        @lines = options[:lines]
+        @errors = options[:errors]
+      end
+
+      # send metrics to Prometheus PushGateway
+      # @return [Bool]
+      def notify
+        unless verify_service url: @url then
+          return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
+        end
+        @@metric_missing.set(@missing, labels: { log: @name })
+        @@metric_count.set(@errors, labels: { log: @name })
+        @@metric_lines.set(@lines, labels: { log: @name })
+        hostname = Socket.gethostname
+        return Prometheus::Client::Push.new("Splash", hostname, @url).add(@@registry)
+      end
+
+    end
+
+
+
     # Log scanner and notifier
     class LogScanner
       include Splash::Constants
@@ -17,13 +57,7 @@ module Splash
       def initialize
         @logs_target = Marshal.load(Marshal.dump(get_config.logs))
         @config = get_config
-        @registry = Prometheus::Client::Registry::new
-        @metric_count = Prometheus::Client::Gauge.new(:logerrors, docstring: 'SPLASH metric log error', labels: [:log ])
-        @metric_missing = Prometheus::Client::Gauge.new(:logmissing, docstring: 'SPLASH metric log missing', labels: [:log ])
-        @metric_lines = Prometheus::Client::Gauge.new(:loglines, docstring: 'SPLASH metric log lines numbers', labels: [:log ])
-        @registry.register(@metric_count)
-        @registry.register(@metric_missing)
-        @registry.register(@metric_lines)
+
       end
 
 
@@ -63,16 +97,16 @@ module Splash
         log.info "Sending metrics to Prometheus Pushgateway", session
         @logs_target.each do |item|
           missing = (item[:status] == :missing)? 1 : 0
-          log.item "Sending metrics for #{item[:log]}", session
-          @metric_count.set(item[:count], labels: { log: item[:log] })
-          @metric_missing.set(missing, labels: { log: item[:log] })
+          errors = item[:count]
           lines = (item[:lines])? item[:lines] : 0
-          @metric_lines.set(lines, labels: { log: item[:log] })
+          name = item[:log]
+          logsmonitor = LogsNotifier::new({name: name, missing: missing, errors: errors, lines: lines})
+          if logsmonitor.notify then
+            log.ok "Sending metrics for log #{name} to Prometheus Pushgateway"
+          else
+            log.ko "Failed to send metrics for log #{name} to Prometheus Pushgateway"
+          end
         end
-        hostname = Socket.gethostname
-        url = @config.prometheus_pushgateway_url
-        Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
-        log.ok "Sending to Prometheus PushGateway done.", session
         return {:case => :quiet_exit }
       end
 

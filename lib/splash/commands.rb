@@ -6,6 +6,40 @@ module Splash
   # Splash Commands module/namespace
   module Commands
 
+
+    class CmdNotifier
+
+      @@registry = Prometheus::Client::Registry::new
+      @@metric_exitcode = Prometheus::Client::Gauge.new(:exitcode, docstring: 'SPLASH metric batch exitcode')
+      @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
+      @@registry.register(@@metric_exitcode)
+      @@registry.register(@@metric_time)
+
+
+
+      def initialize(options={})
+        @config = get_config
+        @url = @config.prometheus_pushgateway_url
+        @name = "cmd_#{options[:name].to_s}"
+        @exitcode = options[:exitcode]
+        @time = options[:time]
+      end
+
+      # send metrics to Prometheus PushGateway
+      # @return [Bool]
+      def notify
+        unless verify_service url: @url then
+          return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
+        end
+        @@metric_exitcode.set(@exitcode)
+        @@metric_time.set(@time)
+        hostname = Socket.gethostname
+        return Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+      end
+
+    end
+
+
     # command execution wrapper
     class CommandWrapper
       include Splash::Templates
@@ -16,11 +50,7 @@ module Splash
       include Splash::Transports
 
 
-      @@registry = Prometheus::Client::Registry::new
-      @@metric_exitcode = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
-      @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
-      @@registry.register(@@metric_exitcode)
-      @@registry.register(@@metric_time)
+
 
       # Constructor
       # @param [String] name the name of the command
@@ -44,13 +74,16 @@ module Splash
       # @param [String] time execution time numeric.to_s
       # @return [Hash] Exiter case :quiet_exit
       def notify(value,time)
+        log = get_logger
         unless verify_service url: @config.prometheus_pushgateway_url then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
         end
-        @@metric_exitcode.set(value)
-        @@metric_time.set(time)
-        hostname = Socket.gethostname
-        Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+        cmdmonitor = CmdNotifier::new({name: @name, exitcode: value, time: time})
+        if cmdmonitor.notify then
+          log.ok "Sending metrics to Prometheus Pushgateway"
+        else
+          log.ko "Failed to send metrics to Prometheus Pushgateway"
+        end
         return { :case => :quiet_exit}
       end
 
@@ -110,9 +143,6 @@ module Splash
               stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
             end
             time = Time.now - start
-            tp = Template::new(
-              list_token: @config.execution_template_tokens,
-              template_file: @config.execution_template_path)
             data = Hash::new
             data[:start_date] = start_date
             data[:end_date] = DateTime.now.to_s
@@ -133,7 +163,6 @@ module Splash
           log.arrow "exitcode #{exit_code}", session
           if options[:notify] then
             acase = notify(exit_code,time.to_i)
-            get_logger.ok "Prometheus Gateway notified.",session
           else
             log.item "Without Prometheus notification", session
           end

@@ -42,6 +42,45 @@ module Splash
 
     end
 
+
+    class ProcessRecords
+      include Splash::Backends
+      include Splash::Constants
+
+      def initialize(name)
+        @name = name
+        @backend = get_backend :process_trace
+      end
+
+      def purge(retention)
+        retention = {} if retention.nil?
+        if retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
+        elsif retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:days].to_i
+        else
+          adjusted_datetime = DateTime.now - DEFAULT_RETENTION
+        end
+
+        data = get_all_records
+
+        data.delete_if { |item,value|
+          DateTime.parse(item) <= (adjusted_datetime)}
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def add_record(record)
+        data = get_all_records
+        data[DateTime.now.to_s] = record
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def get_all_records
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : {}
+      end
+
+    end
+
     # Processes scanner and notifier
     class ProcessScanner
       include Splash::Constants
@@ -92,8 +131,14 @@ module Splash
         session = (options[:session]) ? options[:session] : log.get_session
         log.info "Sending metrics to Prometheus Pushgateway", session
         @processes_target.each do |item|
+          processrec = ProcessRecords::new item[:process]
           missing = (item[:status] == :missing)? 1 : 0
           val = (item[:status] == :running )? 1 : 0
+          processrec.purge(item[:retention])
+          processrec.add_record :status => item[:status],
+                           :cpu_percent => item[:cpu],
+                           :mem_percent => item[:mem] ,
+                           :process => item[:process]
           processmonitor = ProcessNotifier::new({name: item[:process], status: val , cpu_percent: item[:cpu], mem_percent: item[:mem]})
           if processmonitor.notify then
             log.ok "Sending metrics for process #{item[:process]} to Prometheus Pushgateway", session

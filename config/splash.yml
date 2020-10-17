@@ -32,6 +32,9 @@
       :logs_trace:
           :type: :file
           :path: /var/run/splash/logs
+      :process_trace:
+          :type: :file
+          :path: /var/run/splash/process
 
   :transports:
     :active: :rabbitmq
@@ -138,6 +141,8 @@
     - :process: cron
       :patterns:
         - cron
+      :retention:
+          :hours: 5
 
 
 ###

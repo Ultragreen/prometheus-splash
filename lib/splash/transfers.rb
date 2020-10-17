@@ -49,18 +49,21 @@ module Splash
 
     class TxRecords
       include Splash::Backends
+      include Splash::Constants
+      
       def initialize(name)
         @name = name
         @backend = get_backend :transfers_trace
       end
 
       def purge(retention)
+        retention = {} if retention.nil?
         if retention.include? :hours then
           adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
         elsif retention.include? :hours then
           adjusted_datetime = DateTime.now - retention[:days].to_i
         else
-          retention = TRANSFER_DEFAULT_RETENTION
+          adjusted_datetime = DateTime.now - DEFAULT_RETENTION
         end
 
         data = get_all_records

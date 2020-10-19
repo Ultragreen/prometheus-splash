@@ -40,6 +40,44 @@ module Splash
     end
 
 
+    class CmdRecords
+      include Splash::Backends
+      include Splash::Constants
+      def initialize(name)
+        @name = name
+        @backend = get_backend :execution_trace
+      end
+
+      def purge(retention)
+        retention = {} if retention.nil?
+        if retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
+        elsif retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:days].to_i
+        else
+          adjusted_datetime = DateTime.now - DEFAULT_RETENTION
+        end
+
+        data = get_all_records
+
+        data.delete_if { |item|
+          DateTime.parse(item.keys.first) <= (adjusted_datetime)}
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def add_record(record)
+        data = get_all_records
+        data.push({ DateTime.now.to_s => record })
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def get_all_records(options={})
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : []
+      end
+
+    end
+
+
     # command execution wrapper
     class CommandWrapper
       include Splash::Templates
@@ -153,10 +191,9 @@ module Splash
             data[:stdout] = stdout
             data[:stderr] = stderr
             data[:exec_time] = time.to_s
-            backend = get_backend :execution_trace
-            key = @name
-
-            backend.put key: key, value: data.to_yaml
+            cmdrec = CmdRecords::new @name
+            cmdrec.purge(@config.commands[@name.to_sym][:retention])
+            cmdrec.add_record data
             exit_code = status.exitstatus
           end
           log.ok "Command executed", session

@@ -130,8 +130,9 @@ module CLISplash
           table = TTY::Table.new do |t|
             t << ["Start Date", "Status", "CPU Percent", "MEM Percent"]
             t << ['','','','']
-            ProcessRecords::new(process).get_all_records.each do |record,value|
-
+            ProcessRecords::new(process).get_all_records.each do |item|
+              record =item.keys.first
+              value=item[record]
               t << [record, value[:status].to_s, value[:cpu_percent], value[:mem_percent]]
             end
           end
@@ -142,7 +143,9 @@ module CLISplash
           end
 
         else
-          ProcessRecords::new(process).get_all_records.each do |record,value|
+          ProcessRecords::new(process).get_all_records.each do |item|
+            record =item.keys.first
+            value=item[record]
             log.item record
             log.arrow "Status : #{value[:status].to_s}"
             log.arrow "CPU Percent : #{value[:cpu_percent]}"

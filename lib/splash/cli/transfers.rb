@@ -44,7 +44,10 @@ module CLISplash
       log = get_logger
       log.item "Transfer : #{name}"
       config = get_config
-      data = TxRecords::new(name).get_all_records.select {|record,value| record == options[:date]}.first
+      data = TxRecords::new(name).get_all_records.select {|item|
+        record =item.keys.first
+        value=item[record]
+        record == options[:date]}.first
       if data.nil? then
         log.ko "Result for #{name} on date #{options[:date]} not found"
         splash_exit case: :not_found, :more => "Result inexistant"
@@ -93,7 +96,9 @@ module CLISplash
         table = TTY::Table.new do |t|
           t << ["Start Date", "End date", "time", "Files count","File count error","Status"]
           t << ['','','','','','']
-          TxRecords::new(name).get_all_records.each do |record,value|
+          TxRecords::new(name).get_all_records.each do |item|
+            record =item.keys.first
+            value=item[record]
             start_date = record
             end_date = (value[:end_date].nil?)? '': value[:end_date]
             time  = (value[:time].nil?)? '': value[:time]
@@ -111,7 +116,9 @@ module CLISplash
         end
 
       else
-        TxRecords::new(name).get_all_records.each do |record,value|
+        TxRecords::new(name).get_all_records.each do |item|
+          record =item.keys.first
+          value=item[record]
           failed = (value[:count].nil? or value[:done].nil?)? 'undef': value[:count].to_i - value[:done].count
           if value[:end_date].nil? then
             log.item "Event : #{record} STATUS : #{value[:status]}"

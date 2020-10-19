@@ -50,7 +50,7 @@ module Splash
     class TxRecords
       include Splash::Backends
       include Splash::Constants
-      
+
       def initialize(name)
         @name = name
         @backend = get_backend :transfers_trace
@@ -68,24 +68,26 @@ module Splash
 
         data = get_all_records
 
-        data.delete_if { |item,value|
-          DateTime.parse(item) <= (adjusted_datetime) and value[:status] != :prepared}
+        data.delete_if { |item|
+          DateTime.parse(item.keys.first) <= (adjusted_datetime)}
         @backend.put key: @name, value: data.to_yaml
       end
 
       def add_record(record)
         data = get_all_records
-        data[DateTime.now.to_s] = record
+        data.push({ DateTime.now.to_s => record })
         @backend.put key: @name, value: data.to_yaml
       end
 
-      def get_all_records
-        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : {}
+      def get_all_records(options={})
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : []
       end
 
       def check_prepared
         return :never_run_prepare unless @backend.exist?({key: @name})
-        return :never_prepare unless YAML::load(@backend.get({key: @name})).select {|item,value|
+        return :never_prepare unless YAML::load(@backend.get({key: @name})).select {|item|
+          record =item.keys.first
+          value=item[record]
           value[:status] == :prepared
         }.count > 0
         return :prepared

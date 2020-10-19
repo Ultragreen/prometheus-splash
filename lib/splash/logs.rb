@@ -60,19 +60,19 @@ module Splash
 
         data = get_all_records
 
-        data.delete_if { |item,value|
-          DateTime.parse(item) <= (adjusted_datetime)}
+        data.delete_if { |item|
+          DateTime.parse(item.keys.first) <= (adjusted_datetime)}
         @backend.put key: @name, value: data.to_yaml
       end
 
       def add_record(record)
         data = get_all_records
-        data[DateTime.now.to_s] = record
+        data.push({ DateTime.now.to_s => record })
         @backend.put key: @name, value: data.to_yaml
       end
 
-      def get_all_records
-        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : {}
+      def get_all_records(options={})
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : []
       end
 
     end

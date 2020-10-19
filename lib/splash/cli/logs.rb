@@ -123,7 +123,9 @@ module CLISplash
           table = TTY::Table.new do |t|
             t << ["Start Date", "File","Status", "Nb errors", "Nb lines"]
             t << ['','','','','']
-            LogsRecords::new(label).get_all_records.each do |record,value|
+            LogsRecords::new(label).get_all_records.each do |item|
+              record =item.keys.first
+              value=item[record]
 
               t << [record, value[:file], value[:status].to_s, value[:errors], value[:lines]]
             end
@@ -135,7 +137,9 @@ module CLISplash
           end
 
         else
-          LogsRecords::new(label).get_all_records.each do |record,value|
+          LogsRecords::new(label).get_all_records.each do |item|
+            record =item.keys.first
+            value=item[record]
             log.item record
             log.arrow "Status : #{value[:status].to_s}"
             log.arrow "nb files : #{value[:errors]}"

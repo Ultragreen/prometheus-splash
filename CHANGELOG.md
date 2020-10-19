@@ -150,3 +150,8 @@
 * orchestrator rebuild
 * reshash config and reset + grammar and Cli
 * refacto config
+
+## V0.8.1
+
+### FEATURE
+* #55 historisation for reports for all

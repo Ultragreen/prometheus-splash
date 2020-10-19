@@ -252,7 +252,7 @@ module Splash
     # check folder
     # @return [Array] of Symbol with error type : [:inexistant,:mode,:owner,:group]
     # @param [Hash] options
-    # @option options [String] :path folder path (relative or absolute)
+    # @option options [String] :name folder path (relative or absolute)
     # @option options [String] :mode String for OCTAL rights like "644", optionnal
     # @option options [String] :owner file owner for folder, optionnal
     # @option options [String] :group  file group for folder, optionnal
@@ -336,7 +336,6 @@ module Splash
     end
     #!@endgroup
 
-
     def format_response(data, format)
       response = case format
                  when 'application/json' then JSON.pretty_generate(data)
@@ -355,6 +354,16 @@ module Splash
        return result[extension]
     end
 
+    # check if unicode must be used with term ENV
+    # @return [Boolean]
+    def check_unicode_term
+      return false unless ENV.include? "TERM"
+      if ENV.values_at("LC_ALL","LC_CTYPE","LANG").compact.first.include?("UTF-8") and ENV.values_at('TERM').first.include? "xterm" then
+        return true
+      else
+        return false
+      end
+    end
 
   end
 end

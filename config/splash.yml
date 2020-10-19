@@ -2,6 +2,9 @@
 :splash:
 
 ### Main Configuration
+  :paths:
+    :pid_path: /var/run/splash
+    :trace_path: /var/run/splash/traces
   :loggers:
     :level: :info
     :daemon:
@@ -23,6 +26,16 @@
 #        :port: 6379
 #        #:auth: "mykey"
 #        :base: 1
+      :transfers_trace:
+          :type: :file
+          :path: /var/run/splash/transfers
+      :logs_trace:
+          :type: :file
+          :path: /var/run/splash/logs
+      :process_trace:
+          :type: :file
+          :path: /var/run/splash/process
+
   :transports:
     :active: :rabbitmq
     :rabbitmq:
@@ -39,16 +52,14 @@
     :procmon_scheduling:
       :every: 20s
     :process_name: "Splash : daemon."
-    :paths:
-      :pid_path: /var/run/splash
-      :trace_path: /var/run/splash/traces
     :files:
       :stdout_trace: stdout.txt
       :stderr_trace: stderr.txt
       :pid_file: splash.pid
   :prometheus:
-    :pushgateway: 'http://localhost:9091/'
-    :url: 'http://localhost:9090/'
+    :pushgateway: 'http://localhost:9091'
+    :url: 'http://localhost:9090'
+    :alertmanager: 'http://localhost:9093'
   :webadmin:
     :port: 9234
     :ip: 127.0.0.1
@@ -117,15 +128,21 @@
     - :label: :log_app_1
       :log: /tmp/test
       :pattern: ERROR
+      :retention:
+        :hours: 5
     - :label: :log_app_2
       :log: /tmp/test2
       :pattern: ERROR
+      :retention:
+        :hours: 5
 
 ### configuration of monitored processes
   :processes:
     - :process: cron
       :patterns:
         - cron
+      :retention:
+          :hours: 5
 
 
 ###
@@ -174,5 +191,28 @@
       :definition:
         - :step: exec echo3
           :command: :echo3
+
+### Transfers
+  :transfers:
+    - :name: :transfer_text
+      :desc: "List of text files"
+      :pattern: '*.txt'
+      :backup: true
+      :type: :push
+      :retention:
+        :hours: 1
+      :local:
+        :path: /tmp/transferts
+        :user: root
+      :remote:
+        :user: root
+        :host: localhost
+        :path: /tmp/
+      :post:
+        :remote_command: 'ls'
+
+
+
+
 
 ###

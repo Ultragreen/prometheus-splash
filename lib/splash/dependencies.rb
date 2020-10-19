@@ -17,8 +17,12 @@ module Splash
 
 
 
+
+
     # Rubygems
     begin
+      require 'net/ssh'
+      require 'net/scp'
       require 'prometheus/client'
       require 'prometheus/client/push'
       require 'thor'
@@ -35,6 +39,7 @@ module Splash
       require 'rest-client'
       require 'kramdown'
       require 'rack/reverse_proxy'
+      require 'tty-table'
 
 
     rescue Gem::GemNotFoundException
@@ -57,9 +62,9 @@ module Splash
 
     require 'splash/commands'
     require 'splash/sequences'
-
     require 'splash/logs'
     require 'splash/processes'
+    require 'splash/transfers'
 
     require 'splash/daemon'
     require 'splash/webadmin'

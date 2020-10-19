@@ -14,14 +14,14 @@ module CLISplash
     # Thor method : stopping Splash Webadmin
     desc "stop", "Stopping Splash Webadmin Daemon"
     def stop
-      acase = run_as_root :stopdaemon, options
+      acase = run_as_root :stopweb, options
       splash_exit acase
     end
 
     # Thor method : getting execution status of Splashd
     desc "status", "Splash WebAdmin Daemon status"
     def status
-      acase = run_as_root :statusdaemon, options
+      acase = run_as_root :statusweb, options
       splash_exit acase
     end
 
@@ -37,7 +37,7 @@ module CLISplash
     LONGDESC
     desc "start", "Splash WebAdmin Daemon status"
     def start
-      acase = run_as_root :startdaemon
+      acase = run_as_root :startweb
       splash_exit acase
     end
 

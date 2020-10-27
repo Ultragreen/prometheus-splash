@@ -5,7 +5,7 @@
 WebAdminApp.get '/api/process/list.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : GET, route : list, format : #{format}"
+  log.call "API : process, verb : GET, route : list, format : #{format}"
   process_recordset = get_config.processes
   obj =  splash_return case: :quiet_exit, :more => "Processes list"
   obj[:data] = process_recordset
@@ -16,7 +16,7 @@ WebAdminApp.get '/api/process/list.?:format?' do
 WebAdminApp.get '/api/process/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
+  log.call "API : process, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
   process_recordset = get_config.processes.select{|item| item[:process] == params[:name] }
   unless process_recordset.empty? then
     record = process_recordset.first
@@ -32,7 +32,7 @@ end
 WebAdminApp.post '/api/process/analyse.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : POST, route : analyse, format : #{format}"
+  log.call "API : process, verb : POST, route : analyse, format : #{format}"
   results = Splash::Processes::ProcessScanner::new
   results.analyse
   res = results.output
@@ -46,7 +46,7 @@ end
 WebAdminApp.post '/api/process/monitor.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : process, verb : POST, route : monitor, format : #{format}"
+  log.call "API : process, verb : POST, route : monitor, format : #{format}"
   results = Splash::Processes::ProcessScanner::new
   results.analyse
   res = splash_return results.notify

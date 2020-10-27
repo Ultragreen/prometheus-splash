@@ -340,7 +340,7 @@ module Splash
       response = case format
                  when 'application/json' then JSON.pretty_generate(data)
                  when 'text/x-yaml' then data.to_yaml
-                 else JSON.pretty_generate(data)
+                 else data.to_yaml
                  end
       return response
     end

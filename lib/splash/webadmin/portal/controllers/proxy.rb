@@ -19,7 +19,8 @@ end
 
 WebAdminApp.get '/proxy/links' do
   get_menu 5
-
+  log = get_logger
+  log.call "WEB : proxy, verb : GET, controller : /proxy/links"
   config = get_config
   if config.webadmin_proxy == true then
     @proxy = true

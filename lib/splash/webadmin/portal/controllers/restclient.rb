@@ -1,9 +1,13 @@
 WebAdminApp.get '/restclient' do
+  log = get_logger
+  log.call "WEB : restclient, verb : GET, controller : /restclient"
   get_menu 4
   slim :restclient,  :format => :html
 end
 
 WebAdminApp.post '/restclient/query' do
+  log = get_logger
+  log.call "WEB : processes, verb : GET, controller : /restclient/query"
   @method = params[:method]
   @url = params[:url]
   @body = params[:body]

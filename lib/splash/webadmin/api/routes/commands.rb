@@ -5,7 +5,7 @@
 WebAdminApp.get '/api/commands/list.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : commands, verb : GET, route : list, format : #{format}"
+  log.call "API : commands, verb : GET, route : list, format : #{format}"
   obj =  splash_return case: :quiet_exit, :more => "Commands list"
   obj[:data] = get_config.commands
   content_type format
@@ -15,7 +15,7 @@ WebAdminApp.get '/api/commands/list.?:format?' do
 WebAdminApp.get '/api/commands/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : commands, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
+  log.call "API : commands, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
   commands_recordset = get_config.commands[params[:name].to_sym]
   unless commands_recordset.nil? then
     obj = splash_return case: :quiet_exit

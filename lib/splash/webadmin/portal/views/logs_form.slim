@@ -1,18 +1,24 @@
 - unless @data.empty?
-  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Modify Splash log monitoring : #{@data[:label]}
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Modify Splash log monitoring : #{@data[:label]}
 - else
-  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Add new Splash log monitoring
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Add new Splash log monitoring
+
+script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"
 
 form.uk-form.uk-form-horizontal#query action="/save_log" method="POST"
   label.uk-form-label for="label" Label
-  input.uk-form-width-large#label type="text" placeholder="label" name="label" value="#{@data[:label].to_s}"
+  <input class="uk-form-width-large" id="label" type="text" placeholder="label" name="label" value="#{@data[:label].to_s}" required>
   div &nbsp;
   label.uk-form-label for="pattern" Pattern
-  input.uk-form-width-large#pattern type="text" placeholder="pattern" name="pattern" value="#{@data[:pattern]}"
+  <input class="uk-form-width-large" id="pattern" type="text" placeholder="pattern" name="pattern" value="#{@data[:pattern]}" required>
     div &nbsp;
   label.uk-form-label for="log" Log file
-  input.uk-form-width-large#log type="text" placeholder="log" name="log" value="#{@data[:log]}"
+  <input class="uk-form-width-large" id="log" type="text" placeholder="log" name="log" value="#{@data[:log]}" required>
   div &nbsp;
-
+  - unless @data.empty?
+    input type="hidden" name="update" value="true"
+    input type="hidden" name="old_label" value="#{@data[:old_label].to_s}"
   div.uk-align-right
-    input.uk-button.uk-button-primary type="submit" value="Submit"
+    input.uk-button.uk-button-small-primary type="submit" value="Submit"
+javascript:
+  $("#query").validate();

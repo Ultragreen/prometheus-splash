@@ -1,5 +1,7 @@
 WebAdminApp.get '/processes' do
   get_menu 1
+  log = get_logger
+  log.call "WEB : processes, verb : GET, controller : /processes"
   url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/process/list.yml"
   raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
   @data = YAML::load(raw)[:data]

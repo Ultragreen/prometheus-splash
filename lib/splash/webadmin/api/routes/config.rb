@@ -1,7 +1,7 @@
 WebAdminApp.get '/api/config/full.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : config, verb : GET, route : full, format : #{format}"
+  log.call "API : config, verb : GET, route : full, format : #{format}"
   config = get_config.full
   obj =  splash_return case: :quiet_exit, :more => "Show internal Splash Config"
   obj[:data] = config
@@ -13,7 +13,7 @@ WebAdminApp.get '/api/config/fromfile.?:format?' do
   log = get_logger
   fromfile = {}
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : config, verb : GET, route : fromfile, format : #{format}"
+  log.call "API : config, verb : GET, route : fromfile, format : #{format}"
   config = get_config.config_from_file
   fromfile =  splash_return case: :quiet_exit, :more => "Show config from file"
   fromfile[:data] = config
@@ -26,7 +26,7 @@ WebAdminApp.post '/api/config/addlog.?:format?' do
   log = get_logger
   addlog = {}
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : config, verb : POST, route : addlog, format : #{format}"
+  log.call "API : config, verb : POST, route : addlog, format : #{format}"
   res = get_config.add_log :record => YAML::load(request.body.read), :type => :logs, :clean => true
   case res[:status]
   when :success
@@ -45,7 +45,7 @@ end
 WebAdminApp.delete '/api/config/deletelog/:label.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
-  log.call "api : config, verb : DELETE, route : deletelog, format : #{format}"
+  log.call "API : config, verb : DELETE, route : deletelog, format : #{format}"
   res = get_config.delete_log label: params[:label].to_sym
   deletelog = {}
   case res[:status]

@@ -10,7 +10,13 @@
   height: 7em;
 }
 
+h2 {
+  color: green;
+}
 
+.error {
+  color: red;
+}
 
 .wrapper {
     overflow-y:scroll;

@@ -1,9 +1,18 @@
-h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Logs configured in Splash
+h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Logs configured in Splash
+
+
+- unless @log_saved.nil?
+  javascript:
+    UIkit.notify("Log record #{@log_saved} saved", {status:'success'});
+- unless @log_failed.nil?
+  javascript:
+    UIkit.notify("Log record #{@log_saved} not saved", {status:'danger'});
+
 
 javascript:
   $(document).on( 'click','input.delete-log',function(){
     var id = this.id;
-    var url = "/api/config/deletelog/" +  id;
+    var url = "/api/config/deletelog/" +  id + ".json";
     UIkit.modal.confirm('Are you sure?', function(){
       console.debug(url)
       $.ajax({
@@ -21,8 +30,6 @@ javascript:
           }
         },
         error: function(e) {
-          console.log("ERROR: ", e);
-          console.debug('toto' )
           UIkit.notify("Deleting log for " + id + " failed !", {status:'danger'});
         }
       });
@@ -40,30 +47,33 @@ div.uk-width-medium-1-1
           th Definition
           th Status
           th Actions
-        tbody
-          - @data.each do |log|
-            tr id="#{log[:label].to_s}"
-              td <b>Label</b> : #{log[:label]}
-              td
+      tbody
+        - @data.each do |log|
+          tr id="#{log[:label].to_s}"
+            td <b>Label</b> : #{log[:label]}
+            td
+              ul
+                li <b>File</b> : #{log[:log]}
+                li <b>Pattern</b> : #{log[:pattern]}
+            td
+              - if @result[log[:label]][:status] == :missing
+                div.uk-badge.uk-badge-warning missing
+              - if @result[log[:label]][:status] == :clean
+                div.uk-badge.uk-badge-success success
                 ul
-                  li <b>File</b> : #{log[:log]}
-                  li <b>Pattern</b> : #{log[:pattern]}
-              td
-                - if @result[log[:label]][:status] == :missing
-                  div.uk-badge.uk-badge-warning missing
-                - if @result[log[:label]][:status] == :clean
-                  div.uk-badge.uk-badge-success success
-                  ul
-                    li <b>Lines count</b> : #{@result[log[:label]][:lines]}
-                - if @result[log[:label]][:status] == :matched
-                  div.uk-badge.uk-badge-danger matched
-                  ul
-                    li <b>Lines count</b> : #{@result[log[:label]][:lines]}
-                    li <b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>
-              td
-                div.uk-button-group
-                  input.delete-log.uk-button.uk-button-mini.uk-button-danger id="#{log[:label].to_s}" value="Delete"
-                  input.moidfy-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="Modify"
-    div.uk-align-right
-      form.uk-form.uk-form-horizontal#query action="/add_modify_log" method="POST"
-        input.add-log.uk-button.uk-button-primary type="submit" value="Add new log"
+                  li <b>Lines count</b> : #{@result[log[:label]][:lines]}
+              - if @result[log[:label]][:status] == :matched
+                div.uk-badge.uk-badge-danger matched
+                ul
+                  li <b>Lines count</b> : #{@result[log[:label]][:lines]}
+                  li <b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>
+            td
+              input.delete-log.uk-button.uk-button-mini.uk-button-danger id="#{log[:label].to_s}" value="Delete"
+              br
+              input.modify-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="Modify" onclick="location.href='/add_modify_log/#{log[:label].to_s}';"
+              br
+              input.history-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="History" onclick="location.href='/history/#{log[:label].to_s}';"
+  div.uk-align-right
+    form.uk-form.uk-form-horizontal#query action="/add_modify_log" method="GET"
+      div &nbsp;
+      input.add-log.uk-button type="submit" value="Add new log"

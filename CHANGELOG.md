@@ -150,3 +150,7 @@
 * orchestrator rebuild
 * reshash config and reset + grammar and Cli
 * refacto config
+
+## V 0.8.1
+* full Web UI features for Logs (R/W)
+* API Logs Full

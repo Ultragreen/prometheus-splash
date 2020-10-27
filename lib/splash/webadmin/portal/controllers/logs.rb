@@ -12,3 +12,16 @@ WebAdminApp.get '/logs' do
   }
   slim :logs, :format => :html
 end
+
+
+WebAdminApp.post '/add_modify_log/?:label?' do
+  get_menu 0
+  @data = {}
+  if params[:label] then
+    url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/logs/show/#{params[:label].to_s}.yml"
+    raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
+    res = YAML::load(raw)
+    @data = res[:data] if res[:status] == :success
+  end
+  slim :logs_form, :format => :html
+end

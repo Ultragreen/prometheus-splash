@@ -7,7 +7,7 @@ div.uk-grid
         <i class="uk-icon-question-circle"></i> &nbsp;&nbsp;Request
       form.uk-form.uk-form-horizontal#query action="/restclient/query" method="POST"
         label.uk-form-label for="method" Method
-        select.uk-form-large#method name="method"
+        select#method name="method"
           option GET
           option POST
           option DELETE
@@ -15,7 +15,10 @@ div.uk-grid
         div &nbsp;
         label.uk-form-label for="url" Endpoint
         input.uk-form-width-large#url type="text" placeholder="url" name="url"
-        dev.uk-align-right
+        div &nbsp;
+        label.uk-form-label for="body" Body
+        textarea.uk-form-large cols="50" name="body" rows="5" placeholder="body"
+        div.uk-align-right
           input.uk-button.uk-button-primary type="submit" value="Send"
 
 div.uk-grid

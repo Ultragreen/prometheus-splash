@@ -4,25 +4,36 @@ ul.uk-list
   li <b>URL</b> : #{@url}
 h3 Result :
 - unless @result == false
-  table.uk_table
-    tr
-      td.uk-width-2-10
-        i.uk-icon-dollar
-        | &nbsp;<b>Return code :</b>
-      td.uk-width-8-10 #{@result.code}
-    tr
-      td.uk-width-2-10
-        i.uk-icon-file-o
-        | &nbsp;<b>Body :</b>
-      td.uk-width-8-10.uk-scrollable-text <pre><code>#{@result}</code></pre>
-    tr
-      td.uk-width-2-10
-        i.uk-icon-header
-        | &nbsp;<b>Headers :</b>
-      td.uk-width-8-10
-        ul
-          - @result.headers.each do |hkey,value|
-            li <i><b>#{hkey}:</b> &nbsp; &nbsp; #{value}</i>
+  div.uk-grid.uk-text-small
+    div.uk-width-1-2
+      table.uk-table
+        tr
+          td.uk-width-2-10
+            i.uk-icon-file-o
+            | &nbsp;<b>Body :</b>
+          td.uk-width-8-10.uk-scrollable-text <pre><code>#{@result}</code></pre>
+    div.uk-width-1-2
+      table.uk-table
+        tr
+          td.uk-width-2-10
+            i.uk-icon-dollar
+            | &nbsp;<b>Return code :</b>
+          td.uk-width-8-10 #{@result.code}
+        tr
+          td.uk-width-2-10
+            i.uk-icon-header
+            | &nbsp;<b>Headers :</b>
+          td.uk-width-8-10
+            ul
+              - @result.headers.each do |hkey,value|
+                li <i><b>#{hkey}:</b> &nbsp; &nbsp; #{value}</i>
+    div.uk-width-1-2
+      table.uk-table
+        tr
+          td.uk-width-2-10
+            i.uk-icon-file-o
+            | &nbsp;<b>Body :</b>
+          td.uk-width-8-10.uk-scrollable-text <pre><code>#{@result}</code></pre>
 
 - else
   div.uk-alert.uk-alert-danger

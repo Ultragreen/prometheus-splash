@@ -1,18 +1,48 @@
 h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Logs configured in Splash
 
+javascript:
+  $(document).on( 'click','input.delete-log',function(){
+    var id = this.id;
+    var url = "/api/config/deletelog/" +  id;
+    UIkit.modal.confirm('Are you sure?', function(){
+      console.debug(url)
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        success: function( data ) {
+          console.debug(data)
+          if (data['status'] == 'success') {
+            $('table#logrecords tr#' + id).remove();
+            UIkit.notify("Deleting log for " + id + " done", {status:'success'});
+          }
+          else
+          {
+            UIkit.notify("Deleting log for " + id + " failed !", {status:'danger'});
+          }
+        },
+        error: function(e) {
+          console.log("ERROR: ", e);
+          console.debug('toto' )
+          UIkit.notify("Deleting log for " + id + " failed !", {status:'danger'});
+        }
+      });
+    });
+  });
+
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     span.uk-text-large.uk-text-bold List of logs monitored
     br
-    table.uk-table.uk-table-hover.uk-table-striped
+    table#logrecords.uk-table.uk-table-hover.uk-table-striped
       thead
         tr
           th Log record label
           th Definition
           th Status
+          th Actions
         tbody
           - @data.each do |log|
-            tr
+            tr id="#{log[:label].to_s}"
               td <b>Label</b> : #{log[:label]}
               td
                 ul
@@ -30,3 +60,10 @@ div.uk-width-medium-1-1
                   ul
                     li <b>Lines count</b> : #{@result[log[:label]][:lines]}
                     li <b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>
+              td
+                div.uk-button-group
+                  input.delete-log.uk-button.uk-button-mini.uk-button-danger id="#{log[:label].to_s}" value="Delete"
+                  input.moidfy-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="Modify"
+    div.uk-align-right
+      form.uk-form.uk-form-horizontal#query action="/add_modify_log" method="POST"
+        input.add-log.uk-button.uk-button-primary type="submit" value="Add new log"

@@ -1,0 +1,18 @@
+- unless @data.empty?
+  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Modify Splash log monitoring : #{@data[:label]}
+- else
+  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Add new Splash log monitoring
+
+form.uk-form.uk-form-horizontal#query action="/save_log" method="POST"
+  label.uk-form-label for="label" Label
+  input.uk-form-width-large#label type="text" placeholder="label" name="label" value="#{@data[:label].to_s}"
+  div &nbsp;
+  label.uk-form-label for="pattern" Pattern
+  input.uk-form-width-large#pattern type="text" placeholder="pattern" name="pattern" value="#{@data[:pattern]}"
+    div &nbsp;
+  label.uk-form-label for="log" Log file
+  input.uk-form-width-large#log type="text" placeholder="log" name="log" value="#{@data[:log]}"
+  div &nbsp;
+
+  div.uk-align-right
+    input.uk-button.uk-button-primary type="submit" value="Submit"

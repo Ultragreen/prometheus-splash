@@ -62,6 +62,9 @@ module CLISplash
 
     end
 
+
+    
+
     # Thor method : display a specific Splash configured log monitor
     desc "show LOG", "show Splash configured log monitoring for LOG"
     def show(logrecord)

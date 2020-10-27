@@ -152,5 +152,13 @@
 * refacto config
 
 ## V 0.8.1
+
+### FEATURE
 * full Web UI features for Logs (R/W)
 * API Logs Full
+
+## V 0.8.2
+
+### FIX
+* WebAdmin UI bugs and cosmetics
+* API (constants CLONE for exiter)

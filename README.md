@@ -31,7 +31,7 @@ Splash is succesfully tested with Ruby 2.7.0, but it should works correctly with
 
 On Ubuntu :
 
-    # apt install ruby
+    # apt install ruby ruby-dev
 
 In some use case, Splash also require some other components :
 
@@ -39,7 +39,7 @@ In some use case, Splash also require some other components :
 - RabbitMQ
 
 It's not strictly required, Redis is a real option for backend; you could configure backend to flat file, but
-RabbitMQ is required by the Splash Daemon when using host2host sequence execution.
+RabbitMQ is required by the Splash Daemon when using host2host commands/sequence execution.
 
 Redis, is usefull when you need a centralized Splash management.
 
@@ -55,7 +55,7 @@ See Backends Configuration  and Transports Configuration to specify this service
 
 Install with gem command :
 
-    $ gem install splash
+    $ gem install prometheus-splash
 
 
 ## Configuration
@@ -68,7 +68,8 @@ As root or with rvmsudo, if you use RVM.
     👍 Splash Initialisation
     👍 Installing template file : /etc/splash_execution_report.tpl
     👍 Creating/Checking pid file path : /var/run/splash
-    👍 Creating/Checking trace file path : /var/run/spla
+    👍 Creating/Checking trace file path : /var/run/splash/traces :
+    💪 Splash Setup terminated successfully
 
 *NOTE : you can just type 'splash' withou any arguments, for the first setup because, Splash come with an automatic recovery mode, when configuration file is missing, run at the very beginnning of his the execution*     
 
@@ -80,15 +81,12 @@ As root, edit /etc/splash.conf and adapt Prometheus Pushgateway Configuration :
     # vi /etc/splash.yml
     [..]
       :prometheus:
-        :pushgateway:
-          :host: <SERVER>
-          :port: <PORT>
+        :pushgateway: 'http://localhost:9091'
+        :url: 'http://localhost:9090'
+        :alertmanager: 'http://localhost:9093'
+
     [..]
 
-With :
-
-- SERVER : IP or fqdn of the Gateway.
-- PORT : the specific TCP port of the Gateway.
 
 If you have already setup, you could use --preserve option to keep your active configuration and report file on place
 This is usefull for automatique Idempotent installation like with Ansible :
@@ -101,12 +99,12 @@ This is usefull for automatique Idempotent installation like with Ansible :
 As root or with rvmsudo, if you use RVM.
 
     # splash conf san
-    Splash -> sanitycheck :
-    * Config file : /etc/splash.yml : [OK]
-    * PID Path : /tmp : [OK]
-    * trace Path : /tmp/splash : [OK]
-    * Prometheus PushGateway Service running : [OK]
-    Sanitycheck finished with no errors
+    ℹ Splash -> sanitycheck :
+    👍 Config file : /etc/splash.yml
+    👍 PID Path : /var/run/splash
+    👍 Trace Path : /var/run/splash/traces  
+    👍 Prometheus PushGateway Service running
+    💪 Splash Sanitycheck terminated successfully
 
 *WARNING* : setup or Sanitycheck could precises errors if path defined in configuration is *Symbolic links*, type :mode.
 But it's not a problem for Splash to be operational.
@@ -123,8 +121,8 @@ For file/folders if problems is detected, it could be such as :
 run :
 
     $ splash config version
-    Splash version : 0.6.0, Author : Romain GEORGES <gems@ultragreen.net>
-    Ultragreen (c) 2020 BSD-2-Clause
+    ℹ Splash version : 0.8.2, Author : Romain GEORGES <gems@ultragreen.net>
+    ℹ Ultragreen (c) 2020 BSD-2-Clause
 
 
 ## Usage
@@ -140,18 +138,25 @@ In the /etc/splash.yml, you need to adapt default config to monitor your logs.
     [..]
     ### configuration of monitored logs
       :logs:
-        - :log: /a/log/path.log
+        - :label: :a_label
+          :log: /a/log/path.log
           :pattern: <regexp pattern>
-        - :log: /an/other/log/path.log
-          :pattern: <regexp pattern
+          :retention:
+            :hours: 10
+        - :label: :an_other_label
+          :log: /an/other/log/path.log
+          :pattern: <regexp pattern>
+          :retention:
+            :days: 1
         - <etc...>
     [..]
 
 Config for log is a YAML list of Hash, with keys :
 
+- :label : a Symbol like ':xxxxxx' used in Splash internaly to identify logs records
 - :log : a log absolut paths
 - :pattern : a regular expression splash need to detect
-
+- :retention : a hash with keys like (:days or :hours) and a periode in value
 
 #### Prerequisite
 
@@ -169,11 +174,12 @@ or
 
     # slash logs help
     Commands:
-      splash logs analyse         # analyze logs in config
+      splash logs analyse         # analyze logs defined in Splash config
       splash logs help [COMMAND]  # Describe subcommands or one specific subcommand
-      splash logs list            # Show configured logs monitoring
-      splash logs monitor         # monitor logs in config
-      splash logs show LOG        # show configured log monitoring for LOG
+      splash logs history LABEL   # show logs monitoring history
+      splash logs list            # List all Splash configured logs monitoring
+      splash logs monitor         # monitor logs defined in Splash config
+      splash logs show LOG        # show Splash configured log monitoring for LOG
 
 *Typicallly, the way work with all Splash commands or subcommands*
 
@@ -188,9 +194,9 @@ Verify /tmp/test and /tmp/test2 not existence
 Verify configured logs :
 
     # splash logs list
-    Splash configured log monitoring :
-     *  log monitor : /tmp/test
-     *  log monitor : /tmp/test2
+    ℹ Splash configured log monitoring :
+      🔹 log monitor : /tmp/test label : log_app_1
+      🔹 log monitor : /tmp/test2 label : log_app_2
 
 You could run list commands with --detail option , verify it with :
 
@@ -199,29 +205,31 @@ You could run list commands with --detail option , verify it with :
 like :
 
     # splash logs list --detail
-    Splash configured log monitoring :
-     *  log monitor : /tmp/test
-      ->   pattern : /ERROR/
-     *  log monitor : /tmp/test2
-      ->   pattern : /ERROR/
+    ℹ Splash configured log monitoring :
+      🔹 log monitor : /tmp/test label : log_app_1
+        ➡ pattern : /ERROR/
+      🔹 log monitor : /tmp/test2 label : log_app_2
+        ➡ pattern : /ERROR/
 
-You cloud view a specific logs record detail with
 
-    # splash logs show /tmp/test2  
-    Splash log monitor : /tmp/test2
-      ->   pattern : /ERROR/
+You cloud view a specific logs record detail with :
+
+    # splash logs show /tmp/test
+    ℹ Splash log monitor : /tmp/test
+    🔹 pattern : /ERROR/
+    🔹 label : log_app_1
+
+*this command Work with a logname or the label*
 
 Run a first analyse, you would see :
 
     # splash logs analyse
-    SPlash Configured logs status :
-      * Log : /tmp/test : [KO]
-        - Detected pattern : ERROR
-        - detailled Status : missing
-      * Log : /tmp/test2 : [KO]
-        - Detected pattern : ERROR
-        - detailled Status : missing
-    Global Status : [KO]
+    ℹ SPlash Configured log monitors :
+    👎 Log : /tmp/test with label : log_app_1 : missing !
+      🔹 Detected pattern : ERROR
+    👎 Log : /tmp/test2 with label : log_app_2 : missing !
+      🔹 Detected pattern : ERROR
+    🚫 Global status : some error found
 
 Create empty Files, or without ERROR string in.
 
@@ -231,16 +239,14 @@ Create empty Files, or without ERROR string in.
 Re-run analyse :
 
     # splash log an
-    SPlash Configured logs status :
-      * Log : /tmp/test : [OK]
-        - Detected pattern : ERROR
-        - detailled Status : clean
-          nb lines = 1
-      * Log : /tmp/test2 : [OK]
-        - Detected pattern : ERROR
-        - detailled Status : clean
-          nb lines = 0
-    Global Status : [OK]
+    ℹ SPlash Configured log monitors :
+    👍 Log : /tmp/test with label : log_app_1 : no errors
+      🔹 Detected pattern : ERROR
+      🔹 Nb lines = 1
+    👍 Log : /tmp/test2 with label : log_app_2 : no errors
+      🔹 Detected pattern : ERROR
+      🔹 Nb lines = 0
+    👍 Global status : no error found
 
 It's alright, log monitoring work fine.
 
@@ -249,15 +255,13 @@ It's alright, log monitoring work fine.
 Splash is made to run a specific daemon to do this job, but you could do one time, with :
 
     # splash logs monitor
-    Sending metrics to Prometheus Pushgateway
-      * Sending metrics for /tmp/test
-      * Sending metrics for /tmp/test2
-    Sending done.
+    ℹ Sending metrics to Prometheus Pushgateway
+    👍 Sending metrics for log /tmp/test to Prometheus Pushgateway
+    👍 Sending metrics for log /tmp/test2 to Prometheus Pushgateway
 
 if Prometheus Gateway is not running or misconfigured, you could see :
 
-    Prometheus PushGateway Service IS NOT running
-    Exit without notification.
+    ⛔ Splash Service dependence missing : Prometheus Notification not send.
 
 Otherwise Prometheus PushGateway have received the metrics :
 
@@ -293,12 +297,16 @@ To see all the commands in the 'commands' submenu :
 
     $ splash commands                           
     Commands:
-      splash commands help [COMMAND]   # Describe subcommands or one specific subcommand
-      splash commands lastrun COMMAND  # Show last running result for specific configured command COMMAND
-      splash commands list             # Show configured commands
-      splash commands run NAME         # run for command/sequence or ack result
-      splash commands show COMMAND     # Show specific configured command COMMAND
-      splash commands treeview         # Show commands sequence tree
+      splash commands execute NAME                    # run for command/sequence or ack result
+      splash commands getreportlist                   # list all executions report results
+      splash commands help [COMMAND]                  # Describe subcommands or one specific subcommand
+      splash commands history LABEL                   # show commands executions history
+      splash commands lastrun COMMAND                 # Show last running result for specific configured command COMMAND
+      splash commands list                            # Show configured commands
+      splash commands onerun COMMAND -D, --date=DATE  # Show running result for specific configured command COMMAND
+      splash commands schedule NAME                   # Schedule excution of command on Splash daemon
+      splash commands show COMMAND                    # Show specific configured command COMMAND
+      splash commands treeview                        # Show commands sequence tree
 
 #### Prepare test with default configuration
 
@@ -400,40 +408,44 @@ if you want to inject default configuration, again as root :
 You could list the defined commands, in your case :
 
     $ splash commands list
-    Splash configured commands :
-    * id_root
-    * true_test
-    * false_test
-    * ls_slash_tmp
-    * pwd
-    * echo1
-    * echo2
-    * echo3
+    ℹ Splash configured commands :
+    🔹 id_root
+    🔹 true_test
+    🔹 false_test
+    🔹 ls_slash_tmp
+    🔹 pwd
+    🔹 echo1
+    🔹 echo2
+    🔹 echo3
+    🔹 rand_sleep_5
+    🔹 test_remote_call
+
 
 #### Show specific commands
 
 You could show a specific command :
 
     $ splash com show pwd
-    Splash command : pwd
-      - command line : 'pwd'
-      - command description : 'run pwd'
-      - command failure callback : 'echo2'
-      - command success callback : 'echo1'
+    ℹ Splash command : pwd
+    🔹 command line : 'pwd'
+    🔹 command description : 'run pwd'
+    🔹 command failure callback : 'echo2'
+    🔹 command success callback : 'echo1'
+
 
 #### View Sequence execution for commands
 
 You could trace execution sequence for a commands as a tree, with :
 
     # splash com treeview
-    Command : true_test
-      * on failure => ls_slash_tmp
-        * on success => echo1
-          * on failure => echo3
-      * on success => pwd
-        * on failure => echo2
-        * on success => echo1
-          * on failure => echo3
+    ℹ Command : true_test
+    * on failure => ls_slash_tmp
+      * on success => echo1
+        * on failure => echo3
+    * on success => pwd
+      * on failure => echo2
+      * on success => echo1
+        * on failure => echo3
 
 In your sample, in all case :
 - :true_test return 0
@@ -451,10 +463,12 @@ commands execution sequence will be :
 Running a standalone command with ONLY as root
 
     # splash com execute echo1
-    Executing command : 'echo1'
-      * Tracefull execution
-       => exitcode 0
-      * Prometheus Gateway notified.
+    ℹ Executing command : 'echo1'
+      🔹Tracefull execution
+    👍 Command executed
+      ➡ exitcode 0
+    👍 Sending metrics to Prometheus Pushgateway
+
 
 This command :
 
@@ -485,59 +499,66 @@ Splash allow execution of callback (:on_failure, :on_success), you have already 
 In our example, we have see :true_test have a execution sequence, we're going to test this, as root :
 
     # splash com exe true_test
-    Executing command : 'true_test'
-      * Tracefull execution
-       => exitcode 0
-      * Prometheus Gateway notified.
-      * On success callback : pwd
-    Executing command : 'pwd'
-      * Tracefull execution
-       => exitcode 0
-      * Prometheus Gateway notified.
-      * On success callback : echo1
-    Executing command : 'echo1'
-    * Tracefull execution
-     => exitcode 0
-    * Prometheus Gateway notified.
+    ℹ Executing command : 'true_test'
+      🔹 Tracefull execution
+    👍 Command executed
+      ➡ exitcode 0
+    👍 Sending metrics to Prometheus Pushgateway
+      🔹 On success callback : pwd
+    ℹ Executing command : 'pwd'
+      🔹 Tracefull execution
+    👍 Command executed
+      ➡ exitcode 0
+    👍 Sending metrics to Prometheus Pushgateway
+      🔹 On success callback : echo1
+    ℹ Executing command : 'echo1'
+      🔹 Tracefull execution
+    👍 Command executed
+      ➡ exitcode 0
+    👍 Sending metrics to Prometheus Pushgateway
+
 
 We could verify the sequence determined with lastrun command.
 
 If you want to prevent callback execution, as root :
 
       # splash com exe true_test --no-callback
-      Executing command : 'true_test'
-       * Tracefull execution
-        => exitcode 0
-       * Prometheus Gateway notified.
-       * Without callbacks sequences
+      ℹ Executing command : 'true_test'
+        🔹 Tracefull execution
+      👍 Command executed
+        ➡ exitcode 0
+      👍 Sending metrics to Prometheus Pushgateway
+        🔹 Without callbacks sequences
 
 #### Display the last execution trace for a command
 
 If you want to view the last execution trace for  commande, (only if executed with --trace : default)
 
-    # splash com lastrun
-    Splash command pwd previous execution report:
+    # splash com lastrun pwd
+    ℹ Splash command pwd previous execution report:
 
     Command Execution report
     ========================
 
-    Date START: 2020-04-07T18:25:22+02:00
-    Date END: 2020-04-07T18:25:22+02:00
+    Date START: 2020-10-28T13:38:36+01:00
+    Date END: 2020-10-28T13:38:36+01:00
     Command : pwd
     full command line : pwd
     Description : run pwd
-    errorcode : pid 86782 exit 0
-    Execution time (sec) : 0.006568
+    errorcode : pid 10958 exit 0
+    Execution time (sec) : 0.00737092
 
     STDOUT:
     -------
 
-    /Users/ruydiaz/labo/prometheus-splash
+    /home/xxx/prometheus-splash
 
 
 
     STDERR:
     -------
+
+
 
 
 Lastrun could receive the --hostname option to get the execution report of command
@@ -554,6 +575,9 @@ For the moment Splash come with two types of backend :
 backend are usable for :
 
 - execution trace
+- transfers_trace
+- logs_trace
+- process_trace
 
 ##### File backend
 
@@ -597,20 +621,22 @@ Edit /etc/splash.yml, as root :
 - :base must be set as the Redis base number (default: 1)
 - :auth should be set if Redis need an simple authentification key <mykey>
 
-##### Prometheus PushGateway configuration
+##### Prometheus configuration
 
-Prometheus PushGateway could be configured in /etc/splash.yaml
+Prometheus services could be configured in /etc/splash.yaml
 
     # vi /etc/splash.yml
     [...]
       :prometheus:
-        :pushgateway:
-          :host: "localhost"
-          :port: 9091
+        :pushgateway: http://localhost:9091
+        :url: http://localhost:9090
+        :alertmanager: http://localhost:9093
+
     [...]
 
--  :host should be set as the Prometheus PushGateway hostname (default: localhost)
--  :port should be set as the Prometheus PushGateway port (default: 9091)
+-  :pushgateway should be set as the Prometheus PushGateway url (default: http://localhost:9091 )
+-  :url should be set as the Prometheus main service (default: http://localhost:9090)
+-  :alertmanager should be set as the Prometheus Alertmanager service (default: http://localhost:9093)
 
 ### The Splash daemon
 
@@ -621,15 +647,144 @@ We're going to discover the Big part of Splash the Daemon, usefull to :
 - orchestration
 - scheduling
 - Log monitoring (without CRON scheduling)
+- Process monitoring (without CRON scheduling)
+- Transfers scheduling (TODO)
 - host2host sequences execution (optionnal )
+
+
+#### Prerequisite
+
+Splash Daemon requiere Rabbitmq Configured and launched
+if you try to run Splash with Rabbitmq, it will be failed :
+
+    # sudo splash dae start
+    ⛔ Splash Service dependence missing : RabbitMQ Transport not available.
+
+*WARNING : if RabbitMQ service shutdown, Splash will shutdown also !*
+
+You cloud configure RabbitMQ in the /etc/splash.yml :
+
+    [...]
+    :transports:
+      :active: :rabbitmq
+      :rabbitmq:
+        :vhost: "/"
+        :port: 5672
+        :host: localhost
+    [...]
+
+*RabbitMQ, is the only transport service usable actually in Splash*
+
+Where :
+* vhost: is the RabbitMQ vhost used to store Splash Queues
+* port : the TCP RabbitMQ port (default : 5672)
+* Host : the hostname or IP of the RabbitMQ service (default : localhost)
+
+#### the Daemon Splash subcommand
+
+run this command :
+
+    # splash daemon
+    Commands:
+      splash daemon getjobs         # send a get_jobs verb to HOSTNAME daemon over transport (need an active tranport), Typicallly Ra...
+      splash daemon getjobs         # send a reset verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ
+      splash daemon help [COMMAND]  # Describe subcommands or one specific subcommand
+      splash daemon ping HOSTNAME   # send a ping to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ
+      splash daemon purge           # Purge Transport Input queue of Daemon
+      splash daemon start           # Starting Splash Daemon
+      splash daemon status          # Splash Daemon status
+      splash daemon stop            # Stopping Splash Daemon
 
 #### Controlling the daemon
 
-TODO
+##### Running Daemon
+
+    # sudo splash dae start
+    ℹ Queue : splash.live.input purged
+    👍 Splash Daemon Started, with PID : 16904
+    💪 Splash Daemon successfully loaded.
+
+Start command support multiples options, you cloud see it by typing :
+
+    # sudo splash dae help start
+    Usage:
+      splash daemon start
+
+      Options:
+        -F, [--foreground], [--no-foreground]  
+            [--purge], [--no-purge]            
+                                         # Default: true
+            [--scheduling], [--no-scheduling]  
+                                         # Default: true
+
+      Description:
+        Starting Splash Daemon
+
+        With --foreground, run Splash in foreground
+
+        With --no-scheduling, inhibit commands scheduling
+
+        With --no-purge, inhibit purge Input Queue for Splash Daemon
+
+
+##### Status Daemon
+
+if daemon is stopped :
+
+    # sudo splash dae status
+    🔹 Splash Process not found
+    🔹 and PID file don't exist
+    💪 Status OK
+
+
+If daemon is running :
+
+    # splash dae status
+    🔹 Splash Process is running with PID 974
+    🔹 and PID file exist with PID 974
+    💪 Status OK
+
+
+##### Stopping Daemon
+
+    # sudo splash dae stop
+    💪 Splash stopped succesfully
+
 
 #### Configuring the daemon
 
-TODO
+the configuration of the daemon could be done in the /etc/splash.yml
+    [...]
+    :daemon:
+      :logmon_scheduling:
+        :every: 20s
+      :metrics_scheduling:
+        :every: 15s
+      :procmon_scheduling:
+        :every: 20s
+      :process_name: 'Splash : daemon.'
+      :files:
+        :stdout_trace: stdout.txt
+        :stderr_trace: stderr.txt
+        :pid_file: splash.pid
+[...]
+
+Where :
+
+* logmon_scheduling : (Hash) a scheduling for Log monitoring, (default: every 20s) it support :
+  * :every: "<timing>" ex: "1s", "3m", "2h"
+  * :at: "<date/time>" ex: "2030/12/12 23:30:00"
+  * :cron: * * * * * a cron format
+
+
+* metrics_scheduling : (Hash) a scheduling for internals metrics for  daemon, (default: every 20s), scheduled as logmon_scheduling
+
+* procmon_scheduling : (Hash) a scheduling for Process monitoring, (default: every 20s), scheduled as logmon_scheduling
+
+[Rufus Scheduler Doc](https://github.com/jmettraux/rufus-scheduler)
+
+
+#### Daemon metrics
 
 
 ### Ecosystem
@@ -656,74 +811,141 @@ TODO
 
 
 
-    # the only one non-overridable by the configuration
-    CONFIG_FILE = "/etc/splash.yml"
+     # Current splash version
+     VERSION = "0.8.3"
+     # the path to th config file, not overridable by config
+     CONFIG_FILE = "/etc/splash.yml"
+     # the default execution trace_path if backend file
+     TRACE_PATH="/var/run/splash"
+     # the default pid file path
+     PID_PATH="/var/run"
 
 
-    TRACE_PATH="/var/run/splash"
+     # default scheduling criteria for log monitoring
+     DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
+     # default scheduling criteria for  metrics notifications
+     DAEMON_METRICS_SCHEDULING={ :every => '15s'}
+     # default scheduling criteria for process monitoring
+     DAEMON_PROCMON_SCHEDULING={ :every => '20s'}
 
-    DAEMON_LOGMON_SCHEDULING={ :every => '20s'}
-    DAEMON_PROCESS_NAME="Splash : daemon."
-    DAEMON_PID_PATH="/var/run"
-    DAEMON_PID_FILE="splash.pid"
-    DAEMON_STDOUT_TRACE="stdout.txt"
-    DAEMON_STDERR_TRACE="stderr.txt"
+     # the display name of daemon in proc info (ps/top)
+     DAEMON_PROCESS_NAME="Splash : daemon."
+     # the default pid file name
+     DAEMON_PID_FILE="splash.pid"
+     # the default sdtout trace file
+     DAEMON_STDOUT_TRACE="stdout.txt"
+     # the default sdterr trace file
+     DAEMON_STDERR_TRACE="stderr.txt"
 
-    AUTHOR="Romain GEORGES"
-    EMAIL = "gems@ultragreen.net"
-    COPYRIGHT="Ultragreen (c) 2020"
-    LICENSE="BSD-2-Clause"
+     # the Author name
+     AUTHOR="Romain GEORGES"
+     # the maintainer mail
+     EMAIL = "gems@ultragreen.net"
+     # legal Copyright (c) 2020 Copyright Utragreen All Rights Reserved.
+     COPYRIGHT="Ultragreen (c) 2020"
+     # type of licence
+     LICENSE="BSD-2-Clause"
 
-    PROMETHEUS_PUSHGATEWAY_HOST = "localhost"
-    PROMETHEUS_PUSHGATEWAY_PORT = "9091"
+     # the default prometheus pushgateway URL
+     PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9091/'
 
-    EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
-    EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+     # the default prometheus Alertmanager URL
+     PROMETHEUS_ALERTMANAGER_URL = 'http://localhost:9092/'
 
-    BACKENDS_STRUCT = { :list => [:file,:redis],
-                    :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
-    TRANSPORTS_STRUCT = { :list => [:rabbitmq],
-                    :active => :rabbitmq,
-                    :rabbitmq => { :url => 'amqp://localhost/'} }
+     # the default prometheus URL
+     PROMETHEUS_URL = "http://localhost:9090/"
+
+     # the default path fo execution report template
+     EXECUTION_TEMPLATE="/etc/splash_execution_report.tpl"
+
+     # the list of authorized tokens for template, carefull override,
+     EXECUTION_TEMPLATE_TOKENS_LIST = [:end_date,:start_date,:cmd_name,:cmd_line,:stdout,:stderr,:desc,:status,:exec_time]
+
+     # backends default settings
+     BACKENDS_STRUCT = { :list => [:file,:redis],
+                         :stores => { :execution_trace => { :type => :file, :path => "/var/run/splash" }}}
+     # transports default settings
+     TRANSPORTS_STRUCT = { :list => [:rabbitmq],
+                           :active => :rabbitmq,
+                           :rabbitmq => { :port => 5672, :host => "localhost", :vhost => '/'} }
+
+     # loggers default settings
+     LOGGERS_STRUCT = { :list => [:cli,:daemon, :dual, :web],
+                        :default => :cli,
+                        :level => :info,
+                        :daemon => {:file => '/var/log/splash.log'},
+                        :web => {:file => '/var/log/splash_web.log'},
+                        :cli => {:color => true, :emoji => true }  }
+
+     WEBADMIN_IP = "127.0.0.1"
+     WEBADMIN_PORT = "9234"
+     WEBADMIN_PROXY = false
+     # the display name of daemon in proc info (ps/top)
+     WEBADMIN_PROCESS_NAME="Splash : WebAdmin."
+     # the default pid file path
+     WEBADMIN_PID_PATH="/var/run"
+     # the default pid file name
+     WEBADMIN_PID_FILE="splash.pid"
+     # the default sdtout trace file
+     WEBADMIN_STDOUT_TRACE="stdout.txt"
+     # the default sdterr trace file
+     WEBADMIN_STDERR_TRACE="stderr.txt"
+
+     # default retention for trace
+     DEFAULT_RETENTION=1
+
 
 
 #### Splash CLI return code significations
 
 
-    # context execution
-    :not_root => {:message => "This operation need to be run as root (use sudo or rvmsudo)", :code => 10},
-    :options_incompatibility => {:message => "Options incompatibility", :code => 40},
-    :service_dependence_missing => {:message => "Splash Service dependence missing", :code => 60},
+    EXIT_MAP= {
 
-    # config
-    :specific_config_required => {:message => "Specific configuration required", :code => 30},
-    :splash_setup_error => {:message => "Splash Setup terminated unsuccessfully", :code => 25},
-    :splash_setup_success => {:message => "Splash Setup terminated successfully", :code => 0},
-    :splash_sanitycheck_error => {:message => "Splash Sanitycheck terminated unsuccessfully", :code => 20},
-    :splash_sanitycheck_success => {:message => "Splash Sanitycheck terminated successfully", :code => 0},
-    :configuration_error => {:message => "Splash Configuration Error", :code => 50},
+       # context execution
+       :not_root => {:message => "This operation need to be run as root (use sudo or rvmsudo)", :code => 10},
+       :options_incompatibility => {:message => "Options incompatibility", :code => 40},
+       :service_dependence_missing => {:message => "Splash Service dependence missing", :code => 60},
 
-
-    # global
-    :quiet_exit => {:code => 0},
-
-    # events
-    :interrupt => {:message => "Splash user operation interrupted", :code => 33},
-
-    # request
-    :not_found => {:message => "Object not found", :code => 44},
-    :already_exist => {:message => "Object already exist", :code => 48},
-
-    # daemon
-    :status_ok => {:message => "Status OK", :code => 0},
-    :status_ko => {:message => "Status KO", :code => 31}
+       # config
+       :specific_config_required => {:message => "Specific configuration required", :code => 30},
+       :splash_setup_error => {:message => "Splash Setup terminated unsuccessfully", :code => 25},
+       :splash_setup_success => {:message => "Splash Setup terminated successfully", :code => 0},
+       :splash_sanitycheck_error => {:message => "Splash Sanitycheck terminated unsuccessfully", :code => 20},
+       :splash_sanitycheck_success => {:message => "Splash Sanitycheck terminated successfully", :code => 0},
+       :configuration_error => {:message => "Splash Configuration Error", :code => 50},
 
 
-### In the Futur ?
+       # global
+       :quiet_exit => {:code => 0},
+       :error_exit => {:code => 99, :message => "Operation failure"},
 
-- IHM
-- Webservice
+       # events
+       :interrupt => {:message => "Splash user operation interrupted", :code => 33},
 
+       # request
+       :not_found => {:message => "Object not found", :code => 44},
+       :already_exist => {:message => "Object already exist", :code => 48},
+
+       # daemon
+       :status_ok => {:message => "Status OK", :code => 0},
+       :status_ko => {:message => "Status KO", :code => 31}
+
+    }
+
+
+### The Splash WebAdmin
+
+#### Controlling WebAdmin
+
+#### Starting
+#### Stopping
+#### Status
+
+
+#### Accessing WebAdmin
+
+
+### the SPlash API
 
 
 ## Contributing

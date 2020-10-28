@@ -162,3 +162,8 @@
 ### FIX
 * WebAdmin UI bugs and cosmetics
 * API (constants CLONE for exiter)
+
+## V 0.8.3
+
+### SECURITY
+* kramdown dependencies update

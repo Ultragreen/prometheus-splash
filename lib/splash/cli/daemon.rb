@@ -74,7 +74,47 @@ module CLISplash
           splash_exit case: :quiet_exit
         end
       rescue Interrupt
-        splash_exit status: :error, case: :interrupt, more: "Ping Command"
+        splash_exit status: :error, case: :interrupt, more: "ping Command"
+      end
+    end
+
+    # Thor method : sending get_jobs verb over transport in the input queue of Splashd
+    desc "getjobs", "send a get_jobs verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    def getjobs(hostname=Socket.gethostname)
+      log = get_logger
+      log.info "ctrl+c for interrupt"
+      begin
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          log.receive transport.execute({ :verb => :get_jobs,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{hostname}.input" })
+          splash_exit case: :quiet_exit
+        end
+      rescue Interrupt
+        splash_exit status: :error, case: :interrupt, more: "getjobs Command"
+      end
+    end
+
+    # Thor method : sending reset verb over transport in the input queue of Splashd
+    desc "getjobs", "send a reset verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    def reset(hostname=Socket.gethostname)
+      log = get_logger
+      log.info "ctrl+c for interrupt"
+      begin
+        transport = get_default_client
+        if transport.class == Hash  and transport.include? :case then
+          splash_exit transport
+        else
+          log.receive transport.execute({ :verb => :reset,
+                                  :return_to => "splash.#{Socket.gethostname}.returncli",
+                                  :queue => "splash.#{hostname}.input" })
+          splash_exit case: :quiet_exit
+        end
+      rescue Interrupt
+        splash_exit status: :error, case: :interrupt, more: "reset Command"
       end
     end
 

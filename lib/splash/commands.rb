@@ -6,6 +6,78 @@ module Splash
   # Splash Commands module/namespace
   module Commands
 
+
+    class CmdNotifier
+
+      @@registry = Prometheus::Client::Registry::new
+      @@metric_exitcode = Prometheus::Client::Gauge.new(:exitcode, docstring: 'SPLASH metric batch exitcode')
+      @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
+      @@registry.register(@@metric_exitcode)
+      @@registry.register(@@metric_time)
+
+
+
+      def initialize(options={})
+        @config = get_config
+        @url = @config.prometheus_pushgateway_url
+        @name = "cmd_#{options[:name].to_s}"
+        @exitcode = options[:exitcode]
+        @time = options[:time]
+      end
+
+      # send metrics to Prometheus PushGateway
+      # @return [Bool]
+      def notify
+        unless verify_service url: @url then
+          return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
+        end
+        @@metric_exitcode.set(@exitcode)
+        @@metric_time.set(@time)
+        hostname = Socket.gethostname
+        return Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+      end
+
+    end
+
+
+    class CmdRecords
+      include Splash::Backends
+      include Splash::Constants
+      def initialize(name)
+        @name = name
+        @backend = get_backend :execution_trace
+      end
+
+      def purge(retention)
+        retention = {} if retention.nil?
+        if retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:hours].to_f / 24
+        elsif retention.include? :hours then
+          adjusted_datetime = DateTime.now - retention[:days].to_i
+        else
+          adjusted_datetime = DateTime.now - DEFAULT_RETENTION
+        end
+
+        data = get_all_records
+
+        data.delete_if { |item|
+          DateTime.parse(item.keys.first) <= (adjusted_datetime)}
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def add_record(record)
+        data = get_all_records
+        data.push({ DateTime.now.to_s => record })
+        @backend.put key: @name, value: data.to_yaml
+      end
+
+      def get_all_records(options={})
+        return (@backend.exist?({key: @name}))? YAML::load(@backend.get({key: @name})) : []
+      end
+
+    end
+
+
     # command execution wrapper
     class CommandWrapper
       include Splash::Templates
@@ -16,11 +88,7 @@ module Splash
       include Splash::Transports
 
 
-      @@registry = Prometheus::Client::Registry::new
-      @@metric_exitcode = Prometheus::Client::Gauge.new(:errorcode, docstring: 'SPLASH metric batch errorcode')
-      @@metric_time = Prometheus::Client::Gauge.new(:exectime, docstring: 'SPLASH metric batch execution time')
-      @@registry.register(@@metric_exitcode)
-      @@registry.register(@@metric_time)
+
 
       # Constructor
       # @param [String] name the name of the command
@@ -43,14 +111,17 @@ module Splash
       # @param [String] value numeric.to_s
       # @param [String] time execution time numeric.to_s
       # @return [Hash] Exiter case :quiet_exit
-      def notify(value,time)
+      def notify(value,time, session)
+        log = get_logger
         unless verify_service url: @config.prometheus_pushgateway_url then
           return { :case => :service_dependence_missing, :more => "Prometheus Notification not send."}
         end
-        @@metric_exitcode.set(value)
-        @@metric_time.set(time)
-        hostname = Socket.gethostname
-        Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+        cmdmonitor = CmdNotifier::new({name: @name, exitcode: value, time: time})
+        if cmdmonitor.notify then
+          log.ok "Sending metrics to Prometheus Pushgateway",session
+        else
+          log.ko "Failed to send metrics to Prometheus Pushgateway",session
+        end
         return { :case => :quiet_exit}
       end
 
@@ -110,9 +181,6 @@ module Splash
               stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
             end
             time = Time.now - start
-            tp = Template::new(
-              list_token: @config.execution_template_tokens,
-              template_file: @config.execution_template_path)
             data = Hash::new
             data[:start_date] = start_date
             data[:end_date] = DateTime.now.to_s
@@ -123,17 +191,15 @@ module Splash
             data[:stdout] = stdout
             data[:stderr] = stderr
             data[:exec_time] = time.to_s
-            backend = get_backend :execution_trace
-            key = @name
-
-            backend.put key: key, value: data.to_yaml
+            cmdrec = CmdRecords::new @name
+            cmdrec.purge(@config.commands[@name.to_sym][:retention])
+            cmdrec.add_record data
             exit_code = status.exitstatus
           end
           log.ok "Command executed", session
           log.arrow "exitcode #{exit_code}", session
           if options[:notify] then
-            acase = notify(exit_code,time.to_i)
-            get_logger.ok "Prometheus Gateway notified.",session
+            acase = notify(exit_code,time.to_i,session)
           else
             log.item "Without Prometheus notification", session
           end

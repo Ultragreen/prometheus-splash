@@ -21,7 +21,7 @@ module Splash
       # @param [Hash] options
       # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
       # @return [Hash] Exiter Case (:quiet_exit, :already_exist, :unknown_error or other)
-      def startdaemon(options = {})
+      def startweb(options = {})
         require 'splash/webadmin/main'
         config = get_config
         log = get_logger
@@ -64,7 +64,7 @@ module Splash
       # @param [Hash] options
       # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
       # @return [Hash] Exiter Case (:quiet_exit, :not_found, other)
-      def stopdaemon(options = {})
+      def stopweb(options = {})
           config = get_config
           log = get_logger
           log.level = :fatal if options[:quiet]
@@ -86,7 +86,7 @@ module Splash
       # Status of the Splash WebAdmin, display status
       # @param [Hash] options ignored
       # @return [Hash] Exiter Case (:status_ko, :status_ok)
-      def statusdaemon(options = {})
+      def statusweb(options = {})
         log = get_logger
         config = get_config
         pid = realpid = ''

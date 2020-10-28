@@ -3,7 +3,7 @@ nav.uk-navbar.uk-navbar-attached(data-uk-sticky)
   ul.uk-navbar-nav.uk-hidden-small
     - for item in @menu
       li class=( (item == @current_item)? "uk-active" : "uk-inactive")
-        a href="/#{item.downcase}" title="Access to #{item.capitalize}" <i class="uk-icon-#{@menu_icons[item]}"></i> #{item.capitalize}
+        a.uk-navbar-nav-subtitle href="/#{item.downcase}" title="Access to #{item.capitalize}" <i class="uk-icon-#{@menu_icons[item]}"></i><div> #{item.capitalize}</div>
   a.uk-navbar-toggle.uk-visible-small(href="#offcanvas" data-uk-offcanvas)
   div.uk-navbar-brand.uk-navbar-left.uk-visible-small
     <i class="uk-icon-arrow-left"></i> Menu

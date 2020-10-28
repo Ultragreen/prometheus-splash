@@ -1,7 +1,7 @@
 - if @proxy
-  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Proxies for Prometheus components
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Proxies for Prometheus components
 - else
-  h2 <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Links for Prometheus components
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Links for Prometheus components
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     ul.uk-list
@@ -11,3 +11,6 @@ div.uk-width-medium-1-1
       li
         i.uk-icon-hand-o-right
         a href="#{@pushgateway_url}" &nbsp;Prometheus PushGateway
+      li
+        i.uk-icon-hand-o-right
+        a href="#{@alertmanager_url}" &nbsp;Prometheus Alertmanager

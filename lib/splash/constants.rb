@@ -7,8 +7,7 @@ module Splash
   module Constants
 
     # Current splash version
-    VERSION = "0.7.0"
-
+    VERSION = "0.8.2"
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"
     # the default execution trace_path if backend file
@@ -43,7 +42,10 @@ module Splash
     LICENSE="BSD-2-Clause"
 
     # the default prometheus pushgateway URL
-    PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9090/'
+    PROMETHEUS_PUSHGATEWAY_URL = 'http://localhost:9091/'
+
+    # the default prometheus Alertmanager URL
+    PROMETHEUS_ALERTMANAGER_URL = 'http://localhost:9092/'
 
     # the default prometheus URL
     PROMETHEUS_URL = "http://localhost:9090/"
@@ -84,6 +86,8 @@ module Splash
     # the default sdterr trace file
     WEBADMIN_STDERR_TRACE="stderr.txt"
 
+    # default retention for trace
+    DEFAULT_RETENTION=1
 
   end
 end

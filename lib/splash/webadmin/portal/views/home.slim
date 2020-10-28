@@ -1,12 +1,58 @@
-h2 This is Splash
-p Choose a activity in the main menu
+javascript:
+
+
+
+  $('body').on( 'click','button', function(){
+    var tmp = this.id
+    $("#stop").prop('disabled', true);
+    $("#start").prop('disabled', true);
+    var url = "/daemon/" + tmp;
+    $("#stop").prop('disabled', true);
+    $("#start").prop('disabled', true);
+    $.get(url, function( data ) {
+
+      console.log(data);
+      if (data == 'stop') {
+        $("#stop").prop('disabled', true);
+        $("#start").prop('disabled', false);
+        $("#daemon").removeClass('uk-badge-success').addClass('uk-badge-danger');
+  	    $("#daemon").text('OFF');
+      }
+      if (data == 'start') {
+        $("#stop").prop('disabled', false);
+        $("#start").prop('disabled', true);
+        $("#daemon").removeClass('uk-badge-danger').addClass('uk-badge-success');
+	      $("#daemon").text('ON');
+      }
+    });
+  });
+
+div.uk-grid
+  div.uk-width-medium-1-1
+    div.uk-panel.uk-panel-box
+      div.uk-grid
+        div.uk-width-1-3.uk-text-large.uk-text-bold.uk-text-success <i class="uk-icon-cogs uk-icon-justify uk-icon-large"></i>&nbsp;&nbsp;Splash Daemon status
+        div.uk-width-1-3
+          b Actions :
+          div.uk-button-group
+            - if @status == false
+              button.uk-button(id="start" disabled): i.uk-icon-play
+              button.uk-button(id="stop"): i.uk-icon-stop
+            - else
+              button.uk-button(id="start"): i.uk-icon-play
+              button.uk-button(id="stop" disabled): i.uk-icon-stop
+        div.uk-width-1-3
+          b Status :
+          - if @status == false
+            div.uk-badge.uk-badge-success.uk-badge-notifications(id="daemon") ON
+          - else
+            div.uk-badge.uk-badge-danger.uk-badge-notifications(id="daemon") OFF
 
 
 div.uk-grid
   div.uk-width-medium-1-2
     div.uk-panel.uk-panel-box
-      span.uk-text-large.uk-text-bold Global Configuration
-      br
+      span.uk-text-large.uk-text-bold.uk-text-success Global Configuration
       br
       span.uk-text-bold <i>Logger and display</i> :
       ul
@@ -21,8 +67,7 @@ div.uk-grid
 
   div.uk-width-medium-1-2
     div.uk-panel.uk-panel-box
-      span.uk-text-large.uk-text-bold Transport and Backend
-      br
+      span.uk-text-large.uk-text-bold.uk-text-success Transport and Backend
       br
       span.uk-text-bold <i>Backend</i> :
       ul
@@ -48,7 +93,7 @@ div.uk-grid
 div.uk-grid
   div.uk-width-medium-1-2
     div.uk-panel.uk-panel-box
-      span.uk-text-large.uk-text-bold Daemon
+      span.uk-text-large.uk-text-bold.uk-text-success Daemon
       br
       ul
         li <b>Logs monitoring scheduling: </b> #{@data[:daemon_logmon_scheduling]}
@@ -64,8 +109,7 @@ div.uk-grid
 
   div.uk-width-medium-1-2
     div.uk-panel.uk-panel-box
-      span.uk-text-large.uk-text-bold Web UI
-      br
+      span.uk-text-large.uk-text-bold.uk-text-success Web UI
       br
       span.uk-text-bold <i>Webadmin</i> :
       ul

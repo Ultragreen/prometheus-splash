@@ -124,4 +124,41 @@
 ### FEATURE
 
 * processes monitoring #23
- 
+
+## V 0.6.0 2020/10/10
+
+### FEATURE
+
+* read only WebAdmin (Major update)
+* API REST
+* refactoring
+
+## V 0.7.0
+
+### FEATURE
+
+* sequences
+* API sequences
+* UI sequences
+* Transfers
+* API Transfers
+* UI Transfers
+
+## V 0.8.0
+
+### FEATURE
+* orchestrator rebuild
+* reshash config and reset + grammar and Cli
+* refacto config
+
+## V 0.8.1
+
+### FEATURE
+* full Web UI features for Logs (R/W)
+* API Logs Full
+
+## V 0.8.2
+
+### FIX
+* WebAdmin UI bugs and cosmetics
+* API (constants CLONE for exiter)

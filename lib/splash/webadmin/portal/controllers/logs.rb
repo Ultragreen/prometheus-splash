@@ -34,7 +34,7 @@ WebAdminApp.get '/add_modify_log/?:label?' do
 end
 
 
-WebAdminApp.get '/history/:label' do
+WebAdminApp.get '/logs_history/:label' do
   get_menu 0
   log = get_logger
   log.call "WEB : logs, verb : GET, controller : /history/:label"

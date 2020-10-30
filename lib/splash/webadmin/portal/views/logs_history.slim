@@ -1,0 +1,24 @@
+h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;History for log #{@label} monitoring
+
+
+-
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    span.uk-text-large.uk-text-bold List of records
+    br
+    table#logrecords.uk-table.uk-table-hover.uk-table-striped
+      thead
+        tr
+          th Date
+          th File
+          th Status
+          th Nb Errors
+          th Full Nb of lines
+      tbody
+        - @data.each do |key,value|
+          tr
+            td  #{key}
+            td  #{value[:file]}
+            td  #{value[:status]}
+            td  #{value[:errors]}
+            td  #{value[:lines]}

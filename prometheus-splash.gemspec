@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'ps-ruby','~> 0.0.4'
   spec.add_runtime_dependency 'tty-markdown','~> 0.7.0'
   spec.add_runtime_dependency 'tty-pager','~> 0.14.0'
-  spec.add_runtime_dependency 'tty-table','~> 0.11.0'
+  spec.add_runtime_dependency 'tty-table','~> 0.12.0'
   spec.add_runtime_dependency 'net-ssh','~> 6.1.0'
   spec.add_runtime_dependency 'net-scp','~> 3.0.0'
   spec.add_runtime_dependency 'colorize','~> 0.8.1'

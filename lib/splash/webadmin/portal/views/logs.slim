@@ -72,7 +72,7 @@ div.uk-width-medium-1-1
               br
               input.modify-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="Modify" onclick="location.href='/add_modify_log/#{log[:label].to_s}';"
               br
-              input.history-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="History" onclick="location.href='/history/#{log[:label].to_s}';"
+              input.history-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="History" onclick="location.href='/logs_history/#{log[:label].to_s}';"
   div.uk-align-right
     form.uk-form.uk-form-horizontal#query action="/add_modify_log" method="GET"
       div &nbsp;

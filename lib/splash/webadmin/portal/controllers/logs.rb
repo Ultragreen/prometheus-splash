@@ -34,7 +34,7 @@ WebAdminApp.get '/add_modify_log/?:label?' do
 end
 
 
-WebAdminApp.get '/logs_history/:label' do
+WebAdminApp.get '/get_log_history/:label' do
   get_menu 0
   log = get_logger
   log.call "WEB : logs, verb : GET, controller : /history/:label"
@@ -44,7 +44,7 @@ WebAdminApp.get '/logs_history/:label' do
   res = YAML::load(raw)
   @data = res[:data] if res[:status] == :success
   @label = params[:label].to_s
-  slim :logs_history, :format => :html
+  slim :log_history, :format => :html
 end
 
 WebAdminApp.post '/save_log' do

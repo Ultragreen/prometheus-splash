@@ -21,7 +21,7 @@ end
 WebAdminApp.get '/add_modify_log/?:label?' do
   get_menu 0
   log = get_logger
-  log.call "WEB : logs, verb : POST, controller : /add_modify_log/?:label?"
+  log.call "WEB : logs, verb : GET, controller : /add_modify_log/?:label?"
   @data = {}
   if params[:label] then
     url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/logs/show/#{params[:label].to_s}.yml"
@@ -33,6 +33,19 @@ WebAdminApp.get '/add_modify_log/?:label?' do
   slim :logs_form, :format => :html
 end
 
+
+WebAdminApp.get '/history/:label' do
+  get_menu 0
+  log = get_logger
+  log.call "WEB : logs, verb : GET, controller : /history/:label"
+  @data = {}
+  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/logs/history/#{params[:label].to_s}.yml"
+  raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
+  res = YAML::load(raw)
+  @data = res[:data] if res[:status] == :success
+  @label = params[:label].to_s
+  slim :logs_history, :format => :html
+end
 
 WebAdminApp.post '/save_log' do
   get_menu 0

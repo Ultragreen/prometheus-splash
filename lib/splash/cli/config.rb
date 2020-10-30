@@ -53,10 +53,11 @@ module CLISplash
     option :name, :type => :string,  :aliases => "-N"
     def flushbackend
       if options[:name] then
-        acase = run_as_root :flush_backend options
+        acase = run_as_root :flush_backend, options
       else
+        return_cases = {}
         list_backends.each do |key,value|
-          return_cases[key] = run_as_root :flush_backend(name: key )
+          return_cases[key] = run_as_root :flush_backend, { :name => key }
         end
         errors = return_cases.select {|key,value| value[:case] != :quiet_exit}.keys
         acase = (errors.empty?)? {:case => :quiet_exit, :more => "All backends flushed successfully"}: {:case => :configuration_error, :more => "Backends #{errors.join(',')} flushing failed"}

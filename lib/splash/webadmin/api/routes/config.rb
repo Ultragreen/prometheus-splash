@@ -46,8 +46,10 @@ WebAdminApp.delete '/api/config/deletelog/:label.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
   log.call "API : config, verb : DELETE, route : deletelog, format : #{format}"
-  res = get_config.delete_log label: params[:label].to_sym
   deletelog = {}
+  logsrec = Splash::Logs::LogsRecords::new params[:label].to_sym
+  logsrec.clear
+  res = get_config.delete_log label: params[:label].to_sym
   case res[:status]
   when :success
     deletelog = splash_return case: :quiet_exit, :more => "delete logs"

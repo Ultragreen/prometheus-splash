@@ -54,7 +54,7 @@ module Splash
       # @option options [Symbol] :key the name of the record
       # @return [Boolean] status of the operation
       def del(options)
-        ::File.unlink("#{@path}/#{suffix_trace(options[:key])}") if File.exist?("#{@path}/#{suffix_trace(options[:key])}")
+        ::File.unlink("#{@path}/#{suffix_trace(options[:key])}") if ::File.exist?("#{@path}/#{suffix_trace(options[:key])}")
       end
 
       # verifiy a specific record existance

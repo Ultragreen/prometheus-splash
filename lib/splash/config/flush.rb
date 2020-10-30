@@ -16,8 +16,8 @@ module Splash
       self.extend Splash::Backends
       self.extend Splash::Loggers
       log = get_logger
-      log.info "Splash backend flushing"
-      name  = (options[:name])? options[:name] : :execution_trace
+      name  = (options[:name])? options[:name].to_sym : :execution_trace
+      log.info "Splash backend #{name.to_s} flushing"
       backend = get_backend name
       if backend.flush then
         return { :case => :quiet_exit, :more => "Splash backend #{name.to_s} flushed" }

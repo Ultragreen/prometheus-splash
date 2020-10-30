@@ -288,7 +288,7 @@ module CLISplash
     def history(command)
       if is_root? then
         log = get_logger
-        log.info "Log : #{command}#"
+        log.info "Command : #{command}"
         config = get_config
         if options[:table] then
           table = TTY::Table.new do |t|

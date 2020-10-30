@@ -9,6 +9,7 @@ module CLISplash
     include Splash::Helpers
     include Splash::Exiter
     include Splash::Loggers
+    include Splash::Backends
 
     # Thor method : running of Splash setup
     desc "setup", "Setup installation fo Splash"
@@ -49,8 +50,17 @@ module CLISplash
 
     # Thor method : flushing configured backend
     desc "flushbackend", "Flush configured backend"
+    option :name, :type => :string,  :aliases => "-N"
     def flushbackend
-      acase = run_as_root :flush_backend
+      if options[:name] then
+        acase = run_as_root :flush_backend options
+      else
+        list_backends.each do |key,value|
+          return_cases[key] = run_as_root :flush_backend(name: key )
+        end
+        errors = return_cases.select {|key,value| value[:case] != :quiet_exit}.keys
+        acase = (errors.empty?)? {:case => :quiet_exit, :more => "All backends flushed successfully"}: {:case => :configuration_error, :more => "Backends #{errors.join(',')} flushing failed"}
+      end
       splash_exit acase
     end
 

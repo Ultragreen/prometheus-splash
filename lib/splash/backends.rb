@@ -11,7 +11,7 @@ module Splash
 
     # factory for backend
     # @param [Symbol] store the name of the store actually in [:execution_trace]
-    # @return [Splash::Backends::<Type>|Hash] with type in [:redis,:file] or Exiter case :configuration_error 
+    # @return [Splash::Backends::<Type>|Hash] with type in [:redis,:file] or Exiter case :configuration_error
     def get_backend(store)
       splash_exit case: :configuration_error, more: "backend definition failure" if get_config[:backends][:stores][store].nil?
       backend = get_config[:backends][:stores][store][:type].to_s
@@ -21,6 +21,12 @@ module Splash
       rescue
         splash_exit case: :configuration_error, more: "Backend specified for store #{store} inexistant : #{backend}"
       end
+    end
+
+    # return list of configured backand
+    # @return [Hash] the backends hash list/structure
+    def list_backends
+      return get_config[:backends][:stores]
     end
 
   end

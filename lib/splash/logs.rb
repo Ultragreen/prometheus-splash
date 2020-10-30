@@ -132,7 +132,7 @@ module Splash
           logsrec = LogsRecords::new item[:label]
           errors = (item[:count])? item[:count] : 0
           lines = (item[:lines])? item[:lines] : 0
-          missing = (item[:status] = :missing)? 1 : 0
+          missing = (item[:status] == :missing)? 1 : 0
           file = item[:log]
           logsrec.purge(item[:retention])
           logsrec.add_record :status => item[:status],

@@ -15,10 +15,10 @@ div.uk-width-medium-1-1
           th Nb Errors
           th Full Nb of lines
       tbody
-        - @data.each do |key,value|
+        - @data.each do |key|
           tr
-            td  #{key}
-            td  #{value[:file]}
-            td  #{value[:status]}
-            td  #{value[:errors]}
-            td  #{value[:lines]}
+            td  #{key.keys.first}
+            td  #{key[key.keys.first][:file]}
+            td  #{key[key.keys.first][:status]}
+            td  #{key[key.keys.first][:errors]}
+            td  #{key[key.keys.first][:lines]}

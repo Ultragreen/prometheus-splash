@@ -114,6 +114,39 @@ module CLISplash
       end
     end
 
+    # Thor method : display the full list of Splash configured process monitors
+    desc "get_result PROCESS", "Get last or specific process monitoring report"
+    long_desc <<-LONGDESC
+    Get last or specific process monitoring report\n
+    with --date <DATE>, a date format string (same as in history ouput)
+    LONGDESC
+    option :date, :type => :string,  :aliases => "-D"
+    def get_result(process)
+      if is_root? then
+        log = get_logger
+        log.info "Process : #{process}"
+        config = get_config
+        records = ProcessRecords::new(process).get_all_records
+        if options[:date] then
+          wanted = records.select{|key,value| key.keys.first == options[:date]}.first
+        else
+          wanted = records.last
+        end
+        if wanted.nil? then
+          splash_exit case: :not_found, more: "Process never monitored"
+        else
+          record =wanted.keys.first
+          value=wanted[record]
+          log.item record
+          log.arrow "Status : #{value[:status].to_s}"
+          log.arrow "CPU Percent : #{value[:cpu_percent]}"
+          log.arrow "MEM Percent : #{value[:mem_percent]}"
+        end
+      else
+        splash_exit case: :not_root, :more => "Process get result"
+      end
+    end
+
 
     # Thor method : show logs monitoring history
     long_desc <<-LONGDESC

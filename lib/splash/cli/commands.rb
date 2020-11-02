@@ -15,7 +15,7 @@ module CLISplash
 
 
     # Thor method : execution of command
-    desc "execute NAME", "run for command/sequence or ack result"
+    desc "execute COMMAND", "run for command/sequence or ack result"
     long_desc <<-LONGDESC
     execute command or sequence or ack result\n
     with --no-trace prevent storing execution trace in configured backend (see config file)\n
@@ -79,7 +79,7 @@ module CLISplash
 
 
     # Thor method : scheduling commands
-    desc "schedule NAME", "Schedule excution of command on Splash daemon"
+    desc "schedule COMMAND", "Schedule excution of command on Splash daemon"
     long_desc <<-LONGDESC
     Schedule excution of command on Splash daemon\n
     with --hostname, Schedule on an other Splash daemon via transport\n
@@ -125,7 +125,7 @@ module CLISplash
     end
 
     # Thor method : getting a treeview of sequence of commands
-    desc "treeview", "Show commands sequence tree"
+    desc "treeview COMMAND", "Show commands sequence tree"
     long_desc <<-LONGDESC
     Show commands sequence tree\n
     with --hostname, ask other Splash daemon via transport\n
@@ -284,7 +284,7 @@ module CLISplash
     show commands executions history for LABEL\n
     LONGDESC
     option :table, :type => :boolean,  :aliases => "-t"
-    desc "history LABEL", "show commands executions history"
+    desc "history COMMAND", "show commands executions history"
     def history(command)
       if is_root? then
         log = get_logger
@@ -328,52 +328,8 @@ module CLISplash
       end
     end
 
-    # Thor method : getting information on the last execution of a command
-    desc "lastrun COMMAND", "Show last running result for specific configured command COMMAND"
-    long_desc <<-LONGDESC
-    Show last running result for specific configured command COMMAND\n
-    with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
-    LONGDESC
-    option :hostname, :type => :string,  :aliases => "-H"
-    def lastrun(command)
-      unless is_root? then
-        splash_exit case: :not_root, :more => "Command last execution report"
-      end
-      log = get_logger
-      backend = get_backend :execution_trace
-      redis = (backend.class == Splash::Backends::Redis)? true : false
-      if not redis and options[:hostname] then
-        splash_exit case: :specific_config_required, :more => "Redis backend is requiered for Remote execution report request"
-      end
-      splash_exit case: :not_root if not is_root? and not redis
-      list = get_config.commands.keys
-      if options[:hostname] then
-        options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
-        list = backend.list("*", options[:hostname]).map(&:to_sym)
-      end
-      if list.include? command.to_sym then
-        log.info "Splash command #{command} previous execution report:\n"
-        req  = { :key => command}
-        req[:hostname] = options[:hostname] if options[:hostname]
-        if backend.exist? req then
-          res = backend.get req
-          tp = Template::new(
-              list_token: get_config.execution_template_tokens,
-              template_file: get_config.execution_template_path)
-          tp.map YAML::load(res).last.values.first
-          log.flat tp.output
-        else
-          log.ko "Command not already runned."
-        end
-        splash_exit case: :quiet_exit
-      else
-        splash_exit case: :not_found, :more => "Command report never runned remotly" if options[:hostname]
-      end
-    end
-
-
     # Thor method : getting information on one specific execution of a command
-    desc "onerun COMMAND", "Show running result for specific configured command COMMAND"
+    desc "get_result COMMAND", "Show running result for specific configured command COMMAND"
     long_desc <<-LONGDESC
     Show specific running result for specific configured command COMMAND\n
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
@@ -381,8 +337,8 @@ module CLISplash
 
     LONGDESC
     option :hostname, :type => :string,  :aliases => "-H"
-    option :date, :type => :string,  :aliases => "-D", :required => true
-    def onerun(command)
+    option :date, :type => :string,  :aliases => "-D"
+    def get_result(command)
       unless is_root? then
         splash_exit case: :not_root, :more => "Command specific execution report"
       end
@@ -407,11 +363,15 @@ module CLISplash
           tp = Template::new(
               list_token: get_config.execution_template_tokens,
               template_file: get_config.execution_template_path)
-          prov =  YAML::load(res).select{|key,value| key.keys.first == options[:date]}
-          if prov.empty? then
+          if options[:date] then
+            prov =  YAML::load(res).select{|key,value| key.keys.first == options[:date]}.first
+          else
+            prov = YAML::load(res).last
+          end
+          if prov.nil? then
             log.ko "Command not runned one this date or date misformatted."
           else
-            tp.map prov.first.values.first
+            tp.map prov.values.first
             log.flat tp.output
           end
         else
@@ -419,12 +379,16 @@ module CLISplash
         end
         splash_exit case: :quiet_exit
       else
-        splash_exit case: :not_found, :more => "Command report never runned remotly" if options[:hostname]
+        if options[:hostname]
+            splash_exit case: :not_found, :more => "Command never runned remotly"
+          else
+            splash_exit case: :not_found, :more => "Command never runned"
+          end
       end
     end
 
     # Thor method : getting the list of avaibles executions reports
-    desc "getreportlist", "list all executions report results "
+    desc "reportlist", "list all executions report results "
     long_desc <<-LONGDESC
     list all executions report results\n
     with --pattern <SEARCH>, search type string, wilcard * (group) ? (char)\n
@@ -437,7 +401,7 @@ module CLISplash
     option :hostname, :type => :string,  :aliases => "-H"
     option :all, :type => :boolean, :negate => false,  :aliases => "-A"
     option :detail, :type => :boolean,  :aliases => "-D"
-    def getreportlist
+    def reportlist
       unless is_root? then
         splash_exit case: :not_root, :more => "Command execution report list"
       end

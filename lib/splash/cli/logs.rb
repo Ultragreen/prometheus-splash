@@ -63,10 +63,10 @@ module CLISplash
     end
 
 
-    
+
 
     # Thor method : display a specific Splash configured log monitor
-    desc "show LOG", "show Splash configured log monitoring for LOG"
+    desc "show LABEL", "show Splash configured log monitoring for LOG"
     def show(logrecord)
       if is_root? then
         log = get_logger
@@ -110,6 +110,38 @@ module CLISplash
       end
     end
 
+    # Thor method : display the full list of Splash configured log monitors
+    desc "get_result LABEL", "Get last or specific log monitoring report"
+    long_desc <<-LONGDESC
+    Get last or specific log monitoring report\n
+    with --date <DATE>, a date format string (same as in history ouput)
+    LONGDESC
+    option :date, :type => :string,  :aliases => "-D"
+    def get_result(label)
+      if is_root? then
+        log = get_logger
+        log.info "Log : #{label}"
+        config = get_config
+        records = LogsRecords::new(label).get_all_records
+        if options[:date] then
+          wanted = records.select{|key,value| key.keys.first == options[:date]}.first
+        else
+          wanted = records.last
+        end
+        if wanted.nil? then
+          splash_exit case: :not_found, more: "Log never monitored"
+        else
+          record =wanted.keys.first
+          value=wanted[record]
+          log.item record
+          log.arrow "Status : #{value[:status].to_s}"
+          log.arrow "nb files : #{value[:errors]}"
+          log.arrow "nb lines : #{value[:lines]}"
+        end
+      else
+        splash_exit case: :not_root, :more => "Log get result"
+      end
+    end
 
     # Thor method : show logs monitoring history
     long_desc <<-LONGDESC

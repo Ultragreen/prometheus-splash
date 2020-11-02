@@ -36,6 +36,30 @@ javascript:
     });
   });
 
+  $(document).on( 'click','input.monitor-log',function(){
+    var url = "/api/logs/monitor.json";
+    UIkit.modal.confirm('Are you sure?', function(){
+      console.debug(url)
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function( data ) {
+          console.debug(data)
+          if (data['status'] == 'success') {
+            UIkit.notify("Forced monitoring done", {status:'success'});
+          }
+          else
+          {
+            UIkit.notify("Forced monitoring failed !", {status:'danger'});
+          }
+        },
+        error: function(e) {
+          UIkit.notify("Forced monitoring failed !", {status:'danger'});
+        }
+      });
+    });
+  });
+
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     span.uk-text-large.uk-text-bold List of logs monitored
@@ -76,4 +100,5 @@ div.uk-width-medium-1-1
   div.uk-align-right
     form.uk-form.uk-form-horizontal#query action="/add_modify_log" method="GET"
       div &nbsp;
+      input.monitor-log.uk-button value="Force monitoring"&nbsp;
       input.add-log.uk-button type="submit" value="Add new log"

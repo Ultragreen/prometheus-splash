@@ -7,7 +7,7 @@ module Splash
   module Constants
 
     # Current splash version
-    VERSION = "0.8.3"
+    VERSION = "0.8.4"
     # the path to th config file, not overridable by config
     CONFIG_FILE = "/etc/splash.yml"
     # the default execution trace_path if backend file

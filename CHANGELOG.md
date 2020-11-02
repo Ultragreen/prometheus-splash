@@ -127,7 +127,7 @@
 
 ## V 0.6.0 2020/10/10
 
-### FEATURE
+### FEATURES
 
 * read only WebAdmin (Major update)
 * API REST
@@ -135,7 +135,7 @@
 
 ## V 0.7.0
 
-### FEATURE
+### FEATURES
 
 * sequences
 * API sequences
@@ -146,14 +146,16 @@
 
 ## V 0.8.0
 
-### FEATURE
+### FEATURES
+
 * orchestrator rebuild
 * reshash config and reset + grammar and Cli
 * refacto config
 
 ## V 0.8.1
 
-### FEATURE
+### FEATURES
+
 * full Web UI features for Logs (R/W)
 * API Logs Full
 
@@ -167,3 +169,19 @@
 
 ### SECURITY
 * kramdown dependencies update
+
+## V 0.8.4
+
+### FEATURES
+
+* backends flushs #64
+* get_results refactoring #62
+* full process UI and API R/W
+
+### CHANGES
+
+* delete_record purge  
+
+### FIX
+
+* always missing status for log history #65

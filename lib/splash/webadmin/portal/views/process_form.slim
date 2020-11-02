@@ -7,10 +7,10 @@ script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery
 
 form.uk-form.uk-form-horizontal#query action="/save_process" method="POST"
   label.uk-form-label for="process" Process
-  <input class="uk-form-width-large" id="process" type="text" placeholder="label" name="label" value="#{@data[:process].to_s}" required>
+  <input class="uk-form-width-large" id="process" type="text" placeholder="process" name="process" value="#{@data[:process].to_s}" required>
   div &nbsp;
   label.uk-form-label for="patterns" Patterns
-  <input class="uk-form-width-large" id="patterns" type="text" placeholder="patterns" name="patterns" value="#{@data[:patterns].join(',')}" required>
+  <input class="uk-form-width-large" id="patterns" type="text" placeholder="patterns" name="patterns" value="#{@data[:patterns]}" required>
     div &nbsp;
   - unless @data.empty?
     input type="hidden" name="update" value="true"

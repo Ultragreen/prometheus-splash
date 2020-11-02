@@ -2,15 +2,15 @@ WebAdminApp.get '/processes/?:status?/?:process?' do
   get_menu 1
   log = get_logger
   log.call "WEB : processes, verb : GET, controller : /processes/?:status?/?:process?"
-  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/process/list.yml"
+  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/processes/list.yml"
   raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
   @data = YAML::load(raw)[:data]
-  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/process/analyse.yml"
+  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/processes/analyse.yml"
   raw = RestClient::Request.execute(method: 'POST', url: url,timeout: 10)
   prov = YAML::load(raw)[:data]
   @result = {}
-  @log_failed = params[:process] if params[:status] == 'failure'
-  @log_saved = params[:process] if params[:status] == 'success'
+  @process_failed = params[:process] if params[:status] == 'failure'
+  @process_saved = params[:process] if params[:status] == 'success'
   prov.each {|item|
     @result[item[:process]] = item
   }
@@ -18,7 +18,7 @@ WebAdminApp.get '/processes/?:status?/?:process?' do
 end
 
 WebAdminApp.get '/add_modify_process/?:process?' do
-  get_menu 0
+  get_menu 1
   log = get_logger
   log.call "WEB : processes, verb : GET, controller : /add_modify_process/?:process?"
   @data = {}
@@ -27,6 +27,10 @@ WebAdminApp.get '/add_modify_process/?:process?' do
     raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
     res = YAML::load(raw)
     @data = res[:data] if res[:status] == :success
+    if @data[:patterns].class == Array then
+      prov = @data[:patterns].join('|')
+      @data[:patterns] = prov
+    end
     @data[:old_process] = params[:process].to_s
   end
   slim :process_form, :format => :html
@@ -34,11 +38,11 @@ end
 
 
 WebAdminApp.get '/get_process_history/:process' do
-  get_menu 0
+  get_menu 1
   log = get_logger
   log.call "WEB : processes, verb : GET, controller : /get_process_history/:process"
   @data = {}
-  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/processes/history/#{params[:label].to_s}.yml"
+  url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/processes/history/#{params[:process].to_s}.yml"
   raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
   res = YAML::load(raw)
   @data = res[:data] if res[:status] == :success
@@ -47,11 +51,11 @@ WebAdminApp.get '/get_process_history/:process' do
 end
 
 WebAdminApp.post '/save_process' do
-  get_menu 0
+  get_menu 1
   log = get_logger
   log.call "WEB : processes, verb : POST, controller : /save_process/?:process?"
   data = {}
-  data[:patterns] = params[:patterns].split(',')
+  data[:patterns] = params[:patterns].split('|')
   data[:process] = params[:process].to_sym
   if params[:update] then
     url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/config/deleteprocess/#{params[:old_process]}"

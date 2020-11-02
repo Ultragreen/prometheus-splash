@@ -1,9 +1,9 @@
 h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Processes configured in Splash
 
-- unless @log_saved.nil?
+- unless @process_saved.nil?
   javascript:
     UIkit.notify("Process record #{@process_saved} saved", {status:'success'});
-- unless @log_failed.nil?
+- unless @process_failed.nil?
   javascript:
     UIkit.notify("Process record #{@process_saved} not saved", {status:'danger'});
 
@@ -63,7 +63,7 @@ div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     span.uk-text-large.uk-text-bold List of processes monitored
     br
-    table.uk-table.uk-table-hover.uk-table-striped
+    table#processrecords.uk-table.uk-table-hover.uk-table-striped
       thead
         tr
           th Process record
@@ -71,7 +71,7 @@ div.uk-width-medium-1-1
           th Status
         tbody
           - @data.each do |process|
-            tr
+            tr id="#{process[:process].to_s}"
               td <b>Process</b> : #{process[:process]}
               td
                 span.uk-text-bold Patterns
@@ -89,11 +89,11 @@ div.uk-width-medium-1-1
               td
                 input.delete-process.uk-button.uk-button-mini.uk-button-danger id="#{process[:process].to_s}" value="Delete"
                 br
-                input.modify-process.uk-button.uk-button-mini.uk-button-primary id="#{process[:process].to_s}" value="Modify" onclick="location.href='/add_modify_process/#{lprocess[:process].to_s}';"
+                input.modify-process.uk-button.uk-button-mini.uk-button-primary id="#{process[:process].to_s}" value="Modify" onclick="location.href='/add_modify_process/#{process[:process].to_s}';"
                 br
                 input.history-process.uk-button.uk-button-mini.uk-button-primary id="#{process[:process].to_s}" value="History" onclick="location.href='/get_process_history/#{process[:process].to_s}';"
   div.uk-align-right
     form.uk-form.uk-form-horizontal#query action="/add_modify_process" method="GET"
       div &nbsp;
-      input.monitor-log.uk-button value="Force monitoring"&nbsp;
-      input.add-log.uk-button type="submit" value="Add new process"
+      input.monitor-process.uk-button value="Force monitoring"&nbsp;
+      input.add-process.uk-button type="submit" value="Add new process"

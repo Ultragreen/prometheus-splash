@@ -17,7 +17,7 @@ WebAdminApp.get '/api/processes/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
   log.call "API : processes, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
-  process_recordset = get_config.processes.select{|item| item[:process] == params[:name] }
+  process_recordset = get_config.processes.select{|item| item[:process] == params[:name].to_sym }
   unless process_recordset.empty? then
     record = process_recordset.first
     obj = splash_return case: :quiet_exit

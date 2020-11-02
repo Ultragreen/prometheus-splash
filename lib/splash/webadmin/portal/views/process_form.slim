@@ -1,0 +1,21 @@
+- unless @data.empty?
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Modify Splash process monitoring : #{@data[:process]}
+- else
+  h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Add new Splash process monitoring
+
+script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"
+
+form.uk-form.uk-form-horizontal#query action="/save_process" method="POST"
+  label.uk-form-label for="process" Process
+  <input class="uk-form-width-large" id="process" type="text" placeholder="label" name="label" value="#{@data[:process].to_s}" required>
+  div &nbsp;
+  label.uk-form-label for="patterns" Patterns
+  <input class="uk-form-width-large" id="patterns" type="text" placeholder="patterns" name="patterns" value="#{@data[:patterns].join(',')}" required>
+    div &nbsp;
+  - unless @data.empty?
+    input type="hidden" name="update" value="true"
+    input type="hidden" name="old_process" value="#{@data[:old_process].to_s}"
+  div.uk-align-right
+    input.uk-button.uk-button-small-primary type="submit" value="Submit"
+javascript:
+  $("#query").validate();

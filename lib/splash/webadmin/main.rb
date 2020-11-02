@@ -8,6 +8,7 @@ class WebAdminApp < Sinatra::Base
   include Splash::Loggers
   include Splash::Daemon::Controller
   include Splash::Logs
+  include Splash::Processes
 
   set :server, 'thin'
   set :port, get_config.webadmin_port

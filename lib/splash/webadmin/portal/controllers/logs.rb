@@ -30,14 +30,14 @@ WebAdminApp.get '/add_modify_log/?:label?' do
     @data = res[:data] if res[:status] == :success
     @data[:old_label] = params[:label].to_s
   end
-  slim :logs_form, :format => :html
+  slim :log_form, :format => :html
 end
 
 
 WebAdminApp.get '/get_log_history/:label' do
   get_menu 0
   log = get_logger
-  log.call "WEB : logs, verb : GET, controller : /history/:label"
+  log.call "WEB : logs, verb : GET, controller : /get_log_history/:label"
   @data = {}
   url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/logs/history/#{params[:label].to_s}.yml"
   raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)

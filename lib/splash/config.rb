@@ -13,8 +13,10 @@ module Splash
 
     class ConfigLinter
       def initialize
-        @lints_present = {:logs => [:label, :log, :pattern ]}
-        @lints_types = {:logs => {:label => Symbol, :log => String, :pattern => String, :retention => Hash}}
+        @lints_present = {:logs => [:label, :log, :pattern ],
+                          :processes => [:process, :patterns ]}
+        @lints_types = {:logs => {:label => Symbol, :log => String, :pattern => String, :retention => Hash},
+                        :processes  => {:process => Symbol, :patterns => Array, :retention => Hash}}
       end
 
       def verify(options ={})
@@ -97,15 +99,16 @@ module Splash
       end
 
 
-      def add_log(options = {})
+      def add_record(options = {})
         @config_from_file = readconf @config_file
+        key = options[:key]
         res = ConfigLinter::new.verify(options)
         if res[:status] == :success then
-          if @config_from_file[:logs].select{|item| item[:label] == options[:record][:label]}.count > 0 then
+          if @config_from_file[options[:type]].select{|item| item[options[:key]] == options[:record][options[:key]]}.count > 0 then
             return {:status => :already_exist}
           else
             res[:useless].each {|item| options[:record].delete item} if options[:clean]
-            @config_from_file[:logs].push options[:record]
+            @config_from_file[options[:type]].push options[:record]
             writeconf
             hash_config_to_default
             return {:status => :success}
@@ -116,12 +119,12 @@ module Splash
       end
 
 
-      def delete_log(options = {})
+      def delete_record(options = {})
         @config_from_file = readconf @config_file
-        unless @config_from_file[:logs].select{|item| item[:label] == options[:label]}.count > 0 then
+        unless @config_from_file[options[:type]].select{|item| item[options[:key]] == options[options[:key]]}.count > 0 then
           return {:status => :not_found}
         else
-          @config_from_file[:logs].delete_if {|value| options[:label] == value[:label] }
+          @config_from_file[options[:type]].delete_if {|value| options[options[:key]] == value[options[:key]] }
           writeconf
           hash_config_to_default
           return {:status => :success}

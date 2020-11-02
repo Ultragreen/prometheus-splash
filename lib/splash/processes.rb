@@ -52,6 +52,10 @@ module Splash
         @backend = get_backend :process_trace
       end
 
+      def clear
+        @backend.del({:key => @name}) if  @backend.exist?({key: @name})
+      end
+
       def purge(retention)
         retention = {} if retention.nil?
         if retention.include? :hours then

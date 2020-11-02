@@ -142,7 +142,7 @@
       :patterns:
         - cron
       :retention:
-          :hours: 5
+        :hours: 5
 
 
 ###

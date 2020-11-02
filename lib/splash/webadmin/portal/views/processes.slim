@@ -1,5 +1,64 @@
 h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Processes configured in Splash
 
+- unless @log_saved.nil?
+  javascript:
+    UIkit.notify("Process record #{@process_saved} saved", {status:'success'});
+- unless @log_failed.nil?
+  javascript:
+    UIkit.notify("Process record #{@process_saved} not saved", {status:'danger'});
+
+
+javascript:
+  $(document).on( 'click','input.delete-process',function(){
+    var id = this.id;
+    var url = "/api/config/deleteprocess/" +  id + ".json";
+    UIkit.modal.confirm('Are you sure?', function(){
+      console.debug(url)
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        success: function( data ) {
+          console.debug(data)
+          if (data['status'] == 'success') {
+            $('table#processrecords tr#' + id).remove();
+            UIkit.notify("Deleting process for " + id + " done", {status:'success'});
+          }
+          else
+          {
+            UIkit.notify("Deleting process for " + id + " failed !", {status:'danger'});
+          }
+        },
+        error: function(e) {
+          UIkit.notify("Deleting process for " + id + " failed !", {status:'danger'});
+        }
+      });
+    });
+  });
+
+  $(document).on( 'click','input.monitor-process',function(){
+    var url = "/api/processes/monitor.json";
+    UIkit.modal.confirm('Are you sure?', function(){
+      console.debug(url)
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function( data ) {
+          console.debug(data)
+          if (data['status'] == 'success') {
+            UIkit.notify("Forced monitoring done", {status:'success'});
+          }
+          else
+          {
+            UIkit.notify("Forced monitoring failed !", {status:'danger'});
+          }
+        },
+        error: function(e) {
+          UIkit.notify("Forced monitoring failed !", {status:'danger'});
+        }
+      });
+    });
+  });
+
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     span.uk-text-large.uk-text-bold List of processes monitored
@@ -27,3 +86,14 @@ div.uk-width-medium-1-1
                   ul
                     li <b>CPU usage</b> : #{@result[process[:process]][:cpu]}
                     li <b>MEM usage</b> : #{@result[process[:process]][:mem]}
+              td
+                input.delete-process.uk-button.uk-button-mini.uk-button-danger id="#{process[:process].to_s}" value="Delete"
+                br
+                input.modify-process.uk-button.uk-button-mini.uk-button-primary id="#{process[:process].to_s}" value="Modify" onclick="location.href='/add_modify_process/#{lprocess[:process].to_s}';"
+                br
+                input.history-process.uk-button.uk-button-mini.uk-button-primary id="#{process[:process].to_s}" value="History" onclick="location.href='/get_process_history/#{process[:process].to_s}';"
+  div.uk-align-right
+    form.uk-form.uk-form-horizontal#query action="/add_modify_process" method="GET"
+      div &nbsp;
+      input.monitor-log.uk-button value="Force monitoring"&nbsp;
+      input.add-log.uk-button type="submit" value="Add new process"

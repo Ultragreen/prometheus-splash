@@ -139,18 +139,19 @@ module Splash
         session = (options[:session])? options[:session] : get_session
         acase = { :case => :quiet_exit }
         exit_code = 0
-        if @config.commands[@name.to_sym][:delegate_to] then
+        command = @config.commands.select{|command| command[:name] == @name.to_sym]}.first
+        if command[:delegate_to] then
           return { :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'} if options[:hostname]
-          log.send "Remote command : #{@name} execution delegate to : #{@config.commands[@name.to_sym][:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}", session
+          log.send "Remote command : #{@name} execution delegate to : #{command[:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}", session
           begin
             transport = get_default_client
             if transport.class == Hash  and transport.include? :case then
               return transport
             else
               res = transport.execute({ :verb => :execute_command,
-                payload: {:name => @config.commands[@name.to_sym][:delegate_to][:remote_command].to_s},
+                payload: {:name => command[:delegate_to][:remote_command].to_s},
                 :return_to => "splash.#{Socket.gethostname}.return",
-                :queue => "splash.#{@config.commands[@name.to_sym][:delegate_to][:host]}.input" })
+                :queue => "splash.#{command[:delegate_to][:host]}.input" })
               exit_code = res[:exit_code]
               log.receive "return with exitcode #{exit_code}", session
 
@@ -164,35 +165,35 @@ module Splash
           start_date = DateTime.now.to_s
           unless options[:trace] then
             log.item "Traceless execution", session
-            if @config.commands[@name.to_sym][:user] then
-              log.item "Execute with user : #{@config.commands[@name.to_sym][:user]}.", session
-              system("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+            if command[:user] then
+              log.item "Execute with user : #{command[:user]}.", session
+              system("sudo -u #{command[:user]} #{command[:command]} > /dev/null 2>&1")
             else
-              system("#{@config.commands[@name.to_sym][:command]} > /dev/null 2>&1")
+              system("#{command[:command]} > /dev/null 2>&1")
             end
             time = Time.now - start
             exit_code = $?.exitstatus
           else
             log.item "Tracefull execution", session
             if @config.commands[@name.to_sym][:user] then
-              log.item "Execute with user : #{@config.commands[@name.to_sym][:user]}.", session
-              stdout, stderr, status = Open3.capture3("sudo -u #{@config.commands[@name.to_sym][:user]} #{@config.commands[@name.to_sym][:command]}")
+              log.item "Execute with user : #{command[:user]}.", session
+              stdout, stderr, status = Open3.capture3("sudo -u #{command[:user]} #{command[:command]}")
             else
-              stdout, stderr, status = Open3.capture3(@config.commands[@name.to_sym][:command])
+              stdout, stderr, status = Open3.capture3(command[:command])
             end
             time = Time.now - start
             data = Hash::new
             data[:start_date] = start_date
             data[:end_date] = DateTime.now.to_s
             data[:cmd_name] = @name
-            data[:cmd_line] = @config.commands[@name.to_sym][:command]
-            data[:desc] = @config.commands[@name.to_sym][:desc]
+            data[:cmd_line] = command[:command]
+            data[:desc] = command[:desc]
             data[:status] = status.to_s
             data[:stdout] = stdout
             data[:stderr] = stderr
             data[:exec_time] = time.to_s
             cmdrec = CmdRecords::new @name
-            cmdrec.purge(@config.commands[@name.to_sym][:retention])
+            cmdrec.purge(command[:retention])
             cmdrec.add_record data
             exit_code = status.exitstatus
           end
@@ -205,11 +206,11 @@ module Splash
           end
         end
         if options[:callback] then
-          on_failure = (@config.commands[@name.to_sym][:on_failure])? @config.commands[@name.to_sym][:on_failure] : false
-          on_success = (@config.commands[@name.to_sym][:on_success])? @config.commands[@name.to_sym][:on_success] : false
+          on_failure = (command[:on_failure])? command[:on_failure] : false
+          on_success = (command[:on_success])? command[@name.to_sym][:on_success] : false
           if on_failure and exit_code > 0 then
             log.item "On failure callback : #{on_failure}", session
-            if @config.commands.keys.include?  on_failure then
+            if @config.commands.select {|item| item[:name == on_failure]}.count > 0 then
               @name = on_failure.to_s
               call_and_notify options
             else
@@ -218,7 +219,7 @@ module Splash
           end
           if on_success and exit_code == 0 then
             log.item "On success callback : #{on_success}", session
-            if @config.commands.keys.include?  on_success then
+            if @config.commands.select {|item| item[:name == on_success]}.count > 0 then
               @name = on_success.to_s
               call_and_notify options
             else

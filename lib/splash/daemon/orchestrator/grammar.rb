@@ -66,7 +66,7 @@ module Splash
         # @return [Hash] Exiter case
         def execute_command(content)
           payload = content[:payload]
-          unless get_config.commands.include? payload[:name].to_sym
+          unless get_config.commands.select {|cmd| cmd[:name] == payload[:name].to_sym}.count > 0 then
             @log.item "Command not found", content[:session]
             return { :case => :not_found }
           end

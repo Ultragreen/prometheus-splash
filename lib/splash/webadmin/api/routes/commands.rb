@@ -16,7 +16,7 @@ WebAdminApp.get '/api/commands/show/:name.?:format?' do
   log = get_logger
   format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
   log.call "API : commands, verb : GET, route : show, item : #{params[:name]} , format : #{format}"
-  commands_recordset = get_config.commands[params[:name].to_sym]
+  commands_recordset = get_config.commands.select {|command| command[:name] == params[:name].to_sym}.first
   unless commands_recordset.nil? then
     obj = splash_return case: :quiet_exit
     obj[:data] = commands_recordset

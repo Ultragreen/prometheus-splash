@@ -159,7 +159,7 @@ module CLISplash
       end
       log.info "Command : #{command.to_s}" if depht == 0
       aproc = Proc::new do |command,depht|
-        cmd  = commands[command.to_sym]
+        cmd  = commands.select{|command| command[:name] ==  command.to_sym}.first
         if cmd[:on_failure] then
           spacer=  " " * depht + " "
           log.flat "#{spacer}* on failure => #{cmd[:on_failure]}"
@@ -212,15 +212,15 @@ module CLISplash
       end
       log.info "Splash configured commands :"
       log.ko 'No configured commands found' if list.keys.empty?
-      list.keys.each do |command|
-        log.item "#{command.to_s}"
+      list.each do |command|
+        log.item "#{command[:name].to_s}"
         if options[:detail] then
-          log.arrow "command line : '#{list[command][:command]}'"
-          log.arrow "command description : '#{list[command][:desc]}'"
-          log.arrow "command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
-          log.arrow "command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
-          if list[command.to_sym][:schedule]
-            sched,val = list[command.to_sym][:schedule].flatten
+          log.arrow "command line : '#{command[:command]}'"
+          log.arrow "command description : '#{command[:desc]}'"
+          log.arrow "command failure callback : '#{command[:on_failure]}'" if command[:on_failure]
+          log.arrow "command success callback : '#{command[:on_success]}'" if command[:on_success]
+          if command[:schedule] then
+            sched,val = command[:schedule].flatten
             log.arrow "command scheduled : #{sched} #{val}."
           end
         end
@@ -235,7 +235,7 @@ module CLISplash
     with --hostname <HOSTNAME>, an other Splash monitored server (only with Redis backend configured)
     LONGDESC
     option :hostname, :type => :string,  :aliases => "-H"
-    def show(command)
+    def show(name)
       unless is_root? then
         splash_exit case: :not_root, :more => "Command show specifications"
       end
@@ -261,14 +261,15 @@ module CLISplash
       else
         list = get_config.commands
       end
-      if list.keys.include? command.to_sym then
-        log.info "Splash command : #{command}"
-        log.item "command line : '#{list[command.to_sym][:command]}'"
-        log.item "command description : '#{list[command.to_sym][:desc]}'"
-        log.item "command failure callback : '#{list[command.to_sym][:on_failure]}'" if list[command.to_sym][:on_failure]
-        log.item "command success callback : '#{list[command.to_sym][:on_success]}'" if list[command.to_sym][:on_success]
-        if list[command.to_sym][:schedule]
-          sched,val = list[command.to_sym][:schedule].flatten
+      command = list.select{|item| item[:name] == name.to_sym}.first
+      unless command.nil?  then
+        log.info "Splash command : #{command[:name]}"
+        log.item "command line : '#{command[:command]}'"
+        log.item "command description : '#{command[:desc]}'"
+        log.item "command failure callback : '#{command[:on_failure]}'" if command[:on_failure]
+        log.item "command success callback : '#{command[:on_success]}'" if command[:on_success]
+        if command[:schedule]
+          sched,val = command[:schedule].flatten
           log.item "command scheduled : #{sched} #{val}."
         end
         splash_exit case: :quiet_exit
@@ -349,12 +350,12 @@ module CLISplash
         splash_exit case: :specific_config_required, :more => "Redis backend is requiered for Remote execution report request"
       end
       splash_exit case: :not_root if not is_root? and not redis
-      list = get_config.commands.keys
+      list = get_config.commands
       if options[:hostname] then
         options[:hostname] = Socket.gethostname if options[:hostname] == 'hostname'
         list = backend.list("*", options[:hostname]).map(&:to_sym)
       end
-      if list.include? command.to_sym then
+      if list.select{|cmd| cmd[:name] == command.to_sym}.count > 0  then
         log.info "Splash command #{command} previous execution report:\n"
         req  = { :key => command}
         req[:hostname] = options[:hostname] if options[:hostname]

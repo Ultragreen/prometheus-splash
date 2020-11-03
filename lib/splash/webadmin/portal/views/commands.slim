@@ -6,8 +6,8 @@ div.uk-width-medium-1-1
     br
 
     div.uk-accordion(data-uk-accordion)
-      - @data.each do |command,content|
-        h3.uk-accordion-title <b>Name</b> : #{command}
+      - @data.each do |command|
+        h3.uk-accordion-title <b>Name</b> : #{command[:name]}
         div.uk-accordion-content
           table.uk-table.uk-table-hover.uk-table-striped
             thead
@@ -19,31 +19,31 @@ div.uk-width-medium-1-1
                 td
                   dl.uk-description-list-horizontal
                     dt <i class="uk-icon-th-list"></i>&nbsp;Description
-                    dd #{content[:desc]}
-                    - if content[:command]
+                    dd #{command[:desc]}
+                    - if command[:command]
                       dt <i class="uk-icon-cog"></i>&nbsp;Command Line
-                      dd #{content[:command]}
-                    - if content[:schedule]
+                      dd #{command[:command]}
+                    - if command[:schedule]
                       dt <i class="uk-icon-calendar"></i>&nbsp;Schedule
                       dd
                         <ul>
-                          <li> <b><i>Type</b></i> : #{content[:schedule].keys.first}</li>
-                          <li> <b><i>Value</b></i> : #{content[:schedule].values.first}</li>
+                          <li> <b><i>Type</b></i> : #{command[:schedule].keys.first}</li>
+                          <li> <b><i>Value</b></i> : #{command[:schedule].values.first}</li>
                         </ul>
-                    - if content[:on_success]
+                    - if command[:on_success]
                       dt <i class="uk-icon-check"></i>&nbsp;Execute on success
-                      dd #{content[:on_success]}
-                    - if content[:on_failure]
+                      dd #{command[:on_success]}
+                    - if command[:on_failure]
                       dt <i class="uk-icon-bolt"></i>&nbsp;Execute on failure
-                      dd #{content[:on_failure]}
-                    - if content[:user]
+                      dd #{command[:on_failure]}
+                    - if command[:user]
                       dt <i class="uk-icon-user"></i>&nbsp;become user
-                      dd #{content[:user]}
-                    - if content[:delegate_to]
+                      dd #{command[:user]}
+                    - if command[:delegate_to]
                       dt <i class="uk-icon-chevron-circle-right"></i>&nbsp;Remote delegation
                       dd
                         <ul>
-                          <li> <i><b>Host</b></i> : #{content[:delegate_to][:host]}</li>
-                          <li> <b><i>Remote Command</b></i> : #{content[:delegate_to][:remote_command]}</li>
+                          <li> <i><b>Host</b></i> : #{command[:delegate_to][:host]}</li>
+                          <li> <b><i>Remote Command</b></i> : #{command[:delegate_to][:remote_command]}</li>
                         </ul>
                 td

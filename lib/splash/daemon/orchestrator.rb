@@ -155,15 +155,14 @@ module Splash
 
         # prepare commands Scheduling
         def init_commands_scheduling
-          config = get_config.commands
-          commands = config.select{|key,value| value.include? :schedule}.keys
+          commands = config.select{|command| command.include? :schedule}
           commands.each do |command|
-            sched,value = config[command][:schedule].flatten
-            @log.arrow "Scheduling command #{command.to_s}"
+            sched,value = command[:schedule].flatten
+            @log.arrow "Scheduling command #{command[:name].to_s}"
             @server.send sched,value do
               session  = get_session
-              @log.trigger "Executing Scheduled command #{command.to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
-              execute command: command.to_s, session: session
+              @log.trigger "Executing Scheduled command #{command[:name].to_s} for Scheduling : #{sched.to_s} #{value.to_s}", session
+              execute command: command[:name].to_s, session: session
             end
           end
         end

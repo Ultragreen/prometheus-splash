@@ -73,49 +73,49 @@
 
 ### Sample configuration of commands and scheduling
   :commands:
-    :id_root:
+    - :name: :id_root
       :desc: run id command on root
       :command: id root
-    :true_test:
+    - :name: :true_test
       :desc: "test command returning true : 0"
       :command: "true"
       :schedule:
         :every: "1h"
       :on_failure: :ls_slash_tmp
       :on_success: :pwd
-    :false_test:
+    - :name: :false_test
       :desc: "test command returning false > 0"
       :command: "false"
       :schedule:
         :every: "1h"
       :on_failure: :ls_slash_tmp
       :on_success: :pwd
-    :ls_slash_tmp:
+    - :name: :ls_slash_tmp
       :desc: list file in /tmp
       :command: ls -al /tmp
       :user: daemon
       :on_success: :echo1
-    :pwd:
+    - :name: :pwd
       :desc: run pwd
       :command: pwd
       :on_success: :echo1
       :on_failure: :echo2
-    :echo1:
+    - :name: :echo1
       :desc: echo 'foo'
       :command: echo foo
       :on_failure: :echo3
-    :echo2:
+    - :name: :echo2
       :desc: echo 'bar'
       :command: echo bar
-    :echo3:
+    - :name: :echo3
       :desc: echo 'been'
       :command: echo been
-    :rand_sleep_5:
+    - :name: :rand_sleep_5
       :desc: sleep on a rand 5
       :command: ruby -e 'sleep rand(5)'
       :schedule:
         :every: "10s"
-    :test_remote_call:
+    - :name: :test_remote_call
       :desc: remote call test
       :delegate_to:
         :host: omicron

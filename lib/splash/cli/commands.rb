@@ -159,7 +159,7 @@ module CLISplash
       end
       log.info "Command : #{command.to_s}" if depht == 0
       aproc = Proc::new do |command,depht|
-        cmd  = commands.select{|command| command[:name] ==  command.to_sym}.first
+        cmd  = commands.select{|item| item[:name] ==  command.to_sym}.first
         if cmd[:on_failure] then
           spacer=  " " * depht + " "
           log.flat "#{spacer}* on failure => #{cmd[:on_failure]}"
@@ -211,7 +211,7 @@ module CLISplash
         list = get_config.commands
       end
       log.info "Splash configured commands :"
-      log.ko 'No configured commands found' if list.keys.empty?
+      log.ko 'No configured commands found' if list.empty?
       list.each do |command|
         log.item "#{command[:name].to_s}"
         if options[:detail] then
@@ -302,7 +302,7 @@ module CLISplash
                             value[:end_date],
                             value[:exec_time],
                             value[:stdout].empty?,
-                            value[:stdout].empty?]
+                            value[:stderr].empty?]
             end
           end
           if check_unicode_term  then

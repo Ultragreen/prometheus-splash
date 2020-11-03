@@ -96,7 +96,7 @@ module Splash
         @config  = get_config
         @url = @config.prometheus_pushgateway_url
         @name = name
-        unless @config.commands.keys.include? @name.to_sym then
+        unless @config.commands.select{|cmd| cmd[:name] == @name.to_sym }.count > 0 then
           splash_exit case: :not_found, more: "command #{@name} is not defined in configuration"
         end
       end
@@ -139,10 +139,10 @@ module Splash
         session = (options[:session])? options[:session] : get_session
         acase = { :case => :quiet_exit }
         exit_code = 0
-        command = @config.commands.select{|command| command[:name] == @name.to_sym]}.first
+        command = @config.commands.select{|command| command[:name] == @name.to_sym}.first
         if command[:delegate_to] then
           return { :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'} if options[:hostname]
-          log.send "Remote command : #{@name} execution delegate to : #{command[:delegate_to][:host]} as : #{@config.commands[@name.to_sym][:delegate_to][:remote_command]}", session
+          log.send "Remote command : #{@name} execution delegate to : #{command[:delegate_to][:host]} as : #{command[:delegate_to][:remote_command]}", session
           begin
             transport = get_default_client
             if transport.class == Hash  and transport.include? :case then
@@ -175,7 +175,7 @@ module Splash
             exit_code = $?.exitstatus
           else
             log.item "Tracefull execution", session
-            if @config.commands[@name.to_sym][:user] then
+            if command[:user] then
               log.item "Execute with user : #{command[:user]}.", session
               stdout, stderr, status = Open3.capture3("sudo -u #{command[:user]} #{command[:command]}")
             else
@@ -207,10 +207,10 @@ module Splash
         end
         if options[:callback] then
           on_failure = (command[:on_failure])? command[:on_failure] : false
-          on_success = (command[:on_success])? command[@name.to_sym][:on_success] : false
+          on_success = (command[:on_success])? command[:on_success] : false
           if on_failure and exit_code > 0 then
             log.item "On failure callback : #{on_failure}", session
-            if @config.commands.select {|item| item[:name == on_failure]}.count > 0 then
+            if @config.commands.select {|item| item[:name] == on_failure}.count > 0 then
               @name = on_failure.to_s
               call_and_notify options
             else
@@ -219,7 +219,7 @@ module Splash
           end
           if on_success and exit_code == 0 then
             log.item "On success callback : #{on_success}", session
-            if @config.commands.select {|item| item[:name == on_success]}.count > 0 then
+            if @config.commands.select {|item| item[:name] == on_success}.count > 0 then
               @name = on_success.to_s
               call_and_notify options
             else

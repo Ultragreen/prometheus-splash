@@ -155,7 +155,7 @@ module Splash
 
         # prepare commands Scheduling
         def init_commands_scheduling
-          commands = config.select{|command| command.include? :schedule}
+          commands = @config.commands.select{|command| command.include? :schedule}
           commands.each do |command|
             sched,value = command[:schedule].flatten
             @log.arrow "Scheduling command #{command[:name].to_s}"

@@ -14,9 +14,13 @@ module Splash
     class ConfigLinter
       def initialize
         @lints_present = {:logs => [:label, :log, :pattern ],
-                          :processes => [:process, :patterns ]}
+                          :processes => [:process, :patterns ],
+                          :commands => [:name, :desc, :command ]}
         @lints_types = {:logs => {:label => Symbol, :log => String, :pattern => String, :retention => Hash},
-                        :processes  => {:process => Symbol, :patterns => Array, :retention => Hash}}
+                        :processes  => {:process => Symbol, :patterns => Array, :retention => Hash},
+                        :commands => {:name => Symbol, :desc => String, :command => String, :schedule => Hash,
+                                      :retention => Hash, :on_failure => Symbol, :on_success => Symbol,
+                                      :user => String, :delegate_to => Hash}}
       end
 
       def verify(options ={})

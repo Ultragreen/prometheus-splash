@@ -47,3 +47,4 @@ div.uk-width-medium-1-1
                           <li> <b><i>Remote Command</b></i> : #{command[:delegate_to][:remote_command]}</li>
                         </ul>
                 td
+                  input.history-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="History" onclick="location.href='/get_command_history/#{command[:name].to_s}';"

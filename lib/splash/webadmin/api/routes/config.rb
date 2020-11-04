@@ -60,6 +60,25 @@ WebAdminApp.post '/api/config/addprocess.?:format?' do
   format_response(addprocess, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
 
+WebAdminApp.post '/api/config/addcommand.?:format?' do
+  log = get_logger
+  addcommand = {}
+  format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
+  log.call "API : config, verb : POST, route : addcommand, format : #{format}"
+  res = get_config.add_record :record => YAML::load(request.body.read), :type => :commands, :key => :name, :clean => true
+  case res[:status]
+  when :success
+    addcommand = splash_return case: :quiet_exit, :more => "add command done"
+  when :already_exist
+    addcommand = splash_return case: :already_exist, :more => "add command twice not allowed"
+  when :failure
+    addpraddcommandocess = splash_return case: :configuration_error, :more => "add command failed"
+    addcommand[:data] = res
+  end
+  content_type format
+  format_response(addcommand, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
+end
+
 
 
 WebAdminApp.delete '/api/config/deletelog/:label.?:format?' do
@@ -100,4 +119,24 @@ WebAdminApp.delete '/api/config/deleteprocess/:process.?:format?' do
   end
   content_type format
   format_response(deleteprocess, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
+end
+
+WebAdminApp.delete '/api/config/deletecommand/:command.?:format?' do
+  log = get_logger
+  format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
+  log.call "API : config, verb : DELETE, route : deletecommand, format : #{format}"
+  deletecommand = {}
+  cmdrec = Splash::Commands::CmdRecords::new params[:command].to_sym
+  cmdcrec.clear
+  res = get_config.delete_record :type => :commands, :key => :name, name: params[:process].to_sym
+  case res[:status]
+  when :success
+    deletecommand = splash_return case: :quiet_exit, :more => "delete command done"
+  when :not_found
+    deletecommand = splash_return case: :not_found, :more => "nothing done for commands"
+  else
+    deletecommand = splash_return case: :configuration_error, :more => "delete command failed"
+  end
+  content_type format
+  format_response(deletecommand, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end

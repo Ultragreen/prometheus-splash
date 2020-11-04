@@ -1,0 +1,27 @@
+h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;History for command #{@command} executions and monitoring
+
+
+-
+div.uk-width-medium-1-1
+  div.uk-panel.uk-panel-box
+    span.uk-text-large.uk-text-bold List of records
+    br
+    table#logrecords.uk-table.uk-table-hover.uk-table-striped
+      thead
+        tr
+          th Start Date
+          th End Date
+          th Execution time (sec)
+          th Status
+          th STDOUT empty ?
+          th STDERR empty ?
+
+      tbody
+        - @data.each do |key|
+          tr
+            td  #{key.keys.first}
+            td  #{key[key.keys.first][:end_date]}
+            td  #{key[key.keys.first][:exec_time]}
+            td  #{key[key.keys.first][:status].to_s}
+            td  #{key[key.keys.first][:stdout].empty?}
+            td  #{key[key.keys.first][:stderr].empty?}

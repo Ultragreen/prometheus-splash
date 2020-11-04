@@ -26,3 +26,15 @@ WebAdminApp.get '/api/commands/show/:name.?:format?' do
   content_type format
   format_response(obj, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
 end
+
+WebAdminApp.get '/api/commands/history/:name.?:format?' do
+  log = get_logger
+  format = (params[:format])? format_by_extensions(params[:format]) : format_by_extensions('json')
+  log.call "API : commands, verb : GET, route : history, format : #{format}"
+  record = Splash::Commands::CmdRecords::new(params[:name]).get_all_records
+  history =  splash_return case: :quiet_exit, :more => "command monitoring history"
+  history[:data] = record
+  content_type format
+  status 201
+  format_response(history, (params[:format])? format_by_extensions(params[:format]): request.accept.first)
+end

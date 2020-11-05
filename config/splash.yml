@@ -138,7 +138,7 @@
 
 ### configuration of monitored processes
   :processes:
-    - :process: cron
+    - :process: :cron
       :patterns:
         - cron
       :retention:

@@ -17,8 +17,8 @@ div.uk-width-medium-1-1
           th STDERR empty ?
 
       tbody
-        - @data.each do |key|
-          tr
+        - @data.reverse.each do |key|
+          tr class="#{(key[key.keys.first][:status].to_s.split.last == "0")? 'uk-text-success' : 'uk-text-danger'}"
             td  #{key.keys.first}
             td  #{key[key.keys.first][:end_date]}
             td  #{key[key.keys.first][:exec_time]}

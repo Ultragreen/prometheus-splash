@@ -9,8 +9,11 @@ form.uk-form.uk-form-horizontal#query action="/save_process" method="POST"
   label.uk-form-label for="process" Process
   <input class="uk-form-width-large" id="process" type="text" placeholder="process" name="process" value="#{@data[:process].to_s}" required>
   div &nbsp;
-  label.uk-form-label for="patterns" Patterns
+  label.uk-form-label for="patterns" Patterns (separator is "|")
   <input class="uk-form-width-large" id="patterns" type="text" placeholder="patterns" name="patterns" value="#{@data[:patterns]}" required>
+    div &nbsp;
+    label.uk-form-label for="retention" Retention (Like "2 hours, 2 days")
+    <input class="uk-form-width-large" id="retention" type="text" placeholder="retention" name="retention" value="#{@data[:retention]}">
     div &nbsp;
   - unless @data.empty?
     input type="hidden" name="update" value="true"

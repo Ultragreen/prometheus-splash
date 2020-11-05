@@ -74,6 +74,9 @@ div.uk-width-medium-1-1
                           <li> <i><b>Host</b></i> : #{command[:delegate_to][:host]}</li>
                           <li> <b><i>Remote Command</b></i> : #{command[:delegate_to][:remote_command]}</li>
                         </ul>
+                    - if command[:retention].class == Hash
+                      dt <i class="uk-icon-calendar-minus-o"></i>&nbsp;History retention
+                      dd #{command[:retention].flatten.reverse.join(' ')}
                 td
                   input.delete-command.uk-button.uk-button-mini.uk-button-danger id="#{command[:name].to_s}" value="Delete"
                   br

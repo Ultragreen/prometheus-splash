@@ -27,6 +27,10 @@ WebAdminApp.get '/add_modify_process/?:process?' do
     raw = RestClient::Request.execute(method: 'GET', url: url,timeout: 10)
     res = YAML::load(raw)
     @data = res[:data] if res[:status] == :success
+    if @data[:retention].class == Hash then
+      prov = @data[:retention].flatten.reverse.join(' ')
+      @data[:retention] = prov
+    end
     if @data[:patterns].class == Array then
       prov = @data[:patterns].join('|')
       @data[:patterns] = prov
@@ -56,7 +60,20 @@ WebAdminApp.post '/save_process' do
   log.call "WEB : processes, verb : POST, controller : /save_process/?:process?"
   data = {}
   data[:patterns] = params[:patterns].split('|')
-  data[:process] = params[:process].to_sym
+  data[:process] = params[:process].split(' ').first.to_sym
+  if params[:retention].blank?
+    params.delete(:retention)
+  else
+    value, key = params[:retention].split(' ')
+    key = :days if key.nil?
+    key = :days if key == :day
+    key = :hours if key == :hour
+    if [:hours,:days].include? key.to_sym then
+      data[:retention] = {key.to_sym => value.to_i }
+    else
+      params.delete(:retention)
+    end
+  end
   if params[:update] then
     url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/config/deleteprocess/#{params[:old_process]}"
     raw = RestClient::Request.execute(method: 'DELETE', url: url,timeout: 10)

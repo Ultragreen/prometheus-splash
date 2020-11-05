@@ -60,15 +60,18 @@ WebAdminApp.post '/save_log' do
     params.delete(:retention)
   else
     value, key = params[:retention].split(' ')
-    if [:hours,:days].include? key authentification
-      data[:retention] = {key => value.to_i }
+    key = :days if key.nil?
+    key = :days if key == :day
+    key = :hours if key == :hour
+    if [:hours,:days].include? key.to_sym then
+      data[:retention] = {key.to_sym => value.to_i }
     else
       params.delete(:retention)
     end
   end
   data[:log] = params[:log]
   data[:pattern] = params[:pattern]
-  data[:label] = params[:label].to_sym
+  data[:label] = params[:label].split(' ').first.to_sym
   if params[:update] then
     url = "http://#{get_config.webadmin_ip}:#{get_config.webadmin_port}/api/config/deletelog/#{params[:old_label]}"
     raw = RestClient::Request.execute(method: 'DELETE', url: url,timeout: 10)

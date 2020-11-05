@@ -74,10 +74,13 @@ div.uk-width-medium-1-1
             tr id="#{process[:process].to_s}"
               td <b>Process</b> : #{process[:process]}
               td
+                - if process[:retention].class == Hash
+                  div <b>History retention</b> : #{process[:retention].flatten.reverse.join(' ')}
                 span.uk-text-bold Patterns
                 ul
                   - process[:patterns].each do |pattern|
                     li= pattern
+
               td
                 - if @result[process[:process]][:status] == :inexistant
                   div.uk-badge.uk-badge-danger not running

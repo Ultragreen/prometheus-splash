@@ -79,6 +79,8 @@ div.uk-width-medium-1-1
               ul
                 li <b>File</b> : #{log[:log]}
                 li <b>Pattern</b> : #{log[:pattern]}
+                - if log[:retention].class == Hash
+                  li <b>History Retention</b> : #{log[:retention].flatten.reverse.join(' ')}
             td
               - if @result[log[:label]][:status] == :missing
                 div.uk-badge.uk-badge-warning missing

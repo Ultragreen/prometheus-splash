@@ -29,6 +29,10 @@ WebAdminApp.get '/add_modify_log/?:label?' do
     res = YAML::load(raw)
     @data = res[:data] if res[:status] == :success
     @data[:old_label] = params[:label].to_s
+    if @data[:retention].class == Hash then
+      prov = @data[:retention].flatten.reverse.join(' ')
+      @data[:retention] = prov
+    end
   end
   slim :log_form, :format => :html
 end
@@ -52,6 +56,16 @@ WebAdminApp.post '/save_log' do
   log = get_logger
   log.call "WEB : logs, verb : POST, controller : /save_log/?:label?"
   data = {}
+  if params[:retention].blank?
+    params.delete(:retention)
+  else
+    value, key = params[:retention].split(' ')
+    if [:hours,:days].include? key authentification
+      data[:retention] = {key => value.to_i }
+    else
+      params.delete(:retention)
+    end
+  end
   data[:log] = params[:log]
   data[:pattern] = params[:pattern]
   data[:label] = params[:label].to_sym

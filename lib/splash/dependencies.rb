@@ -50,6 +50,7 @@ module Splash
 
 
     # Splash
+    require 'splash/monkeys'
     require 'splash/constants'
     require 'splash/helpers'
     require 'splash/config'

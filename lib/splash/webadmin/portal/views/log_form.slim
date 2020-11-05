@@ -15,6 +15,9 @@ form.uk-form.uk-form-horizontal#query action="/save_log" method="POST"
   label.uk-form-label for="log" Log file
   <input class="uk-form-width-large" id="log" type="text" placeholder="log" name="log" value="#{@data[:log]}" required>
   div &nbsp;
+  label.uk-form-label for="retention" Retention (Like "2 hours, 2 days")
+  <input class="uk-form-width-large" id="retention" type="text" placeholder="retention" name="retention" value="#{@data[:retention]}">
+  div &nbsp;
   - unless @data.empty?
     input type="hidden" name="update" value="true"
     input type="hidden" name="old_label" value="#{@data[:old_label].to_s}"

@@ -127,8 +127,8 @@ WebAdminApp.delete '/api/config/deletecommand/:command.?:format?' do
   log.call "API : config, verb : DELETE, route : deletecommand, format : #{format}"
   deletecommand = {}
   cmdrec = Splash::Commands::CmdRecords::new params[:command].to_sym
-  cmdcrec.clear
-  res = get_config.delete_record :type => :commands, :key => :name, name: params[:process].to_sym
+  cmdrec.clear
+  res = get_config.delete_record :type => :commands, :key => :name, name: params[:command].to_sym
   case res[:status]
   when :success
     deletecommand = splash_return case: :quiet_exit, :more => "delete command done"

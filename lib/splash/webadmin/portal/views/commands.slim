@@ -1,14 +1,42 @@
 h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Commands configured in Splash
 
+javascript:
+  $(document).on( 'click','input.delete-command',function(){
+    var id = this.id;
+    var url = "/api/config/deletecommand/" +  id + ".json";
+    UIkit.modal.confirm('Are you sure?', function(){
+      console.debug(url)
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        success: function( data ) {
+          console.debug(data)
+          if (data['status'] == 'success') {
+            $('div#commandrecords h3#' + id).remove();
+            $('div#commandrecords div#' + id).remove();
+            UIkit.notify("Deleting log for " + id + " done", {status:'success'});
+          }
+          else
+          {
+            UIkit.notify("Deleting log for " + id + " failed !", {status:'danger'});
+          }
+        },
+        error: function(e) {
+          UIkit.notify("Deleting log for " + id + " failed !", {status:'danger'});
+        }
+      });
+    });
+  });
+
 div.uk-width-medium-1-1
   div.uk-panel.uk-panel-box
     span.uk-text-large.uk-text-bold List of commands availables
     br
 
-    div.uk-accordion(data-uk-accordion)
-      - @data.each do |command|
-        h3.uk-accordion-title <b>Name</b> : #{command[:name]}
-        div.uk-accordion-content
+    div#commandrecords.uk-accordion(data-uk-accordion)
+      - @data.reverse.each do |command|
+        h3.uk-accordion-title id="#{command[:name].to_s}" <b>Name</b> : #{command[:name]}
+        div.uk-accordion-content id="#{command[:name].to_s} "
           table.uk-table.uk-table-hover.uk-table-striped
             thead
               tr
@@ -47,4 +75,6 @@ div.uk-width-medium-1-1
                           <li> <b><i>Remote Command</b></i> : #{command[:delegate_to][:remote_command]}</li>
                         </ul>
                 td
-                  input.history-log.uk-button.uk-button-mini.uk-button-primary id="#{log[:label].to_s}" value="History" onclick="location.href='/get_command_history/#{command[:name].to_s}';"
+                  input.delete-command.uk-button.uk-button-mini.uk-button-danger id="#{command[:name].to_s}" value="Delete"
+                  br
+                  input.history-command.uk-button.uk-button-mini.uk-button-primary id="#{command[:name].to_s}" value="History" onclick="location.href='/get_command_history/#{command[:name].to_s}';"

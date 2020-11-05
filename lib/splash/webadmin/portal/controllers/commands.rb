@@ -9,7 +9,7 @@ WebAdminApp.get '/commands' do
 end
 
 WebAdminApp.get '/get_command_history/:command' do
-  get_menu 0
+  get_menu 2
   log = get_logger
   log.call "WEB : commands, verb : GET, controller : /get_command_history/:command"
   @data = {}

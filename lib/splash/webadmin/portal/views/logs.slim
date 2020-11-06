@@ -74,25 +74,25 @@ div.uk-width-medium-1-1
       tbody
         - @data.each do |log|
           tr id="#{log[:label].to_s}"
-            td <b>Label</b> : #{log[:label]}
+            td <i class="uk-icon-tag"></i>&nbsp;<b>Label</b> : #{log[:label]}
             td
               ul
-                li <b>File</b> : #{log[:log]}
-                li <b>Pattern</b> : #{log[:pattern]}
+                li <i class="uk-icon-file"></i>&nbsp;<b>File</b> : #{log[:log]}
+                li <i class="uk-icon-binoculars"></i>&nbsp;<b>Pattern</b> : #{log[:pattern]}
                 - if log[:retention].class == Hash
-                  li <b>History retention</b> : #{log[:retention].flatten.reverse.join(' ')}
+                  li <i class="uk-icon-calendar-minus-o"></i>&nbsp;<b>History retention</b> : #{log[:retention].flatten.reverse.join(' ')}
             td
               - if @result[log[:label]][:status] == :missing
                 div.uk-badge.uk-badge-warning missing
               - if @result[log[:label]][:status] == :clean
                 div.uk-badge.uk-badge-success success
                 ul
-                  li <b>Lines count</b> : #{@result[log[:label]][:lines]}
+                  li <i class="uk-icon-asterisk"></i>&nbsp;<b>Lines count</b> : #{@result[log[:label]][:lines]}
               - if @result[log[:label]][:status] == :matched
                 div.uk-badge.uk-badge-danger matched
                 ul
-                  li <b>Lines count</b> : #{@result[log[:label]][:lines]}
-                  li <b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>
+                  li <i class="uk-icon-asterisk"></i>&nbsp;<b>Lines count</b> : #{@result[log[:label]][:lines]}
+                  li <i class="uk-icon-bolt"></i>&nbsp;<b class="uk-text-danger">Matchs count : #{@result[log[:label]][:count]} </b>
             td
               input.delete-log.uk-button.uk-button-mini.uk-button-danger id="#{log[:label].to_s}" value="Delete"
               br

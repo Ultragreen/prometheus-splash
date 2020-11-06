@@ -35,7 +35,7 @@ div.uk-width-medium-1-1
 
     div#commandrecords.uk-accordion(data-uk-accordion)
       - @data.reverse.each do |command|
-        h3.uk-accordion-title id="#{command[:name].to_s}" <b>Name</b> : #{command[:name]}
+        h3.uk-accordion-title id="#{command[:name].to_s}" <i class="uk-icon-play-circle-o"></i>&nbsp;<b>Name</b> : #{command[:name]}
         div.uk-accordion-content id="#{command[:name].to_s} "
           table.uk-table.uk-table-hover.uk-table-striped
             thead
@@ -80,4 +80,10 @@ div.uk-width-medium-1-1
                 td
                   input.delete-command.uk-button.uk-button-mini.uk-button-danger id="#{command[:name].to_s}" value="Delete"
                   br
+                  input.modify-process.uk-button.uk-button-mini.uk-button-primary id="#{command[:name].to_s}" value="Modify" onclick="location.href='/add_modify_command/#{command[:name].to_s}';"
+                  br
                   input.history-command.uk-button.uk-button-mini.uk-button-primary id="#{command[:name].to_s}" value="History" onclick="location.href='/get_command_history/#{command[:name].to_s}';"
+  div.uk-align-right
+    form.uk-form.uk-form-horizontal#query action="/add_modify_command" method="GET"
+      div &nbsp;
+      input.add-process.uk-button type="submit" value="Add new process"

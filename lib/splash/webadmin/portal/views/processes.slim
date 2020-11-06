@@ -72,11 +72,11 @@ div.uk-width-medium-1-1
         tbody
           - @data.each do |process|
             tr id="#{process[:process].to_s}"
-              td <b>Process</b> : #{process[:process]}
+              td <i class="uk-icon-cog"></i>&nbsp;<b>Process</b> : #{process[:process]}
               td
                 - if process[:retention].class == Hash
-                  div <b>History retention</b> : #{process[:retention].flatten.reverse.join(' ')}
-                span.uk-text-bold Patterns
+                  div <i class="uk-icon-calendar-minus-o"></i>&nbsp;<b>History retention</b> : #{process[:retention].flatten.reverse.join(' ')}
+                span.uk-text-bold <i class="uk-icon-binoculars"></i>&nbsp; Patterns
                 ul
                   - process[:patterns].each do |pattern|
                     li= pattern
@@ -87,8 +87,8 @@ div.uk-width-medium-1-1
                 - if @result[process[:process]][:status] == :running
                   div.uk-badge.uk-badge-success running
                   ul
-                    li <b>CPU usage</b> : #{@result[process[:process]][:cpu]}
-                    li <b>MEM usage</b> : #{@result[process[:process]][:mem]}
+                    li <i class="uk-icon-percent"></i>&nbsp;<b>CPU usage</b> : #{@result[process[:process]][:cpu]}
+                    li <i class="uk-icon-percent"></i>&nbsp;<b>MEM usage</b> : #{@result[process[:process]][:mem]}
               td
                 input.delete-process.uk-button.uk-button-mini.uk-button-danger id="#{process[:process].to_s}" value="Delete"
                 br

@@ -185,3 +185,12 @@
 ### FIX
 
 * always missing status for log history #65
+
+
+## V 0.8.5
+
+### FEATURE
+
+* WebUI R/W commands, logs, processes
+* cosmetics
+* multiples fix, debugging

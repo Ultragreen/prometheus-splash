@@ -25,12 +25,17 @@ module Splash
         list[name][:definition].each do |step|
           log.info "STEP : #{step[:step]}",session
           if step[:on_host].nil? then
-            command =  CommandWrapper::new(step[:command].to_s)
+            if get_config.commands.select{|cmd| cmd[:name] == step[:command]}.count > 0 then
+              command =  CommandWrapper::new(step[:command].to_s)
               step[:callback] = true if step[:callback].nil?
               step[:trace] = true if step[:trace].nil?
               step[:notify] = true if step[:notify].nil?
               step[:session] = session
               acase = command.call_and_notify step
+            else
+              log.error "Commmand #{step[:command]} not found, for STEP : #{step[:step]}", session
+              acase =  splash_return :not_found
+            end
           else
             log.info "Remote execution of #{step[:command]} on #{step[:on_host]}", session
             begin

@@ -1,5 +1,12 @@
 h2.uk-text-success <i class="uk-icon-#{@menu_icons[@current_item]} uk-icon-medium "></i>&nbsp;&nbsp;Commands configured in Splash
 
+- unless @log_saved.nil?
+  javascript:
+    UIkit.notify("Command definition #{@command_saved} saved", {status:'success'});
+- unless @log_failed.nil?
+  javascript:
+    UIkit.notify("Command definition #{@command_saved} not saved", {status:'danger'});
+
 javascript:
   $(document).on( 'click','input.delete-command',function(){
     var id = this.id;
@@ -50,7 +57,10 @@ div.uk-width-medium-1-1
                     dd #{command[:desc]}
                     - if command[:command]
                       dt <i class="uk-icon-cog"></i>&nbsp;Command Line
-                      dd #{command[:command]}
+                      - if command[:delegate_to]
+                        dd.uk-text-danger #{command[:command]} <i>(ignored because delegate_to is set)</i>
+                      - else
+                        dd #{command[:command]}
                     - if command[:schedule]
                       dt <i class="uk-icon-calendar"></i>&nbsp;Schedule
                       dd

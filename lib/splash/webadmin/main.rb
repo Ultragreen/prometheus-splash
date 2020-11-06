@@ -9,6 +9,7 @@ class WebAdminApp < Sinatra::Base
   include Splash::Daemon::Controller
   include Splash::Logs
   include Splash::Processes
+  include Splash::Transports
 
   set :server, 'thin'
   set :port, get_config.webadmin_port
@@ -21,7 +22,18 @@ class WebAdminApp < Sinatra::Base
     rehash_config
   end
 
-
+  def rehash_daemon
+    status = get_processes({ :pattern => get_config.daemon_process_name}).empty?
+    if status == false then
+      transport = get_default_client
+      unless transport.class == Hash  and transport.include? :case then
+        transport.publish queue: "splash.#{Socket.gethostname}.input",
+                          message: { :verb => :reset,
+                            :return_to => :ignore,
+                            :queue => "splash.#{Socket.gethostname}.input" }.to_yaml
+      end
+    end
+  end
 
 end
 

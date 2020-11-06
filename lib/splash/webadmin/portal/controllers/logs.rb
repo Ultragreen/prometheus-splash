@@ -54,19 +54,16 @@ end
 WebAdminApp.post '/save_log' do
   get_menu 0
   log = get_logger
-  log.call "WEB : logs, verb : POST, controller : /save_log/?:label?"
+  log.call "WEB : logs, verb : POST, controller : /save_log "
   data = {}
-  if params[:retention].blank?
-    params.delete(:retention)
-  else
+  unless params[:retention].blank?
     value, key = params[:retention].split(' ')
-    key = :days if key.nil?
+    key = (key.nil?)? :days : key.to_sym
+    value = value.to_i
     key = :days if key == :day
     key = :hours if key == :hour
-    if [:hours,:days].include? key.to_sym then
-      data[:retention] = {key.to_sym => value.to_i }
-    else
-      params.delete(:retention)
+    if [:hours,:days].include? key then
+      data[:retention] = {key => value}
     end
   end
   data[:log] = params[:log]

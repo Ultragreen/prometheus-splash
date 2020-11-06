@@ -30,6 +30,7 @@ WebAdminApp.post '/api/config/addlog.?:format?' do
   res = get_config.add_record :record => YAML::load(request.body.read), :key => :label, :type => :logs, :clean => true
   case res[:status]
   when :success
+    rehash_daemon
     addlog = splash_return case: :quiet_exit, :more => "add log done"
   when :already_exist
     addlog = splash_return case: :already_exist, :more => "add log twice nto allowed"
@@ -49,6 +50,7 @@ WebAdminApp.post '/api/config/addprocess.?:format?' do
   res = get_config.add_record :record => YAML::load(request.body.read), :type => :processes, :key => :process, :clean => true
   case res[:status]
   when :success
+    rehash_daemon
     addprocess = splash_return case: :quiet_exit, :more => "add process done"
   when :already_exist
     addprocess = splash_return case: :already_exist, :more => "add process twice not allowed"
@@ -68,6 +70,7 @@ WebAdminApp.post '/api/config/addcommand.?:format?' do
   res = get_config.add_record :record => YAML::load(request.body.read), :type => :commands, :key => :name, :clean => true
   case res[:status]
   when :success
+    rehash_daemon
     addcommand = splash_return case: :quiet_exit, :more => "add command done"
   when :already_exist
     addcommand = splash_return case: :already_exist, :more => "add command twice not allowed"
@@ -91,6 +94,7 @@ WebAdminApp.delete '/api/config/deletelog/:label.?:format?' do
   res = get_config.delete_record :type => :logs, key: :label, label: params[:label].to_sym
   case res[:status]
   when :success
+    rehash_daemon
     deletelog = splash_return case: :quiet_exit, :more => "delete log done"
   when :not_found
     deletelog = splash_return case: :not_found, :more => "nothing done for logs"
@@ -111,6 +115,7 @@ WebAdminApp.delete '/api/config/deleteprocess/:process.?:format?' do
   res = get_config.delete_record :type => :processes, :key => :process, process: params[:process].to_sym
   case res[:status]
   when :success
+    rehash_daemon
     deleteprocess = splash_return case: :quiet_exit, :more => "delete process done"
   when :not_found
     deleteprocess = splash_return case: :not_found, :more => "nothing done for processes"
@@ -131,6 +136,7 @@ WebAdminApp.delete '/api/config/deletecommand/:command.?:format?' do
   res = get_config.delete_record :type => :commands, :key => :name, name: params[:command].to_sym
   case res[:status]
   when :success
+    rehash_daemon
     deletecommand = splash_return case: :quiet_exit, :more => "delete command done"
   when :not_found
     deletecommand = splash_return case: :not_found, :more => "nothing done for commands"

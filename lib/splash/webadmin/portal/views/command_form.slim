@@ -6,28 +6,30 @@
 script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"
 
 form.uk-form.uk-form-horizontal#query action="/save_command" method="POST"
+  div.uk-text-bold Definition
   label.uk-form-label for="name" Name
   <input class="uk-form-width-large" id="name" type="text" placeholder="name" name="name" value="#{@data[:name].to_s}" required>
   div &nbsp;
   label.uk-form-label for="command" Command
-  <input class="uk-form-width-large" id="command" type="text" placeholder="command" name="command" value="#{@data[:command].to_s}" required>
+  <input class="uk-form-width-large" id="command" type="text" placeholder="command" name="command" value="#{@data[:command].to_s}">
   div &nbsp;
   label.uk-form-label for="desc" Description
   <input class="uk-form-width-large" id="desc" type="text" placeholder="description" name="desc" value="#{@data[:desc]}" required>
   div &nbsp;
   label.uk-form-label for="desc" Become User
-  <input class="uk-form-width-large" id="user" type="text" placeholder="user" name="user" value="#{@data[:user]}" required>
+  <input class="uk-form-width-large" id="user" type="text" placeholder="user" name="user" value="#{@data[:user]}">
   div &nbsp;
   label.uk-form-label for="retention" Retention (Like "2 hours, 2 days")
   <input class="uk-form-width-large" id="retention" type="text" placeholder="retention" name="retention" value="#{@data[:retention]}">
   div &nbsp;
   label.uk-form-label for="schedule" Scheduling (Like "'every 10m', 'in 1h', 'at 12:00'")
-  <input class="uk-form-width-large" id="retention" type="text" placeholder="scheduling" name="retention" value="#{@data[:schedule]}">
+  <input class="uk-form-width-large" id="schedule" type="text" placeholder="scheduling" name="schedule" value="#{@data[:schedule]}">
   div &nbsp;
   label.uk-form-label for="delegate_to" Delegation (Like "task_name@hostname")
   <input class="uk-form-width-large" id="delegate_to" type="text" placeholder="delegation" name="delegate_to" value="#{@data[:delegate_to]}">
   div &nbsp;
-  div.uk-text-large.uk-text-bold Callbacks
+  div &nbsp;
+  div.uk-text-bold Callbacks
   label.uk-form-label for="on_success" On success
   <input class="uk-form-width-large" id="on_success" type="text" placeholder="on success" name="on_success" value="#{@data[:on_success]}">
   div &nbsp;
@@ -36,7 +38,7 @@ form.uk-form.uk-form-horizontal#query action="/save_command" method="POST"
   div &nbsp;
   - unless @data.empty?
     input type="hidden" name="update" value="true"
-    input type="hidden" name="old_process" value="#{@data[:old_command].to_s}"
+    input type="hidden" name="old_command" value="#{@data[:old_command].to_s}"
   div.uk-align-right
     input.uk-button.uk-button-small-primary type="submit" value="Submit"
 javascript:

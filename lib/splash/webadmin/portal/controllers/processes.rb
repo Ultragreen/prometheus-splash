@@ -57,21 +57,18 @@ end
 WebAdminApp.post '/save_process' do
   get_menu 1
   log = get_logger
-  log.call "WEB : processes, verb : POST, controller : /save_process/?:process?"
+  log.call "WEB : processes, verb : POST, controller : /save_process"
   data = {}
   data[:patterns] = params[:patterns].split('|')
   data[:process] = params[:process].split(' ').first.to_sym
-  if params[:retention].blank?
-    params.delete(:retention)
-  else
+  unless params[:retention].blank?
     value, key = params[:retention].split(' ')
-    key = :days if key.nil?
+    key = (key.nil?)? :days : key.to_sym
+    value = value.to_i
     key = :days if key == :day
     key = :hours if key == :hour
-    if [:hours,:days].include? key.to_sym then
-      data[:retention] = {key.to_sym => value.to_i }
-    else
-      params.delete(:retention)
+    if [:hours,:days].include? key then
+      data[:retention] = {key => value}
     end
   end
   if params[:update] then

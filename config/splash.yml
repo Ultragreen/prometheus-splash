@@ -114,7 +114,9 @@
       :desc: sleep on a rand 5
       :command: ruby -e 'sleep rand(5)'
       :schedule:
-        :every: "10s"
+        :every: "30s"
+      :retention:
+        :hours: 1
     - :name: :test_remote_call
       :desc: remote call test
       :delegate_to:

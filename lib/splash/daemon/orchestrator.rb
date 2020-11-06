@@ -84,7 +84,7 @@ module Splash
             if VERBS.include? content[:verb]
               @log.receive "Valid remote order, verb : #{content[:verb].to_s}", session
               res = self.send content[:verb], content
-              get_default_client.publish queue: content[:return_to], message: res.to_yaml
+              get_default_client.publish queue: content[:return_to], message: res.to_yaml unless content[:return_to] == :ignore
               @log.send "Result to #{content[:return_to]}.", session
             else
               @log.receive "INVALID remote order, verb : #{content[:verb].to_s}", session

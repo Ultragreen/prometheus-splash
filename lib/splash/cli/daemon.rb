@@ -99,7 +99,7 @@ module CLISplash
     end
 
     # Thor method : sending reset verb over transport in the input queue of Splashd
-    desc "getjobs", "send a reset verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
+    desc "reset", "send a reset verb to HOSTNAME daemon over transport (need an active tranport), Typicallly RabbitMQ"
     def reset(hostname=Socket.gethostname)
       log = get_logger
       log.info "ctrl+c for interrupt"

@@ -148,6 +148,7 @@ module Splash
         if command[:delegate_to] then
           return { :case => :options_incompatibility, :more => '--hostname forbidden with delagate commands'} if options[:hostname]
           log.send "Remote command : #{@name} execution delegate to : #{command[:delegate_to][:host]} as : #{command[:delegate_to][:remote_command]}", session
+          log.warn "Local command : #{command[:command]} defined but ignored, because delegate have the priority"
           begin
             transport = get_default_client
             if transport.class == Hash  and transport.include? :case then
@@ -219,7 +220,8 @@ module Splash
               @name = on_failure.to_s
               call_and_notify options
             else
-              acase = { :case => :configuration_error , :more => "on_failure call error : #{on_failure} command inexistant."}
+              log.error "on_failure call error : #{on_failure.to_s} command inexistant.", session
+              acase = { :case => :configuration_error , :more => "Command #{command[:name]} callback coniguration error"}
             end
           end
           if on_success and exit_code == 0 then
@@ -228,7 +230,8 @@ module Splash
               @name = on_success.to_s
               call_and_notify options
             else
-              acase = { :case => :configuration_error , :more => "on_success call error : #{on_failure} command inexistant."}
+              log.error "on_success call error : #{on_success.to_s} command inexistant."
+              acase = { :case => :configuration_error , :more => "Command #{command[:name]} callback coniguration error"}
             end
           end
         else

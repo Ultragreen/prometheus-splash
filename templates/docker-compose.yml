@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:latest
+
+  splash:
+    build: .
+    env_file: .env
+    ports:
+      - 9234:9234
+    depends_on:
+      - redis
+

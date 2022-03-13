@@ -20,6 +20,7 @@ module Splash
       # Start the Splash Daemon
       # @param [Hash] options
       # @option options [Symbol] :quiet activate quiet mode for log (limit to :fatal)
+      # @option options [Symbol] :foreground run webadmin in foreground
       # @return [Hash] Exiter Case (:quiet_exit, :already_exist, :unknown_error or other)
       def startweb(options = {})
         require 'splash/webadmin/main'
@@ -37,7 +38,8 @@ module Splash
           daemon_config = {:description => config.webadmin_process_name,
               :pid_file => config.webadmin_full_pid_path,
               :stdout_trace => config.webadmin_full_stdout_trace_path,
-              :stderr_trace => config.webadmin_full_stderr_trace_path
+              :stderr_trace => config.webadmin_full_stderr_trace_path,
+              :foreground => options[:foreground]
             }
 
           ["int","term","hup"].each do |type| daemon_config["sig#{type}_handler".to_sym] = Proc::new {  WebAdminApp.quit! } end

@@ -35,9 +35,10 @@ module CLISplash
     long_desc <<-LONGDESC
     Starting Splash Daemon\n
     LONGDESC
+    option :foreground, :type => :boolean,  :aliases => "-F"
     desc "start", "Splash WebAdmin Daemon status"
     def start
-      acase = run_as_root :startweb
+      acase = run_as_root :startweb, options
       splash_exit acase
     end
 

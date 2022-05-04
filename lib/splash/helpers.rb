@@ -358,7 +358,7 @@ module Splash
     # @return [Boolean]
     def check_unicode_term
       return false unless ENV.include? "TERM"
-      if ENV.values_at("LC_ALL","LC_CTYPE","LANG").compact.first.include?("UTF-8") and ENV.values_at('TERM').first.include? "xterm" then
+      if ENV.values_at("LC_ALL","LC_CTYPE","LANG").compact.include?("UTF-8") and ENV.values_at('TERM').include? "xterm" then
         return true
       else
         return false

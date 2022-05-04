@@ -100,9 +100,9 @@ module Splash
           else
             sched,value = @config.daemon_procmon_scheduling.flatten
             @log.item "Initializing logs monitorings & notifications."
-            @log_result = LogScanner::new
             @server.send sched,value do
               begin
+                @log_result = LogScanner::new
                 session = get_session
                 @metric_manager.inc_logs_monitoring
                 @log.trigger "Logs monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session
@@ -122,9 +122,9 @@ module Splash
           else
             sched,value = @config.daemon_logmon_scheduling.flatten
             @log.item "Initializing processes monitorings & notifications."
-            @process_result = ProcessScanner::new
             @server.send sched,value do
               begin
+                @process_result = ProcessScanner::new
                 session = get_session
                 @metric_manager.inc_processes_monitoring
                 @log.trigger "Processes monitoring for Scheduling : #{sched.to_s} #{value.to_s}", session

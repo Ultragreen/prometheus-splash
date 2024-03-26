@@ -35,7 +35,7 @@ module Splash
         @@metric_count.set(@errors, labels: { log: @name })
         @@metric_lines.set(@lines, labels: { log: @name })
         hostname = Socket.gethostname
-        return Prometheus::Client::Push.new("Splash", hostname, @url).add(@@registry)
+        return Prometheus::Client::Push.new(job: "Splash", grouping_key: { instance: hostname}, gateway: @url).add(@@registry)
       end
 
     end

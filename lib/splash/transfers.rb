@@ -40,7 +40,7 @@ module Splash
         @@metric_nbfiles_failed.set(@nbfiles_failed)
         @@metric_time.set(@time)
         hostname = Socket.gethostname
-        return Prometheus::Client::Push.new(@name, hostname, @url).add(@@registry)
+        return Prometheus::Client::Push.new(job: @name, grouping_key: { instance: hostname}, gateway: @url).add(@@registry)
       end
 
     end

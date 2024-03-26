@@ -37,7 +37,7 @@ module Splash
         @@metric_cpu_percent.set(@cpu_percent, labels: { process: @name })
         @@metric_status.set(@status, labels: { process: @name })
         hostname = Socket.gethostname
-        return Prometheus::Client::Push.new("Splash", hostname, @url).add(@@registry)
+        return Prometheus::Client::Push.new(job: "Splash", grouping_key: { instance: hostname}, gateway: @url).add(@@registry)
       end
 
     end

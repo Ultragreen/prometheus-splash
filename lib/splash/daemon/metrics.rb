@@ -88,7 +88,7 @@ module Splash
 
           hostname = Socket.gethostname
           url = @config.prometheus_pushgateway_url
-          Prometheus::Client::Push.new('Splash',hostname, url).add(@registry)
+          Prometheus::Client::Push.new(job: "Splash", grouping_key: { instance: hostname}, gateway: url).add(@registry)
           log.debug "Sending to Prometheus PushGateway done.", @session
           return {:case => :quiet_exit }
         end

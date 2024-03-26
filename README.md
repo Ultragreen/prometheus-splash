@@ -9,7 +9,7 @@ SPLASH is **Supervision with Prometheus of Logs and Asynchronous tasks orchestra
 * Web : http://www.ultragreen.net
 * Github : https://github.com/Ultragreen/prometheus-splash
 * Rubygems : https://rubygems.org/gems/prometheus-splash
-* DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.8.5
+* DOC yardoc : https://www.rubydoc.info/gems/prometheus-splash/0.9.1
 
 Prometheus Logs and Batchs supervision over PushGateway
 
